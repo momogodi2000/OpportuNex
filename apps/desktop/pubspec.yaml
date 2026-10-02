@@ -1,0 +1,111 @@
+name: opportunex
+description: "OpportuNex — Votre assistant intelligent pour les opportunités publiques et privées"
+publish_to: none
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # ── State management ──────────────────────────────────────────────────────
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  hooks_riverpod: ^2.6.1
+
+  # ── Navigation ────────────────────────────────────────────────────────────
+  go_router: ^17.5.0
+
+  # ── Networking ───────────────────────────────────────────────────────────
+  dio: ^5.7.0
+  web_socket_channel: ^3.0.1
+
+  # ── Data models ───────────────────────────────────────────────────────────
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # ── Secure storage (OS keychain) ──────────────────────────────────────────
+  flutter_secure_storage: ^9.2.4
+
+  # ── Desktop window / tray ─────────────────────────────────────────────────
+  window_manager: ^0.4.3
+  tray_manager: ^0.2.4
+
+  # ── Notifications ─────────────────────────────────────────────────────────
+  local_notifier: ^0.1.6
+
+  # ── Internationalisation ──────────────────────────────────────────────────
+  intl: ^0.20.2
+
+  # ── Charts (dashboard) ────────────────────────────────────────────────────
+  fl_chart: ^1.2.0
+
+  # ── Markdown rendering ────────────────────────────────────────────────────
+  flutter_markdown: ^0.7.4
+
+  # ── File picking / launching ──────────────────────────────────────────────
+  url_launcher: ^6.3.1
+  file_picker: ^8.1.7
+
+  # ── UI utilities ──────────────────────────────────────────────────────────
+  gap: ^3.0.1
+  shimmer: ^3.0.0
+  animations: ^2.0.11
+  badges: ^3.1.2
+
+  # ── Icons ─────────────────────────────────────────────────────────────────
+  hugeicons: ^0.0.7
+
+  # ── Process management (launch Python engine) ─────────────────────────────
+  # Built-in dart:io used directly for Process management
+
+  # ── Logging ───────────────────────────────────────────────────────────────
+  logging: ^1.3.0
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.5.4
+  freezed: ^2.5.8
+  json_serializable: ^6.9.0
+  riverpod_generator: ^2.6.1
+  mocktail: ^1.0.4
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+    - assets/sources/          # Initial 60+ source catalog JSON
+    - assets/i18n/             # Translation ARB fallback
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Inter-ExtraBold.ttf
+          weight: 800
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+          weight: 400
+
+  generate: true    # For flutter_localizations ARB generation
