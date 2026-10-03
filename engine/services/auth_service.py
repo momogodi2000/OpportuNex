@@ -15,7 +15,7 @@ import structlog
 
 from domain.entities.entities import User
 from persistence.models.all_models import UserModel, UserSession, SecurityEvent
-from persistence.repositories.user_repo import UserRepository
+from persistence.repositories.user_repo import UserRepo
 from security.crypto import (
     hash_password,
     verify_password,
@@ -43,7 +43,7 @@ class AuthError(Exception):
 class AuthService:
     """Handles all authentication operations."""
 
-    def __init__(self, user_repo: UserRepository) -> None:
+    def __init__(self, user_repo: UserRepo) -> None:
         self._repo = user_repo
 
     async def register(

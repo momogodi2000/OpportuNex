@@ -22,7 +22,7 @@ void main() async {
 
   // Setup tray_manager
   await trayManager.setIcon(
-    'assets/images/tray_icon.png', // Ensure this exists or catch error
+    'assets/images/icon.png', // Ensure this exists or catch error
   );
 
   // Custom structlog-style logging could be initialized here

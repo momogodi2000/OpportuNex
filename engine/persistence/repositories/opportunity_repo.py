@@ -55,8 +55,38 @@ class OpportunityRepo:
         cursor: Optional[str] = None,
         limit: int = 20,
     ) -> tuple[list[dict], Optional[str]]:
-        # TODO: Implement full filtering and pagination
-        return [], None
+        
+        stmt = select(OpportunityModel)
+        
+        if country:
+            stmt = stmt.where(OpportunityModel.country_code == country)
+        if language:
+            stmt = stmt.where(OpportunityModel.language_code == language)
+        if deadline_before:
+            stmt = stmt.where(OpportunityModel.deadline_on <= deadline_before)
+        if deadline_after:
+            stmt = stmt.where(OpportunityModel.deadline_on >= deadline_after)
+            
+        # Basic pagination based on created_at or id could be implemented, skipping for now
+        stmt = stmt.limit(limit)
+        
+        result = await self.session.execute(stmt)
+        opps = result.scalars().all()
+        
+        items = []
+        for opp in opps:
+            items.append({
+                "id": opp.id,
+                "title": opp.title,
+                "organization": opp.organization_name,
+                "summary": opp.summary,
+                "country_code": opp.country_code,
+                "deadline": opp.deadline_on,
+                "status": opp.verification_status,
+                "url": opp.canonical_url
+            })
+            
+        return items, None
 
     async def get_dashboard_counters(self, user_id: str) -> dict:
         return {"total": 0, "saved": 0, "applied": 0}

@@ -1,8 +1,11 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, EmailStr, validator
-import hmac
-import time
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Dict, Any, List
+
+from persistence.database import get_db_session
+from sqlalchemy.ext.asyncio import AsyncSession
+from services.auth_service import AuthService, AuthError
+from persistence.repositories.user_repo import UserRepo
 
 router = APIRouter(tags=["auth"])
 
@@ -12,7 +15,7 @@ class RegisterRequest(BaseModel):
     password: str
     confirm_password: str
 
-    @validator('password')
+    @field_validator('password')
     def password_complexity(cls, v: str) -> str:
         if len(v) < 12:
             raise ValueError("Password must be at least 12 characters")
@@ -22,43 +25,49 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-LOGIN_ATTEMPTS: Dict[str, Dict[str, Any]] = {}
+def get_auth_service(db: AsyncSession = Depends(get_db_session)) -> AuthService:
+    repo = UserRepo(db)
+    return AuthService(repo)
 
 @router.post("/auth/register")
-async def register(req: RegisterRequest) -> Dict[str, Any]:
-    if not hmac.compare_digest(req.password.encode(), req.confirm_password.encode()):
-        raise HTTPException(400, "Passwords do not match")
-    return {"user_id": "uuid", "display_name": req.name, "recovery_phrase": "phrase"}
+async def register(req: RegisterRequest, auth: AuthService = Depends(get_auth_service)) -> Dict[str, Any]:
+    try:
+        user_id, display_name, recovery_phrase = await auth.register(
+            display_name=req.name,
+            email=req.email,
+            password=req.password,
+            confirm_password=req.confirm_password,
+        )
+        return {"user_id": user_id, "display_name": display_name, "recovery_phrase": recovery_phrase}
+    except AuthError as e:
+        raise HTTPException(status_code=400, detail=e.message)
 
 @router.post("/auth/login")
-async def login(req: LoginRequest) -> Dict[str, Any]:
-    email = req.email
-    now = time.time()
-    
-    if email in LOGIN_ATTEMPTS:
-        attempt_info = LOGIN_ATTEMPTS[email]
-        failures = attempt_info.get("failures", 0)
-        lockout_until = attempt_info.get("lockout_until", 0)
-        
-        if now < lockout_until:
-            raise HTTPException(429, f"Account locked until {lockout_until}")
-            
-    success = False
-    
-    if not success:
-        if email not in LOGIN_ATTEMPTS:
-            LOGIN_ATTEMPTS[email] = {"failures": 1, "lockout_until": 0}
-        else:
-            LOGIN_ATTEMPTS[email]["failures"] += 1
-            f = LOGIN_ATTEMPTS[email]["failures"]
-            if f >= 5:
-                delays = {5: 30, 6: 120, 7: 900, 8: 3600}
-                delay = delays.get(f, 3600 * 24 * 365 * 100)
-                LOGIN_ATTEMPTS[email]["lockout_until"] = now + delay
-        raise HTTPException(401, "Invalid credentials")
-        
-    LOGIN_ATTEMPTS.pop(email, None)
-    return {"user_id": "uuid", "display_name": "name"}
+async def login(req: LoginRequest, auth: AuthService = Depends(get_auth_service)) -> Dict[str, Any]:
+    try:
+        user_id, display_name = await auth.login(email=req.email, password=req.password)
+        # Note: session creation logic should happen here or frontend should get token
+        # Since it's local first desktop app, return the id for now.
+        return {"user_id": str(user_id), "display_name": display_name}
+    except AuthError as e:
+        status_code = 429 if e.code == "AUTH_LOCKED" else 401
+        raise HTTPException(status_code=status_code, detail=e.message)
+
+class RecoverRequest(BaseModel):
+    email: EmailStr
+    recovery_phrase: str
+    new_password: str
+    confirm_new_password: str
+
+class PasswordChangeRequest(BaseModel):
+    user_id: str
+    current_password: str
+    new_password: str
+    confirm_new_password: str
+
+class DeleteAccountRequest(BaseModel):
+    user_id: str
+    password: str
 
 @router.post("/auth/logout")
 async def logout() -> Dict[str, str]:
@@ -73,17 +82,42 @@ async def unlock() -> Dict[str, str]:
     return {"detail": "Unlocked"}
 
 @router.post("/auth/recover")
-async def recover() -> Dict[str, str]:
-    return {"detail": "Recovered"}
+async def recover(req: RecoverRequest, auth: AuthService = Depends(get_auth_service)) -> Dict[str, str]:
+    try:
+        user_id = await auth.recover_account(
+            email=req.email,
+            recovery_phrase=req.recovery_phrase,
+            new_password=req.new_password,
+            confirm_new_password=req.confirm_new_password,
+        )
+        return {"detail": "Recovered", "user_id": user_id}
+    except AuthError as e:
+        raise HTTPException(status_code=400, detail=e.message)
 
 @router.put("/auth/password")
-async def password() -> Dict[str, str]:
-    return {"detail": "Password changed"}
+async def password(req: PasswordChangeRequest, auth: AuthService = Depends(get_auth_service)) -> Dict[str, str]:
+    try:
+        await auth.change_password(
+            user_id=req.user_id,
+            current_password=req.current_password,
+            new_password=req.new_password,
+            confirm_new_password=req.confirm_new_password,
+        )
+        return {"detail": "Password changed"}
+    except AuthError as e:
+        status_code = 401 if e.code == "INVALID_CREDENTIALS" else 400
+        raise HTTPException(status_code=status_code, detail=e.message)
 
 @router.delete("/auth/account")
-async def delete_account() -> Dict[str, str]:
-    return {"detail": "Account deleted"}
+async def delete_account(req: DeleteAccountRequest, auth: AuthService = Depends(get_auth_service)) -> Dict[str, str]:
+    try:
+        await auth.delete_account(user_id=req.user_id, password=req.password)
+        return {"detail": "Account deleted"}
+    except AuthError as e:
+        status_code = 401 if e.code == "INVALID_CREDENTIALS" else 400
+        raise HTTPException(status_code=status_code, detail=e.message)
 
 @router.get("/auth/local-profiles")
-async def local_profiles() -> List[Dict[str, str]]:
-    return []
+async def local_profiles(auth: AuthService = Depends(get_auth_service)) -> List[Dict[str, str]]:
+    profiles = await auth._repo.list_local_profiles()
+    return profiles

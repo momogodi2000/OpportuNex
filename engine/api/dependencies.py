@@ -14,8 +14,8 @@ from fastapi import Depends, Header, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
-from persistence.repositories.user_repo import UserRepository
-from domain.entities.user import User
+from persistence.repositories.user_repo import UserRepo
+from domain.entities.entities import User
 
 log = structlog.get_logger(__name__)
 
@@ -93,7 +93,7 @@ async def get_current_user(
             detail={"code": "INVALID_USER_ID", "title": "Invalid user identifier"},
         )
 
-    repo = UserRepository()
+    repo = UserRepo(db)
     user = await repo.get_by_id(uid)
     if user is None:
         raise HTTPException(
