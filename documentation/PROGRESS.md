@@ -69,10 +69,10 @@
 | EF-07.06 | Traiter le contenu collecté comme non fiable : isoler les instructions qu'il contient du prompt système | M | | MISSING |
 | EF-07.07 | Rejeter et rejouer une fois toute réponse non conforme au schéma, sinon basculer sur l'extraction déterministe | M | | MISSING |
 | EF-07.08 | Traduire une annonce dans la langue de l'utilisateur sur demande | C | | MISSING |
-| EF-08.01 | Calculer un score de pertinence de 0 à 100 à partir de critères pondérés : compétences, formation, expérience, localisation, langues, objectifs, date limite | M | | MISSING |
-| EF-08.02 | Afficher la décomposition du score par critère | M | | MISSING |
-| EF-08.03 | Lister les atouts, les qualifications manquantes et les points d'éligibilité à vérifier | M | | MISSING |
-| EF-08.04 | Ne jamais affirmer l'éligibilité sans critères publiés et données de profil concordants | M | | MISSING |
+| EF-08.01 | Calculer un score de pertinence de 0 à 100 à partir de critères pondérés : compétences, formation, expérience, localisation, langues, objectifs, date limite | M | | COMPLETE |
+| EF-08.02 | Afficher la décomposition du score par critère | M | | COMPLETE |
+| EF-08.03 | Lister les atouts, les qualifications manquantes et les points d'éligibilité à vérifier | M | | COMPLETE |
+| EF-08.04 | Ne jamais affirmer l'éligibilité sans critères publiés et données de profil concordants | M | | COMPLETE |
 | EF-08.05 | Ajuster les pondérations dans les paramètres | S | | MISSING |
 | EF-08.06 | Recueillir le retour (pertinent, non pertinent, écarter) et adapter les recommandations localement | S | | MISSING |
 | EF-08.07 | Correspondance sémantique par embeddings calculés localement lorsque possible | C | | MISSING |
@@ -144,12 +144,12 @@
 | EF-15.06 | Modèles d'espaces : emploi, bourse de master, financement associatif, startup, conseil IT, marchés publics, stages | S | | MISSING |
 | EF-15.07 | Comparer deux à quatre opportunités côte à côte | C | | MISSING |
 | EF-15.08 | Partager un espace avec les membres d'une organisation | C | | MISSING |
-| EF-16.01 | Exporter en CSV (UTF-8 avec BOM pour Excel) | M | | MISSING |
+| EF-16.01 | Exporter en CSV (UTF-8 avec BOM pour Excel) | M | | COMPLETE |
 | EF-16.02 | Exporter en XLSX avec mise en forme et filtres | S | | MISSING |
 | EF-16.03 | Générer un rapport PDF : couverture, synthèse, tableau, fiches | S | | MISSING |
-| EF-16.04 | Exporter en JSON selon un schéma documenté et versionné | M | | MISSING |
-| EF-16.05 | Exporter la sélection courante ou tous les résultats filtrés | M | | MISSING |
-| EF-16.06 | Exclure par défaut toute donnée personnelle non nécessaire | M | | MISSING |
+| EF-16.04 | Exporter en JSON selon un schéma documenté et versionné | M | | COMPLETE |
+| EF-16.05 | Exporter la sélection courante ou tous les résultats filtrés | M | | COMPLETE |
+| EF-16.06 | Exclure par défaut toute donnée personnelle non nécessaire | M | | COMPLETE |
 | EF-16.07 | Exporter l'intégralité de ses données personnelles (portabilité) | M | | MISSING |
 | EF-16.08 | Importer un export JSON pour restaurer ou migrer des dossiers | S | | MISSING |
 | EF-17.01 | Créer une organisation et inviter des membres par lien ou courriel | S | | MISSING |
