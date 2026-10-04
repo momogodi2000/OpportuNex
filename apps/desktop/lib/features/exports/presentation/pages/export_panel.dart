@@ -18,9 +18,9 @@ class _ExportPanelState extends State<ExportPanel> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Exporter des données',
-          style: TextStyle(color: Color(0xFF0D1B3E)),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -30,36 +30,36 @@ class _ExportPanelState extends State<ExportPanel> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Sélectionnez les données à exporter:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             CheckboxListTile(
-              title: const Text('Opportunités sauvegardées'),
+              title: Text('Opportunités sauvegardées'),
               value: _exportSaved,
               onChanged: (v) => setState(() => _exportSaved = v ?? false),
               activeColor: const Color(0xFF22C55E),
             ),
             CheckboxListTile(
-              title: const Text('Candidatures'),
+              title: Text('Candidatures'),
               value: _exportApps,
               onChanged: (v) => setState(() => _exportApps = v ?? false),
               activeColor: const Color(0xFF22C55E),
             ),
             CheckboxListTile(
-              title: const Text('Historique de recherche'),
+              title: Text('Historique de recherche'),
               value: _exportHistory,
               onChanged: (v) => setState(() => _exportHistory = v ?? false),
               activeColor: const Color(0xFF22C55E),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: 24),
+            Text(
               'Format de fichier:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _format,
+              initialValue: _format,
               decoration: const InputDecoration(border: OutlineInputBorder()),
               items: const [
                 DropdownMenuItem(value: 'CSV', child: Text('CSV (Tableur)')),
@@ -78,14 +78,14 @@ class _ExportPanelState extends State<ExportPanel> {
                 if (v != null) setState(() => _format = v);
               },
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {},
-                    icon: const Icon(Icons.date_range),
-                    label: const Text('Période: Toutes'),
+                    icon: Icon(Icons.date_range),
+                    label: Text('Période: Toutes'),
                   ),
                 ),
               ],
@@ -97,7 +97,7 @@ class _ExportPanelState extends State<ExportPanel> {
               child: ElevatedButton.icon(
                 onPressed: _isExporting ? null : _performExport,
                 icon: _isExporting
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
@@ -105,7 +105,7 @@ class _ExportPanelState extends State<ExportPanel> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Icon(Icons.download),
+                    : Icon(Icons.download),
                 label: Text(
                   _isExporting ? 'Exportation en cours...' : 'Exporter',
                 ),
@@ -130,12 +130,12 @@ class _ExportPanelState extends State<ExportPanel> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Export terminé'),
+          title: Text('Export terminé'),
           content: Text('Vos données ont été exportées au format $_format.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Fermer'),
+              child: Text('Fermer'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -143,10 +143,10 @@ class _ExportPanelState extends State<ExportPanel> {
                 // Save file dialog action
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0D1B3E),
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Enregistrer sous...'),
+              child: Text('Enregistrer sous...'),
             ),
           ],
         ),

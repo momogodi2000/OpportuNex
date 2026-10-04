@@ -7,11 +7,9 @@ from __future__ import annotations
 
 import asyncio
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Optional
-from uuid import UUID
 
 import structlog
 from fastapi import WebSocket, WebSocketDisconnect
@@ -63,11 +61,11 @@ class EventType(StrEnum):
 @dataclass
 class ProgressEvent:
     type: str
-    job_id: Optional[str]
+    job_id: str | None
     current: int
     total: int
     message: str
-    data: Optional[dict] = None
+    data: dict | None = None
     timestamp: str = ""
 
     def __post_init__(self) -> None:
@@ -111,11 +109,11 @@ class EventBus:
     async def emit(
         self,
         event_type: EventType,
-        job_id: Optional[str] = None,
+        job_id: str | None = None,
         current: int = 0,
         total: int = 0,
         message: str = "",
-        data: Optional[dict] = None,
+        data: dict | None = None,
     ) -> None:
         """Convenience method to create and publish an event."""
         await self.publish(ProgressEvent(
@@ -147,7 +145,7 @@ class EventBus:
                         self._queue.get(), timeout=25.0
                     )
                     await websocket.send_text(message)
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Send keepalive ping
                     await websocket.send_text(json.dumps({"type": "ping"}))
 

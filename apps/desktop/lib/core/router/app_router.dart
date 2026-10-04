@@ -22,21 +22,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: '/login',
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: '/recover',
-        builder: (context, state) => const Scaffold(body: Center(child: Text('Recover'))),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Recover'))),
       ),
       GoRoute(
         path: '/local-profiles',
-        builder: (context, state) => const Scaffold(body: Center(child: Text('Local Profiles'))),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('Local Profiles'))),
       ),
       GoRoute(
         path: '/onboarding',
@@ -52,12 +51,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   width: 250,
                   child: ListView(
                     children: [
-                      ListTile(title: const Text('Dashboard'), onTap: () => context.go('/dashboard')),
-                      ListTile(title: const Text('Search'), onTap: () => context.go('/search')),
-                      ListTile(title: const Text('Saved'), onTap: () => context.go('/saved')),
-                      ListTile(title: const Text('Applications'), onTap: () => context.go('/applications')),
-                      ListTile(title: const Text('Monitors'), onTap: () => context.go('/monitors')),
-                      ListTile(title: const Text('Settings'), onTap: () => context.go('/settings/account')),
+                      ListTile(
+                        title: const Text('Dashboard'),
+                        onTap: () => context.go('/dashboard'),
+                      ),
+                      ListTile(
+                        title: const Text('Search'),
+                        onTap: () => context.go('/search'),
+                      ),
+                      ListTile(
+                        title: const Text('Saved'),
+                        onTap: () => context.go('/saved'),
+                      ),
+                      ListTile(
+                        title: const Text('Applications'),
+                        onTap: () => context.go('/applications'),
+                      ),
+                      ListTile(
+                        title: const Text('Monitors'),
+                        onTap: () => context.go('/monitors'),
+                      ),
+                      ListTile(
+                        title: const Text('Settings'),
+                        onTap: () => context.go('/settings/account'),
+                      ),
                     ],
                   ),
                 ),
@@ -77,7 +94,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/results/:runId',
-            builder: (context, state) => Scaffold(body: Center(child: Text('Results ${state.pathParameters['runId']}'))),
+            builder: (context, state) => Scaffold(
+              body: Center(
+                child: Text('Results ${state.pathParameters['runId']}'),
+              ),
+            ),
           ),
           GoRoute(
             path: '/saved',
@@ -89,7 +110,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: ':id',
-                builder: (context, state) => Scaffold(body: Center(child: Text('Application ${state.pathParameters['id']}'))),
+                builder: (context, state) => Scaffold(
+                  body: Center(
+                    child: Text('Application ${state.pathParameters['id']}'),
+                  ),
+                ),
               ),
             ],
           ),
@@ -103,15 +128,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/sources',
-            builder: (context, state) => const Scaffold(body: Center(child: Text('Sources'))),
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Sources'))),
           ),
           GoRoute(
             path: '/organizations',
-            builder: (context, state) => const Scaffold(body: Center(child: Text('Organizations'))),
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Organizations'))),
           ),
           GoRoute(
             path: '/opportunities/:id',
-            builder: (context, state) => OpportunityDetailPage(id: state.pathParameters['id'] ?? ''),
+            builder: (context, state) => OpportunityDetailPage(
+              opportunityId: state.pathParameters['id'] ?? '',
+            ),
           ),
           GoRoute(
             path: '/settings/account',

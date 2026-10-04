@@ -1,5 +1,5 @@
-import pytest
-from fastapi.testclient import TestClient
+﻿from fastapi.testclient import TestClient
+
 from api.app import create_app
 
 app = create_app("dummy-token-123")

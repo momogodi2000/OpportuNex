@@ -1,29 +1,29 @@
-from typing import Optional
 from uuid import UUID
-from sqlalchemy import select, update, delete
+
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models.all_models import UserModel, SecurityEvent
+
+from ..models.all_models import SecurityEvent, UserModel
+
 
 class UserRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, id: UUID) -> Optional[UserModel]:
+    async def get_by_id(self, id: UUID) -> UserModel | None:
         result = await self.session.execute(select(UserModel).where(UserModel.id == str(id)))
         return result.scalars().first()
 
-    async def get_by_email(self, email: str) -> Optional[UserModel]:
+    async def get_by_email(self, email: str) -> UserModel | None:
         result = await self.session.execute(select(UserModel).where(UserModel.email == email))
         return result.scalars().first()
 
-    async def create(self, display_name: str, email: str, password_hash: str, recovery_hash: str, password_salt_hex: str, wrapped_key_hex: str) -> str:
+    async def create(self, display_name: str, email: str, password_hash: str, recovery_hash: str) -> str:
         user = UserModel(
             display_name=display_name,
             email=email,
             password_hash=password_hash,
-            recovery_hash=recovery_hash,
-            password_salt_hex=password_salt_hex,
-            wrapped_key_hex=wrapped_key_hex
+            recovery_hash=recovery_hash
         )
         self.session.add(user)
         await self.session.flush()
@@ -33,7 +33,7 @@ class UserRepo:
         await self.session.execute(
             update(UserModel)
             .where(UserModel.id == user_id)
-            .values(failed_attempts=failed_attempts, is_locked=is_locked, lock_until=lock_until)
+            .values(failed_login_attempts=failed_attempts, is_locked=is_locked, lock_until=lock_until)
         )
         await self.session.flush()
 
@@ -41,18 +41,16 @@ class UserRepo:
         await self.session.execute(
             update(UserModel)
             .where(UserModel.id == user_id)
-            .values(failed_attempts=0, is_locked=False, lock_until=None)
+            .values(failed_login_attempts=0, is_locked=False, lock_until=None)
         )
         await self.session.flush()
 
-    async def update_credentials(self, user_id: str, password_hash: str, password_salt_hex: str, wrapped_key_hex: str) -> None:
+    async def update_credentials(self, user_id: str, password_hash: str) -> None:
         await self.session.execute(
             update(UserModel)
             .where(UserModel.id == user_id)
             .values(
-                password_hash=password_hash,
-                password_salt_hex=password_salt_hex,
-                wrapped_key_hex=wrapped_key_hex
+                password_hash=password_hash
             )
         )
         await self.session.flush()
@@ -76,7 +74,7 @@ class UserRepo:
             for row in result.all()
         ]
 
-    async def record_security_event(self, event_type: str, user_id: str, details: Optional[dict] = None) -> None:
-        event = SecurityEvent(event_type=event_type, user_id=user_id, details=details)
+    async def record_security_event(self, event_type: str, user_id: str, details: dict | None = None) -> None:
+        event = SecurityEvent(event_type=event_type, user_id=user_id)
         self.session.add(event)
         await self.session.flush()

@@ -1,7 +1,8 @@
 import hashlib
 import re
-from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
-from typing import Optional, Any
+from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
 
 class Deduplicator:
     def normalize_url(self, url: str) -> str:
@@ -41,5 +42,5 @@ class Deduplicator:
                 fingerprint |= (1 << i)
         return fingerprint
 
-    def find_duplicate(self, raw_doc: Any, db_session: Any) -> Optional[str]:
+    def find_duplicate(self, raw_doc: Any, db_session: Any) -> str | None:
         return None

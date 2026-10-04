@@ -5,6 +5,7 @@ import '../domain/monitor_models.dart';
 
 final monitorRepositoryProvider = Provider<MonitorRepository>((ref) {
   final dio = ref.watch(engineHttpClientProvider);
+  if (dio == null) throw Exception('Engine not healthy');
   return MonitorRepository(dio);
 });
 

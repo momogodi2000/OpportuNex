@@ -1,7 +1,8 @@
-from fastapi import APIRouter
-from typing import List, Dict, Any
-from pydantic import BaseModel
 from datetime import datetime
+from typing import Any
+
+from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/sync", tags=["sync"])
 
@@ -27,7 +28,7 @@ async def start_sync(request: SyncStartRequest):
 async def stop_sync():
     return {"status": "sync_stopped"}
 
-@router.get("/conflicts", response_model=List[Dict[str, Any]])
+@router.get("/conflicts", response_model=list[dict[str, Any]])
 async def list_sync_conflicts():
     return []
 
@@ -35,6 +36,6 @@ async def list_sync_conflicts():
 async def resolve_conflict(conflict_id: str, request: ConflictResolveRequest):
     return {"status": "resolved", "winner": request.winner}
 
-@router.get("/organizations", response_model=List[Dict[str, Any]])
+@router.get("/organizations", response_model=list[dict[str, Any]])
 async def list_sync_organizations():
     return []

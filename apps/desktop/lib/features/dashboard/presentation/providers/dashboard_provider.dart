@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
-import '../domain/dashboard_models.dart';
-import '../data/dashboard_repository.dart';
+import '../../domain/dashboard_models.dart';
+import '../../data/dashboard_repository.dart';
 
-final dioProviderDashboard = Provider<Dio>((ref) {
-  return Dio(BaseOptions(baseUrl: 'https://api.opportunex.local'));
-});
+import '../../../../core/services/engine_http_client.dart';
 
 final dashboardRepositoryProvider = Provider<DashboardRepository>((ref) {
-  final dio = ref.watch(dioProviderDashboard);
+  final dio = ref.watch(engineHttpClientProvider);
+  if (dio == null) throw Exception('Engine is not healthy');
   return DashboardRepository(dio);
 });
 

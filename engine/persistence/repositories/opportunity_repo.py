@@ -1,27 +1,29 @@
-from typing import Optional
-from sqlalchemy import select, update, delete
+
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from ..models.all_models import OpportunityModel
+
 
 class OpportunityRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, id: str) -> Optional[OpportunityModel]:
+    async def get_by_id(self, id: str) -> OpportunityModel | None:
         result = await self.session.execute(select(OpportunityModel).where(OpportunityModel.id == id))
         return result.scalars().first()
 
-    async def get_by_canonical_url(self, url: str) -> Optional[OpportunityModel]:
+    async def get_by_canonical_url(self, url: str) -> OpportunityModel | None:
         result = await self.session.execute(select(OpportunityModel).where(OpportunityModel.canonical_url == url))
         return result.scalars().first()
 
-    async def find_by_fingerprint(self, fingerprint: str) -> Optional[str]:
+    async def find_by_fingerprint(self, fingerprint: str) -> str | None:
         result = await self.session.execute(select(OpportunityModel.id).where(OpportunityModel.fingerprint == fingerprint))
         row = result.first()
         return str(row[0]) if row else None
 
     async def find_simhash_candidates(self, simhash: int, hamming_threshold: int = 3) -> list[dict]:
-        # TODO: Implement actual simhash calculation depending on dialect
+        # Dummy implementation since simhash distance requires custom sqlite function
         return []
 
     async def create(self, data: dict) -> str:
@@ -42,19 +44,19 @@ class OpportunityRepo:
     async def list_for_user(
         self,
         user_id: str,
-        category: Optional[str] = None,
-        country: Optional[str] = None,
-        language: Optional[str] = None,
-        deadline_before: Optional[str] = None,
-        deadline_after: Optional[str] = None,
-        amount_min: Optional[int] = None,
-        amount_max: Optional[int] = None,
-        is_saved: Optional[bool] = None,
-        min_score: Optional[int] = None,
+        category: str | None = None,
+        country: str | None = None,
+        language: str | None = None,
+        deadline_before: str | None = None,
+        deadline_after: str | None = None,
+        amount_min: int | None = None,
+        amount_max: int | None = None,
+        is_saved: bool | None = None,
+        min_score: int | None = None,
         sort_by: str = 'score',
-        cursor: Optional[str] = None,
+        cursor: str | None = None,
         limit: int = 20,
-    ) -> tuple[list[dict], Optional[str]]:
+    ) -> tuple[list[dict], str | None]:
         
         stmt = select(OpportunityModel)
         

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import asyncio
 import os
-import secrets
 import socket
 import sys
 
@@ -17,7 +16,6 @@ import uvicorn
 
 from api.app import create_app
 from persistence.database import init_db
-from security.vault import Vault
 
 log = structlog.get_logger(__name__)
 

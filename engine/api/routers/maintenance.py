@@ -1,10 +1,10 @@
+
 from fastapi import APIRouter, Header, HTTPException, status
 from pydantic import BaseModel
-from typing import Optional, List
 
 router = APIRouter(prefix="/maintenance", tags=["Maintenance"])
 
-def require_user(x_user_id: Optional[str] = Header(None)) -> str:
+def require_user(x_user_id: str | None = Header(None)) -> str:
     if not x_user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -8,16 +8,12 @@ Priority order per ADR-007: API → RSS → JSON-LD → HTML → headless
 from __future__ import annotations
 
 import asyncio
-import json
-import re
-from datetime import datetime, timedelta
-from typing import Any, Optional
+from datetime import datetime
 from urllib.parse import urljoin
 
 import feedparser
 import structlog
 from selectolax.parser import HTMLParser
-import dateparser
 
 from collection.safe_http import SafeHTTPClient
 from domain.entities.entities import Source
@@ -50,10 +46,10 @@ class RawDocument:
         self,
         url: str,
         title: str,
-        content: Optional[str],
-        organization: Optional[str],
-        deadline_raw: Optional[str],
-        external_id: Optional[str],
+        content: str | None,
+        organization: str | None,
+        deadline_raw: str | None,
+        external_id: str | None,
         source_id: str,
         metadata: dict,
     ) -> None:
@@ -313,7 +309,7 @@ class CollectionReader:
         return tree.text(separator=" ", strip=True)[:10000]
 
     @staticmethod
-    def _extract_field(item: dict, candidates: list[str]) -> Optional[str]:
+    def _extract_field(item: dict, candidates: list[str]) -> str | None:
         """Try multiple field name candidates; return first non-empty string."""
         for key in candidates:
             val = item.get(key)

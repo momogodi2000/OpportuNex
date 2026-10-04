@@ -1,13 +1,13 @@
-import structlog
-from typing import Optional
-from fastapi import APIRouter, Depends, Query, Path, HTTPException
-from pydantic import BaseModel
 from datetime import date
+
+import structlog
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from persistence.database import get_db_session
 from api.dependencies import get_current_user
 from domain.entities.entities import User
+from persistence.database import get_db_session
 from persistence.repositories.application_repo import ApplicationRepo
 
 logger = structlog.get_logger(__name__)
@@ -28,7 +28,7 @@ APPLICATION_TRANSITIONS = {
 
 class TransitionRequest(BaseModel):
     new_status: str
-    note: Optional[str] = None
+    note: str | None = None
 
 class DocumentRequest(BaseModel):
     document_path: str
@@ -39,11 +39,11 @@ class NoteRequest(BaseModel):
 
 @router.get("")
 async def list_applications(
-    cursor: Optional[str] = Query(None),
+    cursor: str | None = Query(None),
     limit: int = Query(50, le=200),
-    status: Optional[str] = None,
-    deadline_before: Optional[date] = None,
-    category: Optional[str] = None,
+    status: str | None = None,
+    deadline_before: date | None = None,
+    category: str | None = None,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_user)
 ):

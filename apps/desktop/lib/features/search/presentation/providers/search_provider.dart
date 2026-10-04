@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
-import '../domain/search_models.dart';
-import '../data/search_repository.dart';
+import '../../domain/search_models.dart';
+import '../../data/search_repository.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   return Dio(BaseOptions(baseUrl: 'https://api.opportunex.local'));
@@ -160,8 +160,9 @@ class SearchProvider extends StateNotifier<SearchPageStateModel> {
   Future<void> loadMore() async {
     if (state.status == SearchState.searching ||
         !state.hasMore ||
-        state.currentRunId == null)
+        state.currentRunId == null) {
       return;
+    }
     state = state.copyWith(status: SearchState.searching);
     await _fetchResults(state.currentRunId!, state.cursor);
   }

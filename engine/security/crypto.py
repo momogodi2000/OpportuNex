@@ -1,10 +1,10 @@
 import re
 import secrets
-from typing import Tuple
+
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 # Configure Argon2id as requested: memory=65536, iterations=3, parallelism=1
 ph = PasswordHasher(
@@ -40,7 +40,7 @@ def verify_password(password: str, hash_str: str) -> bool:
     except VerifyMismatchError:
         return False
 
-def generate_recovery_phrase() -> Tuple[str, str]:
+def generate_recovery_phrase() -> tuple[str, str]:
     """Generates a 12-word recovery phrase and its Argon2id hash."""
     words = [secrets.choice(WORDLIST) for _ in range(12)]
     phrase = " ".join(words)

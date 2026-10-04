@@ -1,15 +1,16 @@
-from fastapi import APIRouter
-import sys
-import time
 import os
 import signal
-from typing import Dict, Any
+import sys
+import time
+from typing import Any
+
+from fastapi import APIRouter
 
 router = APIRouter(tags=["system"])
 START_TIME = time.time()
 
 @router.get("/health")
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy",
         "version": "0.1.0",
@@ -17,7 +18,7 @@ async def health_check() -> Dict[str, Any]:
     }
 
 @router.get("/version")
-async def get_version() -> Dict[str, Any]:
+async def get_version() -> dict[str, Any]:
     return {
         "version": "0.1.0",
         "python": sys.version,
@@ -25,6 +26,6 @@ async def get_version() -> Dict[str, Any]:
     }
 
 @router.post("/shutdown")
-async def shutdown() -> Dict[str, str]:
+async def shutdown() -> dict[str, str]:
     os.kill(os.getpid(), signal.SIGTERM)
     return {"detail": "Shutdown signal sent"}

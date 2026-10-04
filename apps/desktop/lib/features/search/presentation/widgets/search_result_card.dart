@@ -53,7 +53,7 @@ class SearchResultCard extends StatelessWidget {
                                   ).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'NOUVEAU',
                                   style: TextStyle(
                                     color: Color(0xFF22C55E),
@@ -62,7 +62,7 @@ class SearchResultCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                             ],
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -70,13 +70,15 @@ class SearchResultCard extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF0D1B3E).withOpacity(0.1),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 result.category,
-                                style: const TextStyle(
-                                  color: Color(0xFF0D1B3E),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -84,18 +86,18 @@ class SearchResultCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           result.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF0D1B3E),
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           result.organization,
                           style: TextStyle(
@@ -107,15 +109,15 @@ class SearchResultCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   _buildMatchScore(),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Row(
                 children: [
                   _buildIconText(Icons.location_on_outlined, result.location),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   if (result.deadline != null) _buildDeadline(result.deadline!),
                   const Spacer(),
                   Container(
@@ -134,7 +136,7 @@ class SearchResultCard extends StatelessWidget {
                           size: 14,
                           color: Colors.grey.shade600,
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: 4),
                         Text(
                           result.provenanceDeadline,
                           style: TextStyle(
@@ -145,7 +147,7 @@ class SearchResultCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   IconButton(
                     icon: Icon(
                       result.isSaved ? Icons.favorite : Icons.favorite_border,
@@ -154,17 +156,17 @@ class SearchResultCard extends StatelessWidget {
                     onPressed: onSave,
                     tooltip: 'Sauvegarder',
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: onTap,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0D1B3E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text('Voir détails'),
+                    child: Text('Voir détails'),
                   ),
                 ],
               ),
@@ -179,7 +181,7 @@ class SearchResultCard extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 16, color: Colors.grey.shade600),
-        const SizedBox(width: 4),
+        SizedBox(width: 4),
         Text(text, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
       ],
     );
@@ -197,7 +199,7 @@ class SearchResultCard extends StatelessWidget {
     return Row(
       children: [
         Icon(Icons.access_time, size: 16, color: color),
-        const SizedBox(width: 4),
+        SizedBox(width: 4),
         Text(
           DateFormat('dd MMM yyyy').format(deadline),
           style: TextStyle(

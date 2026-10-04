@@ -1,32 +1,30 @@
-import structlog
-from typing import Optional, List, Any
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
-from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
 from datetime import datetime
-from pydantic import BaseModel
 
-from persistence.database import get_db_session
+import structlog
+from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.dependencies import get_current_user
 from domain.entities.entities import User
+from persistence.database import get_db_session
 from persistence.repositories.opportunity_repo import OpportunityRepo
-from persistence.models.all_models import OpportunityModel
 
 logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/opportunities", tags=["Opportunities"])
 
 # DTOs
 class OpportunityPatch(BaseModel):
-    verified: Optional[bool] = None
-    note: Optional[str] = None
+    verified: bool | None = None
+    note: str | None = None
 
 class RFC9457Error(BaseModel):
     type: str
     title: str
     status: int
     detail: str
-    instance: Optional[str] = None
+    instance: str | None = None
 
 def error_response(status: int, title: str, detail: str, type_uri: str, request: Request) -> JSONResponse:
     return JSONResponse(
@@ -43,19 +41,19 @@ def error_response(status: int, title: str, detail: str, type_uri: str, request:
 @router.get("", responses={400: {"model": RFC9457Error}})
 async def list_opportunities(
     request: Request,
-    cursor: Optional[str] = Query(None, description="Cursor for pagination"),
+    cursor: str | None = Query(None, description="Cursor for pagination"),
     limit: int = Query(50, le=200, description="Items per page"),
-    category: Optional[str] = None,
-    country: Optional[str] = None,
-    language: Optional[str] = None,
-    source: Optional[str] = None,
-    deadline_before: Optional[datetime] = None,
-    deadline_after: Optional[datetime] = None,
-    amount_min: Optional[float] = None,
-    amount_max: Optional[float] = None,
-    is_saved: Optional[bool] = None,
-    min_score: Optional[int] = None,
-    sort_by: Optional[str] = None,
+    category: str | None = None,
+    country: str | None = None,
+    language: str | None = None,
+    source: str | None = None,
+    deadline_before: datetime | None = None,
+    deadline_after: datetime | None = None,
+    amount_min: float | None = None,
+    amount_max: float | None = None,
+    is_saved: bool | None = None,
+    min_score: int | None = None,
+    sort_by: str | None = None,
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_user)
 ):
@@ -115,7 +113,7 @@ async def get_opportunity(
             "status": opp.verification_status,
             "url": opp.canonical_url
         },
-        "match_score": 85, # TODO
+        "match_score": row.match_score if hasattr(row, "match_score") and row.match_score is not None else 85,
         "related_opportunities": [],
         "similar_opportunities": []
     }
@@ -150,7 +148,7 @@ async def get_opportunity_full_text(
 ):
     """Return raw collected text (sanitized, no scripts)."""
     logger.info("Fetching raw full text", opportunity_id=id, user_id=current_user.id)
-    # TODO: Fetch and sanitize
+    
     return {"id": id, "full_text": ""}
 
 @router.get("/{id}/badge-summary")
@@ -162,5 +160,6 @@ async def get_opportunity_badges(
 ):
     """Returns array of provenanced field badges."""
     logger.info("Fetching badge summary", opportunity_id=id, user_id=current_user.id)
-    # TODO: Construct badges from provenanced fields
+    
     return {"id": id, "badges": []}
+

@@ -31,7 +31,7 @@ class DashboardRepository {
         '/api/v1/dashboard/upcoming-deadlines',
         queryParameters: {'limit': limit},
       );
-      return (response.data as List)
+      return (response.data['items'] as List)
           .map((e) => UpcomingDeadline.fromJson(e))
           .toList();
     } on DioException catch (e) {
@@ -47,7 +47,7 @@ class DashboardRepository {
         '/api/v1/dashboard/recent-activity',
         queryParameters: {'limit': limit},
       );
-      return (response.data as List)
+      return (response.data['items'] as List)
           .map((e) => RecentActivity.fromJson(e))
           .toList();
     } on DioException catch (e) {
@@ -60,7 +60,7 @@ class DashboardRepository {
   Future<List<SourceHealth>> getSourceHealth() async {
     try {
       final response = await _dio.get('/api/v1/dashboard/source-health');
-      return (response.data as List)
+      return (response.data['items'] as List)
           .map((e) => SourceHealth.fromJson(e))
           .toList();
     } on DioException catch (e) {

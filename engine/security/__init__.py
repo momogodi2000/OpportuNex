@@ -1,10 +1,23 @@
 from .crypto import (
-    hash_password, verify_password, generate_recovery_phrase,
-    verify_recovery_phrase, derive_key_from_password, generate_data_key,
-    wrap_key, unwrap_key, expurgate_log
+    derive_key_from_password,
+    expurgate_log,
+    generate_data_key,
+    generate_recovery_phrase,
+    hash_password,
+    unwrap_key,
+    verify_password,
+    verify_recovery_phrase,
+    wrap_key,
 )
+
 __all__ = [
-    'hash_password', 'verify_password', 'generate_recovery_phrase',
-    'verify_recovery_phrase', 'derive_key_from_password', 'generate_data_key',
-    'wrap_key', 'unwrap_key', 'expurgate_log'
+    'derive_key_from_password',
+    'expurgate_log',
+    'generate_data_key',
+    'generate_recovery_phrase',
+    'hash_password',
+    'unwrap_key',
+    'verify_password',
+    'verify_recovery_phrase',
+    'wrap_key'
 ]

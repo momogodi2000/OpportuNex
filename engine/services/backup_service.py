@@ -11,11 +11,9 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
-import os
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Optional
 from uuid import uuid4
 
 import structlog
@@ -138,8 +136,8 @@ class BackupService:
         Create a consistent SQLite backup using the Python sqlite3 backup API.
         This is safe for WAL-mode databases.
         """
-        import sqlite3
         import asyncio
+        import sqlite3
 
         def _do_backup() -> None:
             src_conn = sqlite3.connect(str(source))
@@ -162,9 +160,8 @@ class BackupService:
 
     def _compress(self, source: Path, dest: Path) -> None:
         """Compress a file using gzip."""
-        with open(source, "rb") as f_in:
-            with gzip.open(dest, "wb", compresslevel=9) as f_out:
-                shutil.copyfileobj(f_in, f_out)
+        with open(source, "rb") as f_in, gzip.open(dest, "wb", compresslevel=9) as f_out:
+            shutil.copyfileobj(f_in, f_out)
 
     def _apply_retention_policy(self) -> None:
         """

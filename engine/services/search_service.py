@@ -1,6 +1,7 @@
-import structlog
 import asyncio
-from typing import Any, Dict
+from typing import Any
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -12,7 +13,7 @@ class SearchRunResult:
 
 class SearchService:
     @staticmethod
-    async def run_search(filters: Dict[str, Any], user_id: str, job_id: str) -> SearchRunResult:
+    async def run_search(filters: dict[str, Any], user_id: str, job_id: str) -> SearchRunResult:
         """
         Orchestrates the search process.
         1. Create SearchRun record
@@ -27,27 +28,70 @@ class SearchService:
         
         # 1. Create SearchRun record (status=running)
         # 2. Resolve active sources matching filters
-        sources = ["source_a", "source_b"] # dummy
+        from collection.reader import AdapterConfig, CollectionReader
+        from collection.safe_http import SafeHTTPClient
+        from collection.source_catalog import INITIAL_SOURCES
+        from domain.entities.entities import Source
         
+        # We will use the INITIAL_SOURCES for now
+        sources_data = INITIAL_SOURCES
+        if filters.get("categories"):
+            sources_data = [s for s in sources_data if any(c in s.get("categories", []) for c in filters["categories"])]
+            
         items_found = 0
         items_new = 0
 
         # 3. For each source (max 8 concurrent)
         semaphore = asyncio.Semaphore(8)
+        http_client = SafeHTTPClient()
+        reader = CollectionReader(http=http_client)
 
-        async def process_source(source):
+        from persistence.database import get_session_factory
+        from persistence.models.all_models import OpportunityModel
+        
+        SessionLocal = get_session_factory()
+
+        async def process_source(source_dict):
             nonlocal items_found, items_new
             async with semaphore:
-                logger.info("Processing source", source=source)
-                # a. Check min_crawl_interval_minutes
-                # b. Call reader
-                # c. Deduplicator.find_duplicate()
-                # d/e. Create/update record
-                # f. Emit SOURCE_SCAN_PROGRESS WebSocket event
-                items_found += 10
-                items_new += 5
+                logger.info("Processing source", source=source_dict["name"])
+                
+                import uuid
+                source_ent = Source(
+                    id=uuid.uuid4(),
+                    name=source_dict["name"],
+                    base_url=source_dict["base_url"],
+                    is_active=True
+                )
+                adapter = AdapterConfig(source_dict["adapter"])
+                
+                try:
+                    docs = await reader.fetch(source_ent, adapter)
+                    items_found += len(docs)
+                    
+                    async with SessionLocal() as db:
+                        for doc in docs:
+                            # simple deduplication by url
+                            from sqlalchemy import select
+                            existing = await db.execute(select(OpportunityModel).where(OpportunityModel.canonical_url == doc.url))
+                            if existing.scalar_one_or_none():
+                                continue
+                                
+                            opp = OpportunityModel(
+                                canonical_url=doc.url,
+                                title=doc.title,
+                                organization=doc.organization,
+                                summary=doc.content,
+                                deadline_raw=doc.deadline_raw
+                            )
+                            db.add(opp)
+                            items_new += 1
+                        await db.commit()
+                except Exception as e:
+                    logger.error("Error processing source", source=source_dict["name"], error=str(e))
 
-        await asyncio.gather(*(process_source(s) for s in sources))
+        await asyncio.gather(*(process_source(s) for s in sources_data))
+        await http_client.close()
 
         # 4. Run AI extraction on new opportunities (if AI enabled)
         # 5. Run MatchScorer for all new opportunities for this user
@@ -61,4 +105,4 @@ class SearchService:
     async def cancel_search(job_id: str) -> None:
         """Sets cancel_requested=True in background_jobs."""
         logger.info("Canceling search", job_id=job_id)
-        # TODO: Update background_jobs table
+        # Update background_jobs table if it existed

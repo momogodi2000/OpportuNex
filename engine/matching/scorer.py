@@ -1,5 +1,6 @@
+
 from pydantic import BaseModel
-from typing import List, Dict, Any
+
 
 class OpportunityModel(BaseModel):
     id: str
@@ -18,10 +19,10 @@ class MatchingWeights(BaseModel):
 
 class MatchScore(BaseModel):
     total_score: float
-    criteria: Dict[str, float]
-    strengths: List[str]
-    gaps: List[str]
-    conditions_to_verify: List[str]
+    criteria: dict[str, float]
+    strengths: list[str]
+    gaps: list[str]
+    conditions_to_verify: list[str]
 
 class MatchScorer:
     def score(self, opportunity: OpportunityModel, profile: UserProfile, weights: MatchingWeights) -> MatchScore:

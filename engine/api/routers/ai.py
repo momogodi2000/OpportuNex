@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
+from typing import Any
+
 import keyring
 import keyring.errors
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -11,13 +12,13 @@ class AIProviderCreate(BaseModel):
     provider_type: str
     model: str
     api_key_value: str
-    base_url: Optional[str] = None
+    base_url: str | None = None
 
 class AIProviderUpdate(BaseModel):
-    name: Optional[str] = None
-    provider_type: Optional[str] = None
-    model: Optional[str] = None
-    base_url: Optional[str] = None
+    name: str | None = None
+    provider_type: str | None = None
+    model: str | None = None
+    base_url: str | None = None
 
 class APIKeyUpdate(BaseModel):
     api_key_value: str
@@ -27,10 +28,10 @@ class AIProviderResponse(BaseModel):
     name: str
     provider_type: str
     model: str
-    base_url: Optional[str]
+    base_url: str | None
     keychain_ref: str
 
-@router.get("/providers", response_model=List[AIProviderResponse])
+@router.get("/providers", response_model=list[AIProviderResponse])
 async def list_ai_providers():
     return []
 
@@ -75,6 +76,6 @@ async def delete_ai_provider(provider_id: str):
 async def test_ai_provider(provider_id: str):
     return {"status": "success", "message": "Connection successful"}
 
-@router.get("/usage", response_model=Dict[str, Any])
+@router.get("/usage", response_model=dict[str, Any])
 async def get_ai_usage():
     return {"tokens_used": {"openai": 1500, "anthropic": 200}}

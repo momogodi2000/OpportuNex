@@ -121,29 +121,31 @@ class _AppShellState extends State<AppShell> {
             child: Center(
               child: isDesktop
                   ? RichText(
-                      text: const TextSpan(
-                        style: TextStyle(
+                      text: TextSpan(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
                         ),
                         children: [
                           TextSpan(
                             text: 'Opportu',
-                            style: TextStyle(color: const Color(0xFF0D1B3E)),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
-                          TextSpan(
+                          const TextSpan(
                             text: 'Nex',
-                            style: TextStyle(color: const Color(0xFF22C55E)),
+                            style: TextStyle(color: Color(0xFF22C55E)),
                           ),
                         ],
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'ON',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF0D1B3E),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
             ),
@@ -230,7 +232,7 @@ class _AppShellState extends State<AppShell> {
             context,
             isBottom: true,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
         ],
       ),
     );
@@ -248,7 +250,7 @@ class _AppShellState extends State<AppShell> {
     final isSelected = index == selectedIndex;
     final color = isSelected
         ? const Color(0xFF22C55E)
-        : const Color(0xFF0D1B3E).withOpacity(0.6);
+        : Theme.of(context).colorScheme.primary.withOpacity(0.6);
 
     return InkWell(
       onTap: () {
@@ -275,7 +277,7 @@ class _AppShellState extends State<AppShell> {
           children: [
             Icon(icon, color: color, size: 24),
             if (isDesktop) ...[
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Text(
                 label,
                 style: TextStyle(
@@ -303,32 +305,32 @@ class _AppShellState extends State<AppShell> {
         children: [
           Text(
             _getBreadcrumb(context),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0D1B3E),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const Spacer(),
           ElevatedButton.icon(
             onPressed: () => context.go('/search'),
-            icon: const Icon(Icons.search, size: 18),
-            label: const Text('Rechercher (Ctrl+K)'),
+            icon: Icon(Icons.search, size: 18),
+            label: Text('Rechercher (Ctrl+K)'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey.shade100,
               foregroundColor: Colors.grey.shade700,
               elevation: 0,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           _buildEngineStatus(),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Stack(
             children: [
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.notifications_outlined,
-                  color: Color(0xFF0D1B3E),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onPressed: () {},
               ),
@@ -345,7 +347,7 @@ class _AppShellState extends State<AppShell> {
                     minWidth: 14,
                     minHeight: 14,
                   ),
-                  child: const Text(
+                  child: Text(
                     '3',
                     style: TextStyle(
                       color: Colors.white,
@@ -358,7 +360,7 @@ class _AppShellState extends State<AppShell> {
               ),
             ],
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           PopupMenuButton<String>(
             offset: const Offset(0, 40),
             onSelected: (value) {
@@ -371,10 +373,10 @@ class _AppShellState extends State<AppShell> {
               const PopupMenuItem(value: 'lock', child: Text('Verrouiller')),
               const PopupMenuItem(value: 'logout', child: Text('Déconnexion')),
             ],
-            child: const CircleAvatar(
+            child: CircleAvatar(
               radius: 16,
-              backgroundColor: Color(0xFF0D1B3E),
-              child: Text(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: const Text(
                 'JD',
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
@@ -398,11 +400,8 @@ class _AppShellState extends State<AppShell> {
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 8),
-          const Text(
-            'En ligne',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
+          SizedBox(width: 8),
+          Text('En ligne', style: TextStyle(fontSize: 12, color: Colors.grey)),
         ],
       ),
     );

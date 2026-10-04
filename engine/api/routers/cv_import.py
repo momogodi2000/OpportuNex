@@ -1,11 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from typing import Dict, Any
+from typing import Any
+
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/cv", tags=["cv"])
 
 class CVApplyRequest(BaseModel):
-    extracted_data: Dict[str, Any]
+    extracted_data: dict[str, Any]
 
 @router.post("/import")
 async def import_cv(file: UploadFile = File(...)):

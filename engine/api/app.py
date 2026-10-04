@@ -5,8 +5,8 @@ All routes require the session token in the Authorization header.
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import structlog
 from fastapi import FastAPI, Request, Response
@@ -15,25 +15,25 @@ from fastapi.responses import JSONResponse
 
 from api.dependencies import SessionTokenMiddleware
 from api.routers import (
-    auth_router,
-    profile_router,
-    cv_import_router,
-    ref_router,
-    search_router,
-    opportunity_router,
-    source_router,
-    saved_router,
-    application_router,
-    monitor_router,
-    workspace_router,
-    dashboard_router,
     ai_router,
+    application_router,
+    auth_router,
+    cv_import_router,
+    dashboard_router,
     export_router,
-    privacy_router,
-    organization_router,
-    sync_router,
     maintenance_router,
+    monitor_router,
+    opportunity_router,
+    organization_router,
+    privacy_router,
+    profile_router,
+    ref_router,
+    saved_router,
+    search_router,
+    source_router,
+    sync_router,
     system_router,
+    workspace_router,
 )
 
 log = structlog.get_logger(__name__)

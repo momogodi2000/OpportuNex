@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../providers/opportunity_provider.dart';
-import '../domain/opportunity_models.dart';
-import 'widgets/match_score_panel.dart';
+import '../../domain/opportunity_models.dart';
+
+import '../widgets/match_score_panel.dart';
 
 class OpportunityDetailPage extends ConsumerWidget {
   final String opportunityId;
 
-  const OpportunityDetailPage({Key? key, required this.opportunityId})
-    : super(key: key);
+  const OpportunityDetailPage({super.key, required this.opportunityId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,8 +20,8 @@ class OpportunityDetailPage extends ConsumerWidget {
       appBar: AppBar(
         title: detailAsync.when(
           data: (detail) => Text(detail.title, overflow: TextOverflow.ellipsis),
-          loading: () => const Text('Chargement...'),
-          error: (_, __) => const Text('Erreur'),
+          loading: () => Text('Chargement...'),
+          error: (_, __) => Text('Erreur'),
         ),
         actions:
             detailAsync
@@ -48,7 +48,7 @@ class OpportunityDetailPage extends ConsumerWidget {
                         );
                       },
                     ),
-                    IconButton(icon: const Icon(Icons.share), onPressed: () {}),
+                    IconButton(icon: Icon(Icons.share), onPressed: () {}),
                   ],
                 )
                 .valueOrNull ??
@@ -67,26 +67,26 @@ class OpportunityDetailPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeader(detail),
-                      const SizedBox(height: 24),
+                      _buildHeader(context, detail),
+                      SizedBox(height: 24),
                       _buildSummary(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildEligibility(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildRadarChart(),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildAmount(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildDeadline(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildLocation(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildOriginalText(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildDetailedFields(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildSimilarOpportunities(detail),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                       _buildActions(context, detail),
                     ],
                   ),
@@ -100,13 +100,13 @@ class OpportunityDetailPage extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('Erreur: $error')),
       ),
     );
   }
 
-  Widget _buildHeader(OpportunityDetail detail) {
+  Widget _buildHeader(BuildContext context, OpportunityDetail detail) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -123,18 +123,18 @@ class OpportunityDetailPage extends ConsumerWidget {
                 children: [
                   Text(
                     detail.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D1B3E),
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     detail.organization,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Chip(
                     label: Text(detail.categoryId),
                     backgroundColor: const Color(0xFFE0E7FF),
@@ -155,7 +155,7 @@ class OpportunityDetailPage extends ConsumerWidget {
                 child: Center(
                   child: Text(
                     '${detail.matchScore}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
@@ -175,25 +175,25 @@ class OpportunityDetailPage extends ConsumerWidget {
       children: [
         Row(
           children: [
-            const Text(
+            Text(
               'Résumé IA',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.purple[100],
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
+              child: Text(
                 'Généré',
                 style: TextStyle(fontSize: 12, color: Colors.purple),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(detail.summaryAi),
       ],
     );
@@ -203,11 +203,11 @@ class OpportunityDetailPage extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Éligibilité',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(detail.eligibilityAnalysis ?? 'Aucune analyse disponible.'),
       ],
     );
@@ -216,7 +216,7 @@ class OpportunityDetailPage extends ConsumerWidget {
   Widget _buildAmount(OpportunityDetail detail) {
     return Text(
       'Montant: ${detail.amountMin ?? ''} - ${detail.amountMax ?? ''} ${detail.currencyCode ?? 'FCFA'}',
-      style: const TextStyle(fontSize: 16),
+      style: TextStyle(fontSize: 16),
     );
   }
 
@@ -234,13 +234,13 @@ class OpportunityDetailPage extends ConsumerWidget {
   Widget _buildLocation(OpportunityDetail detail) {
     return Text(
       'Localisation: ${detail.location} (${detail.countryCode})',
-      style: const TextStyle(fontSize: 16),
+      style: TextStyle(fontSize: 16),
     );
   }
 
   Widget _buildOriginalText(OpportunityDetail detail) {
     return ExpansionTile(
-      title: const Text(
+      title: Text(
         'Texte original',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
@@ -256,7 +256,7 @@ class OpportunityDetailPage extends ConsumerWidget {
 
   Widget _buildDetailedFields(OpportunityDetail detail) {
     return ExpansionTile(
-      title: const Text(
+      title: Text(
         'Champs détaillés',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
@@ -273,15 +273,15 @@ class OpportunityDetailPage extends ConsumerWidget {
   }
 
   Widget _buildSimilarOpportunities(OpportunityDetail detail) {
-    if (detail.relatedOpportunities.isEmpty) return const SizedBox();
+    if (detail.relatedOpportunities.isEmpty) return SizedBox();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Opportunités similaires',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         SizedBox(
           height: 120,
           child: ListView.builder(
@@ -300,7 +300,7 @@ class OpportunityDetailPage extends ConsumerWidget {
                         item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
                       Text(
@@ -355,15 +355,15 @@ class OpportunityDetailPage extends ConsumerWidget {
       children: [
         ElevatedButton(
           onPressed: () {},
-          child: const Text('Postuler'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0D1B3E),
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
+          child: Text('Postuler'),
         ),
-        OutlinedButton(onPressed: () {}, child: const Text('Exporter')),
+        OutlinedButton(onPressed: () {}, child: Text('Exporter')),
         TextButton(
           onPressed: () {},
-          child: const Text('Signaler', style: TextStyle(color: Colors.red)),
+          child: Text('Signaler', style: TextStyle(color: Colors.red)),
         ),
       ],
     );

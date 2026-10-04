@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({Key? key}) : super(key: key);
+  const OnboardingPage({super.key});
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -19,10 +19,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text('Enregistrer et quitter'),
-          ),
+          TextButton(onPressed: () {}, child: Text('Enregistrer et quitter')),
         ],
       ),
       body: Column(
@@ -79,7 +76,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       case 6:
         return _buildStep7();
       default:
-        return const SizedBox();
+        return SizedBox();
     }
   }
 
@@ -87,27 +84,24 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Bienvenue ! Qui êtes-vous ?',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         const TextField(
           decoration: InputDecoration(
             labelText: 'Nom de profil',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 24),
-        const Text(
-          'Statut actuel',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
+        SizedBox(height: 24),
+        Text('Statut actuel', style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -137,15 +131,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Où êtes-vous basé ?',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         DropdownButtonFormField<String>(
           decoration: const InputDecoration(
             labelText: 'Pays',
@@ -158,19 +152,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
           onChanged: (_) {},
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const TextField(
           decoration: InputDecoration(
             labelText: 'Ville',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 24),
-        const Text(
+        SizedBox(height: 24),
+        Text(
           'Mode de travail souhaité',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Wrap(
           spacing: 8,
           children: ['Sur site', 'Hybride', 'Télétravail']
@@ -183,9 +177,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
               )
               .toList(),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         SwitchListTile(
-          title: const Text('Prêt à déménager ?'),
+          title: Text('Prêt à déménager ?'),
           value: true,
           onChanged: (_) {},
         ),
@@ -197,15 +191,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Votre formation',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         DropdownButtonFormField<String>(
           decoration: const InputDecoration(
             labelText: "Niveau d'études",
@@ -218,21 +212,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
           ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
           onChanged: (_) {},
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const TextField(
           decoration: InputDecoration(
             labelText: "Domaine d'études",
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const TextField(
           decoration: InputDecoration(
             labelText: "Année d'obtention",
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const TextField(
           decoration: InputDecoration(
             labelText: 'Établissement',
@@ -247,38 +241,38 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Expérience professionnelle',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         const TextField(
           decoration: InputDecoration(
             labelText: 'Titre du poste',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const TextField(
           decoration: InputDecoration(
             labelText: 'Employeur',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const TextField(
           decoration: InputDecoration(
             labelText: "Années d'expérience",
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         SwitchListTile(
-          title: const Text("C'est mon poste actuel"),
+          title: Text("C'est mon poste actuel"),
           value: true,
           onChanged: (_) {},
         ),
@@ -290,15 +284,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Vos compétences',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         const TextField(
           decoration: InputDecoration(
             labelText: 'Rechercher une compétence...',
@@ -306,16 +300,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
             prefixIcon: Icon(Icons.search),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Wrap(
           spacing: 8,
           children: [
-            Chip(label: const Text('Gestion de projet'), onDeleted: () {}),
-            Chip(label: const Text('Analyse de données'), onDeleted: () {}),
+            Chip(label: Text('Gestion de projet'), onDeleted: () {}),
+            Chip(label: Text('Analyse de données'), onDeleted: () {}),
           ],
         ),
-        const SizedBox(height: 24),
-        const Text('Niveau pour "Gestion de projet"'),
+        SizedBox(height: 24),
+        Text('Niveau pour "Gestion de projet"'),
         Slider(
           value: 2,
           min: 0,
@@ -332,15 +326,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Langues',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         Row(
           children: [
             Expanded(
@@ -355,7 +349,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 onChanged: (_) {},
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
@@ -370,11 +364,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         TextButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.add),
-          label: const Text('Ajouter une langue'),
+          icon: Icon(Icons.add),
+          label: Text('Ajouter une langue'),
         ),
       ],
     );
@@ -384,42 +378,42 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Quels sont vos objectifs ?',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         CheckboxListTile(
-          title: const Text("Bourses d'études"),
+          title: Text("Bourses d'études"),
           value: true,
           onChanged: (_) {},
         ),
         CheckboxListTile(
-          title: const Text("Offres d'emploi"),
+          title: Text("Offres d'emploi"),
           value: true,
           onChanged: (_) {},
         ),
         CheckboxListTile(
-          title: const Text("Appels d'offres"),
+          title: Text("Appels d'offres"),
           value: false,
           onChanged: (_) {},
         ),
         CheckboxListTile(
-          title: const Text('Entrepreneuriat (Financement)'),
+          title: Text('Entrepreneuriat (Financement)'),
           value: false,
           onChanged: (_) {},
         ),
         CheckboxListTile(
-          title: const Text('Recherche'),
+          title: Text('Recherche'),
           value: false,
           onChanged: (_) {},
         ),
         CheckboxListTile(
-          title: const Text('Volontariat'),
+          title: Text('Volontariat'),
           value: false,
           onChanged: (_) {},
         ),
@@ -440,14 +434,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
           if (_currentStep > 0)
             OutlinedButton(
               onPressed: () => setState(() => _currentStep--),
-              child: const Text('Précédent'),
+              child: Text('Précédent'),
             )
           else
-            TextButton(onPressed: () {}, child: const Text('Passer')),
+            TextButton(onPressed: () {}, child: Text('Passer')),
 
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0D1B3E),
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
             onPressed: () {
               if (_currentStep < _totalSteps - 1) {

@@ -8,8 +8,8 @@ and the pragma configuration below.
 from __future__ import annotations
 
 import os
+from collections.abc import AsyncGenerator
 from pathlib import Path
-from typing import AsyncGenerator
 
 import structlog
 from sqlalchemy.ext.asyncio import (
@@ -17,7 +17,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import StaticPool
 
 log = structlog.get_logger(__name__)
@@ -36,6 +35,13 @@ def configure_db_key(key_hex: str) -> None:
     global _db_key
     _db_key = key_hex
 
+def reset_engine() -> None:
+    """Resets the engine so it will be recreated with the new key."""
+    global _engine, _session_factory
+    _engine = None
+    _session_factory = None
+
+
 
 def _get_engine():
     """Create the async SQLAlchemy engine for the current session."""
@@ -48,15 +54,24 @@ def _get_engine():
     }
 
     if _db_key:
-        # SQLCipher pragma: applied as connection-level event
         connect_args["timeout"] = 30
 
-    return create_async_engine(
+    engine = create_async_engine(
         db_url,
         connect_args=connect_args,
         poolclass=StaticPool,    # SQLite requires single connection in WAL mode
         echo=os.environ.get("OPX_SQL_ECHO", "false").lower() == "true",
     )
+
+    if _db_key:
+        from sqlalchemy import event
+        @event.listens_for(engine.sync_engine, "connect")
+        def receive_connect(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute(f"PRAGMA key = '{_db_key}';")
+            cursor.close()
+
+    return engine
 
 
 # Module-level engine and session factory (lazy-initialized)
@@ -98,8 +113,8 @@ async def init_db() -> None:
     Initialize the database on first launch.
     In production this runs Alembic migrations instead of create_all.
     """
+    from persistence import models
     from persistence.models.base import Base
-    from persistence import models  # noqa: F401 — import all models
 
     async with get_engine().begin() as conn:
         # Enable WAL mode for concurrent reads + single writer

@@ -21,13 +21,13 @@ class ErrorDisplay extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 64, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'Une erreur est survenue',
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -36,11 +36,11 @@ class ErrorDisplay extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Réessayer'),
+                icon: Icon(Icons.refresh),
+                label: Text('Réessayer'),
               ),
             ],
           ],

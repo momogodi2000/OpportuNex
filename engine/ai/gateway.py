@@ -9,12 +9,12 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from typing import Any, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import Any
 
 import httpx
 import structlog
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 from collection.safe_http import SafeHTTPClient
 
@@ -30,7 +30,7 @@ def _cache_key(*parts: str) -> str:
     return hashlib.sha256("|".join(parts).encode()).hexdigest()
 
 
-def _cache_get(key: str) -> Optional[Any]:
+def _cache_get(key: str) -> Any | None:
     entry = _cache.get(key)
     if entry and time.time() < entry[1]:
         return entry[0]
@@ -49,30 +49,30 @@ class SearchFiltersExtracted(BaseModel):
     categories: list[str] = Field(default_factory=list)
     countries: list[str] = Field(default_factory=list)
     languages: list[str] = Field(default_factory=list)
-    deadline_before: Optional[str] = None
-    amount_min: Optional[int] = None
-    amount_max: Optional[int] = None
+    deadline_before: str | None = None
+    amount_min: int | None = None
+    amount_max: int | None = None
     remote_only: bool = False
     confidence: float = Field(default=0.7, ge=0.0, le=1.0)
 
 
 class OpportunityExtraction(BaseModel):
     """Structured extraction result from raw HTML/text content."""
-    title: Optional[str] = None
-    organization: Optional[str] = None
-    category: Optional[str] = None
-    deadline: Optional[str] = None      # ISO 8601 date if found
-    location: Optional[str] = None
-    amount_min: Optional[int] = None
-    amount_max: Optional[int] = None
-    currency_code: Optional[str] = None
-    language: Optional[str] = None
-    eligibility_text: Optional[str] = None
-    summary: Optional[str] = None       # ≤ 5 lines
+    title: str | None = None
+    organization: str | None = None
+    category: str | None = None
+    deadline: str | None = None      # ISO 8601 date if found
+    location: str | None = None
+    amount_min: int | None = None
+    amount_max: int | None = None
+    currency_code: str | None = None
+    language: str | None = None
+    eligibility_text: str | None = None
+    summary: str | None = None       # ≤ 5 lines
     required_skills: list[str] = Field(default_factory=list)
     required_languages: list[str] = Field(default_factory=list)
-    min_education_level: Optional[str] = None
-    min_experience_years: Optional[float] = None
+    min_education_level: str | None = None
+    min_experience_years: float | None = None
     extraction_confidence: float = Field(default=0.5, ge=0.0, le=1.0)
 
 
@@ -83,7 +83,7 @@ class ProviderConfig:
     name: str
     provider_type: str    # openai_compat | gemini | anthropic | ollama | lmstudio
     model: str
-    api_key: Optional[str]
+    api_key: str | None
     base_url: str
     is_local: bool = False
     max_tokens: int = 2000
@@ -106,7 +106,7 @@ class AIGateway:
         self._remote_client = SafeHTTPClient()
 
     async def interpret_query(
-        self, query: str, profile_summary: Optional[dict] = None
+        self, query: str, profile_summary: dict | None = None
     ) -> SearchFiltersExtracted:
         """
         Interpret a natural language search query into structured filters.
@@ -144,7 +144,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte supplémentaire."""
         return result
 
     async def extract_opportunity(
-        self, content: str, source_url: str, existing_title: Optional[str] = None
+        self, content: str, source_url: str, existing_title: str | None = None
     ) -> OpportunityExtraction:
         """
         Extract structured opportunity data from raw content.
@@ -294,7 +294,7 @@ Rédige une ébauche de {type_name} d'environ 300 mots."""
         provider: ProviderConfig,
         system_prompt: str,
         user_prompt: str,
-        max_tokens: Optional[int] = None,
+        max_tokens: int | None = None,
     ) -> str:
         """Make API call to a specific provider."""
         max_tokens = max_tokens or provider.max_tokens

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../domain/monitor_models.dart';
-import '../data/monitor_repository.dart';
+import '../../domain/monitor_models.dart';
+import '../../data/monitor_repository.dart';
 
 final monitorsProvider = FutureProvider<List<MonitorModel>>((ref) async {
   final repo = ref.watch(monitorRepositoryProvider);
@@ -18,17 +18,17 @@ class MonitorsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Mes veilles',
-          style: TextStyle(color: Color(0xFF0D1B3E)),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showMonitorBottomSheet(context, ref),
-        icon: const Icon(Icons.add),
-        label: const Text('Nouvelle veille'),
+        icon: Icon(Icons.add),
+        label: Text('Nouvelle veille'),
         backgroundColor: const Color(0xFF22C55E),
       ),
       body: monitorsAsync.when(
@@ -43,24 +43,24 @@ class MonitorsPage extends ConsumerWidget {
                     size: 64,
                     color: Colors.grey.shade400,
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     'Aucune veille configurée',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     'Créez une veille pour être alerté des nouvelles opportunités.',
                     style: TextStyle(color: Colors.grey),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () => _showMonitorBottomSheet(context, ref),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0D1B3E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Créer ma première veille'),
+                    child: Text('Créer ma première veille'),
                   ),
                 ],
               ),
@@ -75,7 +75,7 @@ class MonitorsPage extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Erreur: $err')),
       ),
     );
@@ -119,10 +119,10 @@ class _MonitorCard extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     monitor.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D1B3E),
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ),
@@ -140,11 +140,11 @@ class _MonitorCard extends ConsumerWidget {
                           ref.invalidate(monitorsProvider);
                         });
                   },
-                  activeColor: const Color(0xFF22C55E),
+                  activeThumbColor: const Color(0xFF22C55E),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Row(
               children: [
                 Chip(
@@ -152,7 +152,7 @@ class _MonitorCard extends ConsumerWidget {
                     monitor.frequency == MonitorFrequency.daily
                         ? 'Quotidienne'
                         : 'Hebdomadaire',
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: 12),
                   ),
                   backgroundColor: const Color(0xFFE0F2FE),
                 ),
@@ -160,11 +160,11 @@ class _MonitorCard extends ConsumerWidget {
                 if (monitor.minScore > 0)
                   Text(
                     'Score min: ${monitor.minScore}',
-                    style: const TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey),
                   ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Row(
               children: [
                 Column(
@@ -183,11 +183,11 @@ class _MonitorCard extends ConsumerWidget {
                               'dd/MM/yyyy HH:mm',
                             ).format(monitor.lastRunAt!)
                           : 'Jamais',
-                      style: const TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 14),
                     ),
                   ],
                 ),
-                const SizedBox(width: 24),
+                SizedBox(width: 24),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -204,13 +204,13 @@ class _MonitorCard extends ConsumerWidget {
                               'dd/MM/yyyy HH:mm',
                             ).format(monitor.nextRunAt!)
                           : '-',
-                      style: const TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 14),
                     ),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -218,10 +218,10 @@ class _MonitorCard extends ConsumerWidget {
                   onPressed: () {
                     // Edit
                   },
-                  icon: const Icon(Icons.edit, size: 18),
-                  label: const Text('Modifier'),
+                  icon: Icon(Icons.edit, size: 18),
+                  label: Text('Modifier'),
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF0D1B3E),
+                    foregroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 TextButton.icon(
@@ -232,8 +232,8 @@ class _MonitorCard extends ConsumerWidget {
                         .deleteMonitor(monitor.id)
                         .then((_) => ref.invalidate(monitorsProvider));
                   },
-                  icon: const Icon(Icons.delete, size: 18),
-                  label: const Text('Supprimer'),
+                  icon: Icon(Icons.delete, size: 18),
+                  label: Text('Supprimer'),
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
                 ElevatedButton.icon(
@@ -247,8 +247,8 @@ class _MonitorCard extends ConsumerWidget {
                       ref.invalidate(monitorsProvider);
                     });
                   },
-                  icon: const Icon(Icons.play_arrow, size: 18),
-                  label: const Text('Lancer maintenant'),
+                  icon: Icon(Icons.play_arrow, size: 18),
+                  label: Text('Lancer maintenant'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF97316),
                     foregroundColor: Colors.white,
@@ -308,13 +308,13 @@ class _MonitorFormSheetState extends State<_MonitorFormSheet> {
         children: [
           Text(
             widget.monitor == null ? 'Nouvelle veille' : 'Modifier la veille',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF0D1B3E),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           TextField(
             controller: _nameController,
             decoration: const InputDecoration(
@@ -322,9 +322,9 @@ class _MonitorFormSheetState extends State<_MonitorFormSheet> {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           DropdownButtonFormField<MonitorFrequency>(
-            value: _frequency,
+            initialValue: _frequency,
             decoration: const InputDecoration(
               labelText: 'Fréquence',
               border: OutlineInputBorder(),
@@ -347,7 +347,7 @@ class _MonitorFormSheetState extends State<_MonitorFormSheet> {
               if (val != null) setState(() => _frequency = val);
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text('Score minimum: ${_minScore.toInt()}'),
           Slider(
             value: _minScore,
@@ -357,13 +357,13 @@ class _MonitorFormSheetState extends State<_MonitorFormSheet> {
             activeColor: const Color(0xFF22C55E),
             onChanged: (val) => setState(() => _minScore = val),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Annuler'),
+                child: Text('Annuler'),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -371,14 +371,14 @@ class _MonitorFormSheetState extends State<_MonitorFormSheet> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0D1B3E),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('Enregistrer'),
+                child: Text('Enregistrer'),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
         ],
       ),
     );

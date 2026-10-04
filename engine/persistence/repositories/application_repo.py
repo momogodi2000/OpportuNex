@@ -1,13 +1,15 @@
-from typing import Optional
-from sqlalchemy import select, update, delete
+
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from ..models.all_models import ApplicationModel, ApplicationStatusHistory
+
 
 class ApplicationRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, id: str) -> Optional[ApplicationModel]:
+    async def get_by_id(self, id: str) -> ApplicationModel | None:
         result = await self.session.execute(select(ApplicationModel).where(ApplicationModel.id == id))
         return result.scalars().first()
 
@@ -17,7 +19,7 @@ class ApplicationRepo:
         await self.session.flush()
         return str(app.id)
 
-    async def update_status(self, id: str, new_status: str, old_status: str, note: Optional[str]) -> None:
+    async def update_status(self, id: str, new_status: str, old_status: str, note: str | None) -> None:
         import datetime
         # Insert status history
         history = ApplicationStatusHistory(
@@ -42,5 +44,5 @@ class ApplicationRepo:
     async def get_calendar_events(self, user_id: str, from_date: str, to_date: str) -> list[dict]:
         return []
 
-    async def list_for_user(self, user_id: str, status: Optional[str], cursor: Optional[str], limit: int) -> tuple[list, Optional[str]]:
+    async def list_for_user(self, user_id: str, status: str | None, cursor: str | None, limit: int) -> tuple[list, str | None]:
         return [], None

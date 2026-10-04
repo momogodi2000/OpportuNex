@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     Boolean,
@@ -19,9 +18,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
-    event,
 )
-from sqlalchemy.dialects.sqlite import BLOB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from persistence.models.base import Base
@@ -59,7 +56,7 @@ class Country(Base):
     code: Mapped[str] = mapped_column(String(2), primary_key=True)   # ISO 3166-1 alpha-2
     name_fr: Mapped[str] = mapped_column(String(100), nullable=False)
     name_en: Mapped[str] = mapped_column(String(100), nullable=False)
-    region: Mapped[Optional[str]] = mapped_column(String(50))
+    region: Mapped[str | None] = mapped_column(String(50))
 
 
 class Currency(Base):
@@ -83,7 +80,7 @@ class OpportunityCategory(Base):
     __tablename__ = "opportunity_categories"
 
     id: Mapped[str] = mapped_column(String(50), primary_key=True)
-    parent_id: Mapped[Optional[str]] = mapped_column(
+    parent_id: Mapped[str | None] = mapped_column(
         String(50), ForeignKey("opportunity_categories.id")
     )
     label_fr: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -95,7 +92,7 @@ class Skill(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-    category: Mapped[Optional[str]] = mapped_column(String(50))
+    category: Mapped[str | None] = mapped_column(String(50))
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -112,7 +109,7 @@ class UserModel(Base):
     recovery_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0)
-    lock_until: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    lock_until: Mapped[datetime | None] = mapped_column(DateTime)
     sync_mode: Mapped[str] = mapped_column(
         String(10), default="local", nullable=False
     )
@@ -126,15 +123,15 @@ class UserModel(Base):
     )
 
     # Relationships
-    profile: Mapped["UserProfile"] = relationship(back_populates="user", uselist=False)
-    sessions: Mapped[list["UserSession"]] = relationship(back_populates="user")
-    consents: Mapped[list["Consent"]] = relationship(back_populates="user")
-    workspaces: Mapped[list["ResearchWorkspace"]] = relationship(back_populates="user")
-    saved_opportunities: Mapped[list["SavedOpportunity"]] = relationship(
+    profile: Mapped[UserProfile] = relationship(back_populates="user", uselist=False)
+    sessions: Mapped[list[UserSession]] = relationship(back_populates="user")
+    consents: Mapped[list[Consent]] = relationship(back_populates="user")
+    workspaces: Mapped[list[ResearchWorkspace]] = relationship(back_populates="user")
+    saved_opportunities: Mapped[list[SavedOpportunity]] = relationship(
         back_populates="user"
     )
-    monitors: Mapped[list["Monitor"]] = relationship(back_populates="user")
-    ai_providers: Mapped[list["AIProvider"]] = relationship(back_populates="user")
+    monitors: Mapped[list[Monitor]] = relationship(back_populates="user")
+    ai_providers: Mapped[list[AIProvider]] = relationship(back_populates="user")
 
 
 class UserSession(Base):
@@ -146,7 +143,7 @@ class UserSession(Base):
     )
     token_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     user: Mapped[UserModel] = relationship(back_populates="sessions")
@@ -162,8 +159,8 @@ class Consent(Base):
     purpose: Mapped[str] = mapped_column(String(100), nullable=False)
     granted: Mapped[bool] = mapped_column(Boolean, nullable=False)
     granted_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    revoked_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    provider_id: Mapped[Optional[str]] = mapped_column(String(36))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime)
+    provider_id: Mapped[str | None] = mapped_column(String(36))
 
     user: Mapped[UserModel] = relationship(back_populates="consents")
 
@@ -182,41 +179,52 @@ class UserProfile(Base):
     user_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    country_code: Mapped[Optional[str]] = mapped_column(
+    full_name: Mapped[str | None] = mapped_column(String(255))
+    country_code: Mapped[str | None] = mapped_column(
         String(2), ForeignKey("countries.code")
     )
-    city: Mapped[Optional[str]] = mapped_column(String(100))
-    status: Mapped[Optional[str]] = mapped_column(String(50))
-    work_mode: Mapped[Optional[str]] = mapped_column(String(20))
-    mobility: Mapped[Optional[str]] = mapped_column(String(20))
-    summary: Mapped[Optional[str]] = mapped_column(Text)
-    summary_validated: Mapped[bool] = mapped_column(Boolean, default=False)
-    completeness_score: Mapped[int] = mapped_column(Integer, default=0)
+    city: Mapped[str | None] = mapped_column(String(100))
+    professional_status: Mapped[str | None] = mapped_column(String(50))
+    current_occupation: Mapped[str | None] = mapped_column(String(255))
+    experience_years: Mapped[float | None] = mapped_column(Float)
+    highest_education: Mapped[str | None] = mapped_column(String(50))
+    work_mode_pref: Mapped[str | None] = mapped_column(String(20))
+    willing_to_relocate: Mapped[int | None] = mapped_column(Integer)
+    contact_phone: Mapped[str | None] = mapped_column(String(50))
+    bio: Mapped[str | None] = mapped_column(Text)
+    summary_text: Mapped[str | None] = mapped_column(Text)
+    summary_approved: Mapped[int] = mapped_column(Integer, default=0)
+    completeness_pct: Mapped[int] = mapped_column(Integer, default=0)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=_now, onupdate=_now, nullable=False
     )
 
     __table_args__ = (
         CheckConstraint(
-            "work_mode IN ('remote', 'hybrid', 'onsite', NULL)",
-            name="ck_profile_work_mode",
+            "professional_status IN ('student','job_seeker','employed','self_employed','freelancer','entrepreneur','researcher','unemployed','retired','other', NULL)",
+            name="ck_profile_professional_status",
         ),
         CheckConstraint(
-            "completeness_score BETWEEN 0 AND 100",
-            name="ck_profile_completeness",
+            "highest_education IN ('none','primary','secondary','bac','bac_plus_2','bachelor','master','doctorate','postdoc','vocational', NULL)",
+            name="ck_profile_edu",
         ),
+        CheckConstraint(
+            "work_mode_pref IN ('remote','hybrid','onsite','any', NULL)",
+            name="ck_profile_work_mode",
+        ),
+        CheckConstraint("completeness_pct BETWEEN 0 AND 100", name="ck_profile_completeness"),
     )
 
     user: Mapped[UserModel] = relationship(back_populates="profile")
-    education_records: Mapped[list["EducationRecord"]] = relationship(
+    education_records: Mapped[list[EducationRecord]] = relationship(
         back_populates="profile"
     )
-    work_experiences: Mapped[list["WorkExperience"]] = relationship(
+    work_experiences: Mapped[list[WorkExperience]] = relationship(
         back_populates="profile"
     )
-    skills: Mapped[list["UserSkill"]] = relationship(back_populates="profile")
-    languages: Mapped[list["UserLanguage"]] = relationship(back_populates="profile")
-    objectives: Mapped[list["UserObjective"]] = relationship(back_populates="profile")
+    skills: Mapped[list[UserSkill]] = relationship(back_populates="profile")
+    languages: Mapped[list[UserLanguage]] = relationship(back_populates="profile")
+    objectives: Mapped[list[UserObjective]] = relationship(back_populates="profile")
 
 
 class EducationRecord(Base):
@@ -226,11 +234,11 @@ class EducationRecord(Base):
     user_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("user_profiles.user_id", ondelete="CASCADE")
     )
-    degree_level: Mapped[Optional[str]] = mapped_column(String(50))
-    field_of_study: Mapped[Optional[str]] = mapped_column(String(100))
-    institution: Mapped[Optional[str]] = mapped_column(String(200))
-    graduation_year: Mapped[Optional[int]] = mapped_column(Integer)
-    country_code: Mapped[Optional[str]] = mapped_column(
+    degree_level: Mapped[str | None] = mapped_column(String(50))
+    field_of_study: Mapped[str | None] = mapped_column(String(100))
+    institution: Mapped[str | None] = mapped_column(String(200))
+    graduation_year: Mapped[int | None] = mapped_column(Integer)
+    country_code: Mapped[str | None] = mapped_column(
         String(2), ForeignKey("countries.code")
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
@@ -246,12 +254,12 @@ class WorkExperience(Base):
         String(36), ForeignKey("user_profiles.user_id", ondelete="CASCADE")
     )
     job_title: Mapped[str] = mapped_column(String(200), nullable=False)
-    employer: Mapped[Optional[str]] = mapped_column(String(200))
-    start_date: Mapped[Optional[str]] = mapped_column(String(10))    # YYYY-MM
-    end_date: Mapped[Optional[str]] = mapped_column(String(10))
+    employer: Mapped[str | None] = mapped_column(String(200))
+    start_date: Mapped[str | None] = mapped_column(String(10))    # YYYY-MM
+    end_date: Mapped[str | None] = mapped_column(String(10))
     is_current: Mapped[bool] = mapped_column(Boolean, default=False)
-    description: Mapped[Optional[str]] = mapped_column(Text)
-    country_code: Mapped[Optional[str]] = mapped_column(
+    description: Mapped[str | None] = mapped_column(Text)
+    country_code: Mapped[str | None] = mapped_column(
         String(2), ForeignKey("countries.code")
     )
 
@@ -268,7 +276,7 @@ class UserSkill(Base):
     skill_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("skills.id"), nullable=False
     )
-    level: Mapped[Optional[str]] = mapped_column(String(20))    # beginner/intermediate/advanced/expert
+    level: Mapped[str | None] = mapped_column(String(20))    # beginner/intermediate/advanced/expert
 
     profile: Mapped[UserProfile] = relationship(back_populates="skills")
 
@@ -283,7 +291,7 @@ class UserLanguage(Base):
     language_code: Mapped[str] = mapped_column(
         String(5), ForeignKey("languages.code"), nullable=False
     )
-    cefr_level: Mapped[Optional[str]] = mapped_column(String(2))    # A1-C2
+    cefr_level: Mapped[str | None] = mapped_column(String(2))    # A1-C2
 
     __table_args__ = (
         CheckConstraint(
@@ -318,18 +326,18 @@ class Source(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     base_url: Mapped[str] = mapped_column(String(500), nullable=False)
-    country_code: Mapped[Optional[str]] = mapped_column(
+    country_code: Mapped[str | None] = mapped_column(
         String(2), ForeignKey("countries.code")
     )
-    language_code: Mapped[Optional[str]] = mapped_column(
+    language_code: Mapped[str | None] = mapped_column(
         String(5), ForeignKey("languages.code")
     )
     status: Mapped[str] = mapped_column(String(20), default="active", nullable=False)
     is_official: Mapped[bool] = mapped_column(Boolean, default=False)
     requires_headless: Mapped[bool] = mapped_column(Boolean, default=False)
     reliability_score: Mapped[float] = mapped_column(Float, default=0.5)
-    last_success_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    last_error_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    last_success_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_error_at: Mapped[datetime | None] = mapped_column(DateTime)
     consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
     min_crawl_interval_minutes: Mapped[int] = mapped_column(Integer, default=60)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
@@ -352,8 +360,8 @@ class Source(Base):
         ),
     )
 
-    scan_runs: Mapped[list["SourceScanRun"]] = relationship(back_populates="source")
-    adapters: Mapped[list["SourceAdapter"]] = relationship(back_populates="source")
+    scan_runs: Mapped[list[SourceScanRun]] = relationship(back_populates="source")
+    adapters: Mapped[list[SourceAdapter]] = relationship(back_populates="source")
 
 
 class SourceAdapter(Base):
@@ -366,7 +374,7 @@ class SourceAdapter(Base):
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     adapter_json: Mapped[str] = mapped_column(Text, nullable=False)   # Declarative JSON
-    signature: Mapped[Optional[str]] = mapped_column(String(500))     # Sigstore/minisign
+    signature: Mapped[str | None] = mapped_column(String(500))     # Sigstore/minisign
     access_method: Mapped[str] = mapped_column(String(20), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
@@ -393,11 +401,11 @@ class SourceScanRun(Base):
         String(36), ForeignKey("sources.id", ondelete="CASCADE"), nullable=False
     )
     started_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime)
     status: Mapped[str] = mapped_column(String(20), default="running")
     items_found: Mapped[int] = mapped_column(Integer, default=0)
     items_new: Mapped[int] = mapped_column(Integer, default=0)
-    error_message: Mapped[Optional[str]] = mapped_column(Text)
+    error_message: Mapped[str | None] = mapped_column(Text)
 
     source: Mapped[Source] = relationship(back_populates="scan_runs")
 
@@ -413,32 +421,32 @@ class OpportunityModel(Base):
     canonical_url: Mapped[str] = mapped_column(String(2000), nullable=False, unique=True)
     status: Mapped[str] = mapped_column(String(20), default="collected", nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
-    organization: Mapped[Optional[str]] = mapped_column(String(200))
-    category_id: Mapped[Optional[str]] = mapped_column(
+    organization: Mapped[str | None] = mapped_column(String(200))
+    category_id: Mapped[str | None] = mapped_column(
         String(50), ForeignKey("opportunity_categories.id")
     )
-    deadline_raw: Mapped[Optional[str]] = mapped_column(String(100))
-    deadline_iso: Mapped[Optional[str]] = mapped_column(String(20))
-    location: Mapped[Optional[str]] = mapped_column(String(300))
-    country_code: Mapped[Optional[str]] = mapped_column(
+    deadline_raw: Mapped[str | None] = mapped_column(String(100))
+    deadline_iso: Mapped[str | None] = mapped_column(String(20))
+    location: Mapped[str | None] = mapped_column(String(300))
+    country_code: Mapped[str | None] = mapped_column(
         String(2), ForeignKey("countries.code")
     )
-    language_code: Mapped[Optional[str]] = mapped_column(
+    language_code: Mapped[str | None] = mapped_column(
         String(5), ForeignKey("languages.code")
     )
-    amount_min: Mapped[Optional[int]] = mapped_column(Integer)
-    amount_max: Mapped[Optional[int]] = mapped_column(Integer)
-    currency_code: Mapped[Optional[str]] = mapped_column(
+    amount_min: Mapped[int | None] = mapped_column(Integer)
+    amount_max: Mapped[int | None] = mapped_column(Integer)
+    currency_code: Mapped[str | None] = mapped_column(
         String(3), ForeignKey("currencies.code")
     )
-    summary: Mapped[Optional[str]] = mapped_column(Text)
-    eligibility_verbatim: Mapped[Optional[str]] = mapped_column(Text)
-    content_fingerprint: Mapped[Optional[str]] = mapped_column(String(64))  # SHA-256
-    simhash: Mapped[Optional[int]] = mapped_column(Integer)
+    summary: Mapped[str | None] = mapped_column(Text)
+    eligibility_verbatim: Mapped[str | None] = mapped_column(Text)
+    content_fingerprint: Mapped[str | None] = mapped_column(String(64))  # SHA-256
+    simhash: Mapped[int | None] = mapped_column(Integer)
     is_ai_analysed: Mapped[bool] = mapped_column(Boolean, default=False)
     collected_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    analysed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    analysed_at: Mapped[datetime | None] = mapped_column(DateTime)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=_now, onupdate=_now, nullable=False
     )
@@ -454,9 +462,9 @@ class OpportunityModel(Base):
         ),
     )
 
-    fields: Mapped[list["OpportunityField"]] = relationship(back_populates="opportunity")
-    sources: Mapped[list["OpportunitySource"]] = relationship(back_populates="opportunity")
-    match_scores: Mapped[list["MatchScoreModel"]] = relationship(back_populates="opportunity")
+    fields: Mapped[list[OpportunityField]] = relationship(back_populates="opportunity")
+    sources: Mapped[list[OpportunitySource]] = relationship(back_populates="opportunity")
+    match_scores: Mapped[list[MatchScoreModel]] = relationship(back_populates="opportunity")
 
 
 class OpportunityField(Base):
@@ -468,11 +476,11 @@ class OpportunityField(Base):
         String(36), ForeignKey("opportunities.id", ondelete="CASCADE"), nullable=False
     )
     field_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    value: Mapped[Optional[str]] = mapped_column(Text)
+    value: Mapped[str | None] = mapped_column(Text)
     provenance: Mapped[str] = mapped_column(String(20), nullable=False)
-    excerpt: Mapped[Optional[str]] = mapped_column(Text)
+    excerpt: Mapped[str | None] = mapped_column(Text)
     confidence: Mapped[float] = mapped_column(Float, default=1.0)
-    prompt_version: Mapped[Optional[str]] = mapped_column(String(20))
+    prompt_version: Mapped[str | None] = mapped_column(String(20))
 
     __table_args__ = (
         CheckConstraint(
@@ -495,7 +503,7 @@ class OpportunitySource(Base):
         String(36), ForeignKey("sources.id"), nullable=False
     )
     source_url: Mapped[str] = mapped_column(String(2000), nullable=False)
-    external_id: Mapped[Optional[str]] = mapped_column(String(500))
+    external_id: Mapped[str | None] = mapped_column(String(500))
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
     collected_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
@@ -556,8 +564,8 @@ class SavedOpportunity(Base):
         String(36), ForeignKey("opportunities.id"), nullable=False
     )
     priority: Mapped[str] = mapped_column(String(10), default="medium")
-    notes: Mapped[Optional[str]] = mapped_column(Text)
-    personal_deadline: Mapped[Optional[str]] = mapped_column(String(20))
+    notes: Mapped[str | None] = mapped_column(Text)
+    personal_deadline: Mapped[str | None] = mapped_column(String(20))
     saved_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=_now, onupdate=_now, nullable=False
@@ -572,10 +580,10 @@ class SavedOpportunity(Base):
     )
 
     user: Mapped[UserModel] = relationship(back_populates="saved_opportunities")
-    application: Mapped[Optional["ApplicationModel"]] = relationship(
+    application: Mapped[ApplicationModel | None] = relationship(
         back_populates="saved_opportunity", uselist=False
     )
-    reminders: Mapped[list["ReminderModel"]] = relationship(
+    reminders: Mapped[list[ReminderModel]] = relationship(
         back_populates="saved_opportunity"
     )
 
@@ -594,7 +602,7 @@ class ApplicationModel(Base):
         String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     status: Mapped[str] = mapped_column(String(30), default="discovered", nullable=False)
-    submitted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=_now, onupdate=_now, nullable=False
@@ -617,7 +625,7 @@ class ApplicationModel(Base):
     saved_opportunity: Mapped[SavedOpportunity] = relationship(
         back_populates="application"
     )
-    status_history: Mapped[list["ApplicationStatusHistory"]] = relationship(
+    status_history: Mapped[list[ApplicationStatusHistory]] = relationship(
         back_populates="application", order_by="ApplicationStatusHistory.changed_at"
     )
 
@@ -629,10 +637,10 @@ class ApplicationStatusHistory(Base):
     application_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("applications.id", ondelete="CASCADE"), nullable=False
     )
-    old_status: Mapped[Optional[str]] = mapped_column(String(30))
+    old_status: Mapped[str | None] = mapped_column(String(30))
     new_status: Mapped[str] = mapped_column(String(30), nullable=False)
     changed_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    note: Mapped[Optional[str]] = mapped_column(Text)
+    note: Mapped[str | None] = mapped_column(Text)
 
     application: Mapped[ApplicationModel] = relationship(back_populates="status_history")
 
@@ -649,7 +657,7 @@ class ResearchWorkspace(Base):
         String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
-    template: Mapped[Optional[str]] = mapped_column(String(50))
+    template: Mapped[str | None] = mapped_column(String(50))
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     updated_at: Mapped[datetime] = mapped_column(
@@ -657,7 +665,7 @@ class ResearchWorkspace(Base):
     )
 
     user: Mapped[UserModel] = relationship(back_populates="workspaces")
-    search_queries: Mapped[list["SearchQuery"]] = relationship(back_populates="workspace")
+    search_queries: Mapped[list[SearchQuery]] = relationship(back_populates="workspace")
 
 
 class SearchQuery(Base):
@@ -671,11 +679,11 @@ class SearchQuery(Base):
         String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     raw_query: Mapped[str] = mapped_column(Text, nullable=False)
-    interpreted_filters: Mapped[Optional[str]] = mapped_column(Text)   # JSON
+    interpreted_filters: Mapped[str | None] = mapped_column(Text)   # JSON
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     workspace: Mapped[ResearchWorkspace] = relationship(back_populates="search_queries")
-    runs: Mapped[list["SearchRun"]] = relationship(back_populates="query")
+    runs: Mapped[list[SearchRun]] = relationship(back_populates="query")
 
 
 class SearchRun(Base):
@@ -686,11 +694,11 @@ class SearchRun(Base):
         String(36), ForeignKey("search_queries.id", ondelete="CASCADE"), nullable=False
     )
     started_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime)
     status: Mapped[str] = mapped_column(String(20), default="running")
     total_results: Mapped[int] = mapped_column(Integer, default=0)
     new_results: Mapped[int] = mapped_column(Integer, default=0)
-    error_message: Mapped[Optional[str]] = mapped_column(Text)
+    error_message: Mapped[str | None] = mapped_column(Text)
 
     query: Mapped[SearchQuery] = relationship(back_populates="runs")
 
@@ -711,8 +719,8 @@ class Monitor(Base):
     frequency: Mapped[str] = mapped_column(String(20), default="daily")
     min_score: Mapped[int] = mapped_column(Integer, default=50)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    next_run_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    last_run_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    next_run_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     __table_args__ = (
@@ -744,11 +752,11 @@ class AIProvider(Base):
     provider_type: Mapped[str] = mapped_column(String(30), nullable=False)
     model_name: Mapped[str] = mapped_column(String(100), nullable=False)
     # API key is stored in the OS keychain; only a reference ID is stored here
-    keychain_ref: Mapped[Optional[str]] = mapped_column(String(200))
-    base_url: Mapped[Optional[str]] = mapped_column(String(500))
+    keychain_ref: Mapped[str | None] = mapped_column(String(200))
+    base_url: Mapped[str | None] = mapped_column(String(500))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_local: Mapped[bool] = mapped_column(Boolean, default=False)
-    daily_token_limit: Mapped[Optional[int]] = mapped_column(Integer)
+    daily_token_limit: Mapped[int | None] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
     __table_args__ = (
@@ -769,18 +777,18 @@ class BackgroundJob(Base):
     __tablename__ = "background_jobs"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    user_id: Mapped[Optional[str]] = mapped_column(
+    user_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL")
     )
     job_type: Mapped[str] = mapped_column(String(50), nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
     progress: Mapped[int] = mapped_column(Integer, default=0)
     total: Mapped[int] = mapped_column(Integer, default=0)
-    checkpoint_json: Mapped[Optional[str]] = mapped_column(Text)   # For resume
-    error_message: Mapped[Optional[str]] = mapped_column(Text)
+    checkpoint_json: Mapped[str | None] = mapped_column(Text)   # For resume
+    error_message: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime)
     cancel_requested: Mapped[bool] = mapped_column(Boolean, default=False)
 
     __table_args__ = (
@@ -801,14 +809,14 @@ class BackupRecord(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     backup_type: Mapped[str] = mapped_column(String(20), default="full")
     status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
-    file_path: Mapped[Optional[str]] = mapped_column(String(1000))
-    file_size_bytes: Mapped[Optional[int]] = mapped_column(Integer)
-    compressed_size_bytes: Mapped[Optional[int]] = mapped_column(Integer)
-    checksum_sha256: Mapped[Optional[str]] = mapped_column(String(64))
+    file_path: Mapped[str | None] = mapped_column(String(1000))
+    file_size_bytes: Mapped[int | None] = mapped_column(Integer)
+    compressed_size_bytes: Mapped[int | None] = mapped_column(Integer)
+    checksum_sha256: Mapped[str | None] = mapped_column(String(64))
     triggered_by: Mapped[str] = mapped_column(String(20), default="scheduler")
     started_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    error_message: Mapped[Optional[str]] = mapped_column(Text)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime)
+    error_message: Mapped[str | None] = mapped_column(Text)
 
     __table_args__ = (
         CheckConstraint(
@@ -833,16 +841,16 @@ class ReminderModel(Base):
     user_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    saved_opportunity_id: Mapped[Optional[str]] = mapped_column(
+    saved_opportunity_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("saved_opportunities.id", ondelete="CASCADE")
     )
     due_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
-    body: Mapped[Optional[str]] = mapped_column(Text)
+    body: Mapped[str | None] = mapped_column(Text)
     is_sent: Mapped[bool] = mapped_column(Boolean, default=False)
-    sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime)
 
-    saved_opportunity: Mapped[Optional[SavedOpportunity]] = relationship(
+    saved_opportunity: Mapped[SavedOpportunity | None] = relationship(
         back_populates="reminders"
     )
 
@@ -856,11 +864,11 @@ class NotificationRecord(Base):
     )
     notification_type: Mapped[str] = mapped_column(String(50), nullable=False)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
-    body: Mapped[Optional[str]] = mapped_column(Text)
+    body: Mapped[str | None] = mapped_column(Text)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
-    related_id: Mapped[Optional[str]] = mapped_column(String(36))
+    related_id: Mapped[str | None] = mapped_column(String(36))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -872,6 +880,6 @@ class SecurityEvent(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     event_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    user_id: Mapped[Optional[str]] = mapped_column(String(36))
-    details_json: Mapped[Optional[str]] = mapped_column(Text)
+    user_id: Mapped[str | None] = mapped_column(String(36))
+    details_json: Mapped[str | None] = mapped_column(Text)
     occurred_at: Mapped[datetime] = mapped_column(DateTime, default=_now)

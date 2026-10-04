@@ -1,12 +1,12 @@
+
 import structlog
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-from typing import Dict, Any, List
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from persistence.database import get_db_session
 from api.dependencies import get_current_user
 from domain.entities.entities import User
+from persistence.database import get_db_session
 
 logger = structlog.get_logger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
@@ -25,23 +25,23 @@ async def get_counters(
     
     if row:
         return {
-            "discovered": row.discovered,
-            "relevant": row.relevant,
-            "saved": row.saved,
-            "in_progress": row.in_progress,
-            "submitted": row.submitted,
-            "deadlines_14d": row.deadlines_14d,
-            "unread_notifications": row.unread_notifications
+            'totalOpportunities': row.discovered,
+            'newThisWeek': row.relevant,
+            'savedCount': row.saved,
+            'pendingApplications': row.in_progress + row.submitted,
+            'upcomingDeadlines': row.deadlines_14d,
+            'monitorsActive': 0,
+            'averageScore': 0.0
         }
     else:
         return {
-            "discovered": 0,
-            "relevant": 0,
-            "saved": 0,
-            "in_progress": 0,
-            "submitted": 0,
-            "deadlines_14d": 0,
-            "unread_notifications": 0
+            'totalOpportunities': 0,
+            'newThisWeek': 0,
+            'savedCount': 0,
+            'pendingApplications': 0,
+            'upcomingDeadlines': 0,
+            'monitorsActive': 0,
+            'averageScore': 0.0
         }
 
 @router.get("/upcoming-deadlines")
@@ -50,9 +50,7 @@ async def get_upcoming_deadlines(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_user)
 ):
-    """Queries v_upcoming_deadlines view."""
     logger.info("Fetching upcoming deadlines", limit=limit, user_id=current_user.id)
-    
     query = text('''
         SELECT saved_id, opportunity_id, title, organization_name, effective_deadline, days_left, application_status, priority
         FROM v_upcoming_deadlines 
@@ -65,54 +63,66 @@ async def get_upcoming_deadlines(
     items = []
     for row in result:
         items.append({
-            "saved_id": row.saved_id,
-            "opportunity_id": row.opportunity_id,
-            "title": row.title,
-            "organization_name": row.organization_name,
-            "effective_deadline": row.effective_deadline,
-            "days_left": row.days_left,
-            "application_status": row.application_status,
-            "priority": row.priority
+            'opportunityId': row.opportunity_id,
+            'title': row.title,
+            'deadline': row.effective_deadline,
+            'daysLeft': row.days_left,
+            'applicationStatus': row.application_status
         })
-        
     return {"items": items}
 
 @router.get("/recent-activity")
 async def get_recent_activity(
-    limit: int = Query(20, le=100),
+    limit: int = Query(10, le=50),
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_user)
 ):
-    """Returns recent search runs, saved opportunities, application status changes."""
-    logger.info("Fetching recent activity", limit=limit, user_id=current_user.id)
-    # Simple mockup for now. A real union requires querying search runs, saves, applications.
-    return {"items": []}
+    logger.info("Fetching recent activity")
+    query = text('''
+        SELECT event_type, entity_id, details, created_at
+        FROM security_events 
+        WHERE user_id = :user_id 
+        ORDER BY created_at DESC 
+        LIMIT :limit
+    ''')
+    result = await db.execute(query, {"user_id": str(current_user.id), "limit": limit})
+    
+    items = []
+    for row in result:
+        items.append({
+            'type': 'system',
+            'description': f"Action {row.event_type}",
+            'occurredAt': row.created_at.isoformat(),
+            'opportunityId': None
+        })
+    return {"items": items}
 
 @router.get("/source-health")
 async def get_source_health(
     db: AsyncSession = Depends(get_db_session),
     current_user: User = Depends(get_current_user)
 ):
-    """Queries v_source_health view + recent scan run data."""
-    logger.info("Fetching source health", user_id=current_user.id)
-    
-    query = text('SELECT * FROM v_source_health ORDER BY reliability_score DESC LIMIT 20')
+    logger.info("Fetching source health")
+    query = text('''
+        SELECT id, name, last_status, reliability_score, last_success_at, consecutive_failures
+        FROM opportunity_sources
+        ORDER BY reliability_score DESC
+        LIMIT 10
+    ''')
     result = await db.execute(query)
     
     items = []
     for row in result:
         items.append({
-            "id": row.id,
-            "name": row.name,
-            "domain": row.domain,
-            "access_method": row.access_method,
-            "enabled": row.enabled,
-            "allowed_status": row.allowed_status,
-            "last_status": row.last_status,
-            "last_success_at": row.last_success_at,
-            "consecutive_failures": row.consecutive_failures,
-            "reliability_score": row.reliability_score,
-            "opportunities_count": row.opportunities_count
+            'sourceId': row.id,
+            'name': row.name,
+            'status': row.last_status or 'unknown',
+            'reliability': float(row.reliability_score) if row.reliability_score else 0.0,
+            'lastSuccess': row.last_success_at.isoformat() if row.last_success_at else None,
+            'consecutiveFailures': row.consecutive_failures or 0
         })
-        
     return {"items": items}
+
+
+
+

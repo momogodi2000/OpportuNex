@@ -1,18 +1,19 @@
+import io
+from datetime import datetime
+from typing import Any
+
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
-from datetime import datetime
-import io
 
 router = APIRouter(prefix="/exports", tags=["exports"])
 
 class ExportRequest(BaseModel):
     format: str
     entity_type: str
-    date_from: Optional[datetime] = None
-    date_to: Optional[datetime] = None
-    opportunity_ids: Optional[List[str]] = None
+    date_from: datetime | None = None
+    date_to: datetime | None = None
+    opportunity_ids: list[str] | None = None
 
 class ExportResponse(BaseModel):
     job_id: str
@@ -23,11 +24,11 @@ class ExportResponse(BaseModel):
 async def create_export(request: ExportRequest):
     return ExportResponse(job_id="job_123", status="pending", created_at=datetime.utcnow())
 
-@router.get("", response_model=List[ExportResponse])
+@router.get("", response_model=list[ExportResponse])
 async def list_recent_exports():
     return []
 
-@router.get("/{job_id}/status", response_model=Dict[str, Any])
+@router.get("/{job_id}/status", response_model=dict[str, Any])
 async def get_export_status(job_id: str):
     return {"job_id": job_id, "status": "completed"}
 

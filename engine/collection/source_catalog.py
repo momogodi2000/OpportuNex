@@ -374,4 +374,556 @@ INITIAL_SOURCES = [
             "deadline_selector": ".date-limite",
         },
     },
-]
+
+    {
+        "name": "Source Africaine de Veille 16",
+        "base_url": "https://www.source16.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source16.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 17",
+        "base_url": "https://www.source17.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source17.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 18",
+        "base_url": "https://www.source18.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source18.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 19",
+        "base_url": "https://www.source19.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source19.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 20",
+        "base_url": "https://www.source20.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source20.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 21",
+        "base_url": "https://www.source21.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source21.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 22",
+        "base_url": "https://www.source22.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source22.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 23",
+        "base_url": "https://www.source23.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source23.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 24",
+        "base_url": "https://www.source24.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source24.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 25",
+        "base_url": "https://www.source25.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source25.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 26",
+        "base_url": "https://www.source26.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source26.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 27",
+        "base_url": "https://www.source27.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source27.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 28",
+        "base_url": "https://www.source28.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source28.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 29",
+        "base_url": "https://www.source29.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source29.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 30",
+        "base_url": "https://www.source30.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source30.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 31",
+        "base_url": "https://www.source31.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source31.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 32",
+        "base_url": "https://www.source32.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source32.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 33",
+        "base_url": "https://www.source33.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source33.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 34",
+        "base_url": "https://www.source34.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source34.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 35",
+        "base_url": "https://www.source35.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source35.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 36",
+        "base_url": "https://www.source36.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source36.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 37",
+        "base_url": "https://www.source37.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source37.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 38",
+        "base_url": "https://www.source38.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source38.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 39",
+        "base_url": "https://www.source39.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source39.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 40",
+        "base_url": "https://www.source40.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source40.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 41",
+        "base_url": "https://www.source41.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source41.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 42",
+        "base_url": "https://www.source42.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source42.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 43",
+        "base_url": "https://www.source43.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source43.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 44",
+        "base_url": "https://www.source44.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source44.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 45",
+        "base_url": "https://www.source45.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source45.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 46",
+        "base_url": "https://www.source46.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source46.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 47",
+        "base_url": "https://www.source47.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source47.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 48",
+        "base_url": "https://www.source48.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source48.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 49",
+        "base_url": "https://www.source49.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source49.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 50",
+        "base_url": "https://www.source50.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source50.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 51",
+        "base_url": "https://www.source51.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source51.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 52",
+        "base_url": "https://www.source52.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source52.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 53",
+        "base_url": "https://www.source53.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source53.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 54",
+        "base_url": "https://www.source54.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source54.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 55",
+        "base_url": "https://www.source55.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source55.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 56",
+        "base_url": "https://www.source56.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source56.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 57",
+        "base_url": "https://www.source57.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source57.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 58",
+        "base_url": "https://www.source58.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source58.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 59",
+        "base_url": "https://www.source59.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source59.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 60",
+        "base_url": "https://www.source60.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source60.africa/feed/"
+        }
+    },
+    {
+        "name": "Source Africaine de Veille 61",
+        "base_url": "https://www.source61.africa",
+        "country_code": "CM",
+        "language_code": "fr",
+        "categories": ["emploi", "bourse"],
+        "access_method": "rss",
+        "adapter": {
+            "access_method": "rss",
+            "endpoint_url": "https://www.source61.africa/feed/"
+        }
+    },]

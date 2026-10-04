@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 from pathlib import Path
+
 try:
     import nacl.secret
     import nacl.utils

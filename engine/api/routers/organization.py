@@ -1,16 +1,17 @@
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/organizations", tags=["organizations"])
 
 class OrganizationCreate(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 class OrganizationUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
 
 class MemberInvite(BaseModel):
     email: str
@@ -18,9 +19,9 @@ class MemberInvite(BaseModel):
 class OrganizationResponse(BaseModel):
     id: str
     name: str
-    description: Optional[str]
+    description: str | None
 
-@router.get("", response_model=List[OrganizationResponse])
+@router.get("", response_model=list[OrganizationResponse])
 async def list_organizations():
     return []
 
@@ -40,7 +41,7 @@ async def update_organization(org_id: str, org: OrganizationUpdate):
 async def invite_member(org_id: str, invite: MemberInvite):
     return {"status": "invited", "email": invite.email}
 
-@router.get("/{org_id}/members", response_model=List[Dict[str, Any]])
+@router.get("/{org_id}/members", response_model=list[dict[str, Any]])
 async def list_members(org_id: str):
     return []
 

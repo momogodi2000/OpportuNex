@@ -1,23 +1,24 @@
-from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
 from datetime import datetime
+from typing import Any
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/sources", tags=["sources"])
 
 class SourceCreate(BaseModel):
     name: str
     base_url: str
-    country_code: Optional[str] = None
-    language_code: Optional[str] = None
-    adapter_json: Dict[str, Any]
+    country_code: str | None = None
+    language_code: str | None = None
+    adapter_json: dict[str, Any]
 
 class SourceUpdate(BaseModel):
-    name: Optional[str] = None
-    base_url: Optional[str] = None
-    country_code: Optional[str] = None
-    language_code: Optional[str] = None
-    adapter_json: Optional[Dict[str, Any]] = None
+    name: str | None = None
+    base_url: str | None = None
+    country_code: str | None = None
+    language_code: str | None = None
+    adapter_json: dict[str, Any] | None = None
 
 class SourceStatusUpdate(BaseModel):
     status: str
@@ -27,17 +28,17 @@ class SourceResponse(BaseModel):
     name: str
     base_url: str
     status: str
-    country_code: Optional[str]
-    language_code: Optional[str]
+    country_code: str | None
+    language_code: str | None
     reliability: float
-    last_run_at: Optional[datetime]
-    adapter_json: Optional[Dict[str, Any]]
+    last_run_at: datetime | None
+    adapter_json: dict[str, Any] | None
 
-@router.get("", response_model=List[SourceResponse])
+@router.get("", response_model=list[SourceResponse])
 async def list_sources():
     return []
 
-@router.get("/catalog", response_model=List[Dict[str, Any]])
+@router.get("/catalog", response_model=list[dict[str, Any]])
 async def list_source_catalog():
     return []
 

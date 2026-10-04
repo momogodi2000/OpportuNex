@@ -51,11 +51,11 @@ if (-Not $NoFrontend) {
     Write-Host "Running frontend checks..."
     Push-Location $FrontendDir
     try {
-        # flutter analyze
-        if ($LASTEXITCODE -ne 0) { Write-Warning "Frontend analysis failed." }
+        flutter analyze
+        if ($LASTEXITCODE -ne 0) { Write-Warning "Frontend analysis failed, but continuing for demonstration." }
         
-        # flutter test
-        if ($LASTEXITCODE -ne 0) { Write-Warning "Frontend tests failed." }
+        flutter test
+        if ($LASTEXITCODE -ne 0) { Write-Error "Frontend tests failed."; exit 1 }
     } finally {
         Pop-Location
     }
@@ -65,10 +65,11 @@ if (-Not $NoFrontend) {
 Write-Host "Starting backend..."
 Push-Location $EngineDir
 # Let's start the backend in the background and capture output
-$BackendLog = Join-Path $ProjectRoot "backend.log"
+$BackendLogOut = Join-Path $ProjectRoot "backend-out.log"
+$BackendLogErr = Join-Path $ProjectRoot "backend-err.log"
 
 $env:OPX_SESSION_TOKEN = "dev-token-12345-dev-token-12345-dev"
-$BackendProcess = Start-Process -FilePath "python" -ArgumentList "main.py" -NoNewWindow -RedirectStandardOutput $BackendLog -RedirectStandardError $BackendLog -PassThru
+$BackendProcess = Start-Process -FilePath "python" -ArgumentList "main.py" -NoNewWindow -RedirectStandardOutput $BackendLogOut -RedirectStandardError $BackendLogErr -PassThru
 Pop-Location
 
 Write-Host "Backend started with PID $($BackendProcess.Id)"
@@ -77,8 +78,9 @@ if (-Not $NoFrontend) {
     # Start frontend
     Write-Host "Starting frontend..."
     Push-Location $FrontendDir
-    $FrontendLog = Join-Path $ProjectRoot "frontend.log"
-    $FrontendProcess = Start-Process -FilePath "flutter" -ArgumentList "run -d windows" -NoNewWindow -RedirectStandardOutput $FrontendLog -RedirectStandardError $FrontendLog -PassThru
+    $FrontendLogOut = Join-Path $ProjectRoot "frontend-out.log"
+    $FrontendLogErr = Join-Path $ProjectRoot "frontend-err.log"
+    $FrontendProcess = Start-Process -FilePath "flutter" -ArgumentList "run -d windows" -NoNewWindow -RedirectStandardOutput $FrontendLogOut -RedirectStandardError $FrontendLogErr -PassThru
     Pop-Location
     Write-Host "Frontend started with PID $($FrontendProcess.Id)"
 }
@@ -93,3 +95,4 @@ try {
     if ($BackendProcess) { Stop-Process -Id $BackendProcess.Id -Force -ErrorAction SilentlyContinue }
     if ($FrontendProcess) { Stop-Process -Id $FrontendProcess.Id -Force -ErrorAction SilentlyContinue }
 }
+

@@ -1,243 +1,153 @@
-import structlog
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
-from typing import Optional, List
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+"""
+Profile API Router.
+"""
 
-from persistence.database import get_db_session
+from typing import Any
+
+import structlog
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.dependencies import get_current_user
 from domain.entities.entities import User
-from persistence.models.all_models import (
-    UserProfile, EducationRecord, WorkExperience, UserSkill, UserLanguage, UserObjective, Skill, Language
-)
+from persistence.database import get_db_session
+from persistence.repositories.profile_repo import ProfileRepo
+from services.profile_service import ProfileService
 
-logger = structlog.get_logger(__name__)
-router = APIRouter(prefix="/profile", tags=["Profile"])
+log = structlog.get_logger(__name__)
 
-class ProfileUpdate(BaseModel):
-    display_name: Optional[str] = None
-    country_code: Optional[str] = None
-    city: Optional[str] = None
-    status: Optional[str] = None
-    work_mode: Optional[str] = None
-    mobility: Optional[str] = None
-    summary: Optional[str] = None
+router = APIRouter(prefix="/profile", tags=["profile"])
 
-class EducationRecordModel(BaseModel):
+async def get_profile_service(session: AsyncSession = Depends(get_db_session)) -> ProfileService:
+    repo = ProfileRepo(session)
+    return ProfileService(repo)
+
+
+class GeneralInfoRequest(BaseModel):
+    full_name: str | None = None
+    country_code: str | None = None
+    city: str | None = None
+    professional_status: str | None = None
+    work_mode_pref: str | None = None
+
+
+class EducationRequest(BaseModel):
+    degree_level: str
+    field_of_study: str
     institution: str
-    degree_level: Optional[str] = None
-    field_of_study: Optional[str] = None
-    graduation_year: Optional[int] = None
-    country_code: Optional[str] = None
+    graduation_year: int | None = None
+    country_code: str | None = None
 
-class ExperienceRecordModel(BaseModel):
-    employer: str
+
+class ExperienceRequest(BaseModel):
     job_title: str
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+    employer: str
+    start_date: str | None = None
+    end_date: str | None = None
     is_current: bool = False
-    description: Optional[str] = None
-    country_code: Optional[str] = None
+    description: str | None = None
+    country_code: str | None = None
 
-class SkillsModel(BaseModel):
-    skills: List[str]
 
-class LanguagesModel(BaseModel):
-    languages: List[str]
+class SkillRequest(BaseModel):
+    skill_id: str
+    level: str | None = None
 
-class ObjectivesModel(BaseModel):
-    objectives: List[str]
+
+class LanguageRequest(BaseModel):
+    language_code: str
+    cefr_level: str
+
+
+class ObjectivesRequest(BaseModel):
+    objective_ids: list[str]
+
 
 @router.get("")
-async def get_profile(
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    logger.info("Fetching profile", user_id=current_user.id)
-    result = await db.execute(select(UserProfile).where(UserProfile.user_id == str(current_user.id)))
-    profile = result.scalars().first()
-    if not profile:
-        profile = UserProfile(user_id=str(current_user.id))
-        db.add(profile)
-        await db.flush()
-    
-    return {
-        "id": profile.user_id,
-        "country_code": profile.country_code,
-        "city": profile.city,
-        "status": profile.status,
-        "work_mode": profile.work_mode,
-        "mobility": profile.mobility,
-        "summary": profile.summary,
-        "completeness_score": profile.completeness_score
-    }
+async def get_summary(
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    return await service.get_profile_summary(str(current_user.id))
+
 
 @router.put("")
-async def update_profile(
-    req: ProfileUpdate,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    logger.info("Updating profile", user_id=current_user.id)
-    result = await db.execute(select(UserProfile).where(UserProfile.user_id == str(current_user.id)))
-    profile = result.scalars().first()
-    if not profile:
-        profile = UserProfile(user_id=str(current_user.id))
-        db.add(profile)
-        
-    if req.country_code is not None: profile.country_code = req.country_code
-    if req.city is not None: profile.city = req.city
-    if req.status is not None: profile.status = req.status
-    if req.work_mode is not None: profile.work_mode = req.work_mode
-    if req.mobility is not None: profile.mobility = req.mobility
-    if req.summary is not None: profile.summary = req.summary
-    
-    await db.flush()
-    return {"status": "updated"}
+async def update_general(
+    req: GeneralInfoRequest,
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    return await service.update_general_info(str(current_user.id), req.model_dump(exclude_unset=True))
+
 
 @router.get("/completeness")
 async def get_completeness(
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    result = await db.execute(select(UserProfile.completeness_score).where(UserProfile.user_id == str(current_user.id)))
-    score = result.scalars().first() or 0
-    return {"score": score, "missing_sections": []}
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    summary = await service.get_profile_summary(str(current_user.id))
+    return {
+        "score": summary["completeness_score"],
+        "missing_sections": summary["suggestions"]
+    }
+
 
 @router.post("/education")
 async def add_education(
-    req: EducationRecordModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    record = EducationRecord(
-        user_id=str(current_user.id),
-        institution=req.institution,
-        degree_level=req.degree_level,
-        field_of_study=req.field_of_study,
-        graduation_year=req.graduation_year,
-        country_code=req.country_code
-    )
-    db.add(record)
-    await db.flush()
-    return {"status": "added", "id": record.id}
+    req: EducationRequest,
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    return await service.add_education(str(current_user.id), req.model_dump())
 
-@router.put("/education/{id}")
-async def update_education(
-    id: str,
-    req: EducationRecordModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    result = await db.execute(select(EducationRecord).where(EducationRecord.id == id, EducationRecord.user_id == str(current_user.id)))
-    record = result.scalars().first()
-    if not record:
-        raise HTTPException(status_code=404, detail="Not found")
-        
-    record.institution = req.institution
-    record.degree_level = req.degree_level
-    record.field_of_study = req.field_of_study
-    record.graduation_year = req.graduation_year
-    record.country_code = req.country_code
-    
-    await db.flush()
-    return {"status": "updated"}
-
-@router.delete("/education/{id}")
-async def delete_education(
-    id: str,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    await db.execute(delete(EducationRecord).where(EducationRecord.id == id, EducationRecord.user_id == str(current_user.id)))
-    return {"status": "deleted"}
 
 @router.post("/experience")
 async def add_experience(
-    req: ExperienceRecordModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    record = WorkExperience(
-        user_id=str(current_user.id),
-        job_title=req.job_title,
-        employer=req.employer,
-        start_date=req.start_date,
-        end_date=req.end_date,
-        is_current=req.is_current,
-        description=req.description,
-        country_code=req.country_code
-    )
-    db.add(record)
-    await db.flush()
-    return {"status": "added", "id": record.id}
+    req: ExperienceRequest,
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    return await service.add_experience(str(current_user.id), req.model_dump())
 
-@router.put("/experience/{id}")
-async def update_experience(
-    id: str,
-    req: ExperienceRecordModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    result = await db.execute(select(WorkExperience).where(WorkExperience.id == id, WorkExperience.user_id == str(current_user.id)))
-    record = result.scalars().first()
-    if not record:
-        raise HTTPException(status_code=404, detail="Not found")
-        
-    record.job_title = req.job_title
-    record.employer = req.employer
-    record.start_date = req.start_date
-    record.end_date = req.end_date
-    record.is_current = req.is_current
-    record.description = req.description
-    record.country_code = req.country_code
-    
-    await db.flush()
-    return {"status": "updated"}
-
-@router.delete("/experience/{id}")
-async def delete_experience(
-    id: str,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    await db.execute(delete(WorkExperience).where(WorkExperience.id == id, WorkExperience.user_id == str(current_user.id)))
-    return {"status": "deleted"}
 
 @router.post("/skills")
-async def update_skills(
-    req: SkillsModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    # Simply replace for now. Real impl would match against Skill table.
-    await db.execute(delete(UserSkill).where(UserSkill.user_id == str(current_user.id)))
-    for skill_name in req.skills:
-        # We need skill_id. Since we don't have it here directly without a Skill table lookup, we skip real insert for now or mock it.
-        pass
-    return {"status": "updated"}
+async def add_skill(
+    req: SkillRequest,
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    return await service.add_skill(str(current_user.id), req.model_dump())
+
 
 @router.post("/languages")
-async def update_languages(
-    req: LanguagesModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    await db.execute(delete(UserLanguage).where(UserLanguage.user_id == str(current_user.id)))
-    for lang in req.languages:
-        # similar issue with missing Language lookup
-        pass
-    return {"status": "updated"}
+async def add_language(
+    req: LanguageRequest,
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    return await service.add_language(str(current_user.id), req.model_dump())
+
 
 @router.put("/objectives")
 async def update_objectives(
-    req: ObjectivesModel,
-    db: AsyncSession = Depends(get_db_session),
-    current_user: User = Depends(get_current_user)
-):
-    await db.execute(delete(UserObjective).where(UserObjective.user_id == str(current_user.id)))
-    for obj in req.objectives:
-        record = UserObjective(user_id=str(current_user.id), objective_code=obj)
-        db.add(record)
-    return {"status": "updated"}
+    req: ObjectivesRequest,
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, str]:
+    await service.update_objectives(str(current_user.id), req.objective_ids)
+    return {"detail": "Objectives updated"}
+
+
+@router.post("/cv-extract")
+async def extract_cv(
+    file: UploadFile = File(...),
+    use_ai: bool = Form(False),
+    current_user: User = Depends(get_current_user),
+    service: ProfileService = Depends(get_profile_service)
+) -> dict[str, Any]:
+    if file.size and file.size > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 10MB)")
+        
+    content = await file.read()
+    return await service.extract_cv(content, file.filename or "cv.pdf", use_ai)

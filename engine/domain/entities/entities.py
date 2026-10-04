@@ -8,9 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
-from typing import Optional
 from uuid import UUID
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 #  User
@@ -25,7 +23,7 @@ class User:
     recovery_hash: str          # Hash of the 12-word recovery phrase
     is_locked: bool
     failed_login_attempts: int
-    lock_until: Optional[datetime]
+    lock_until: datetime | None
     created_at: datetime
     updated_at: datetime
     sync_mode: str              # "local" | "synced"
@@ -63,9 +61,9 @@ class ProvenanceTag(StrEnum):
 @dataclass(frozen=True)
 class ProvenancedField:
     """A field value with its source excerpt and provenance tag."""
-    value: Optional[str]
+    value: str | None
     provenance: ProvenanceTag
-    excerpt: Optional[str] = None          # Original text from source
+    excerpt: str | None = None          # Original text from source
     confidence: float = 1.0
 
 
@@ -78,19 +76,19 @@ class Opportunity:
     title: ProvenancedField
     organization: ProvenancedField
     category: str
-    subcategory: Optional[str]
+    subcategory: str | None
     deadline: ProvenancedField
     location: ProvenancedField
-    amount_min: Optional[int]              # In minor currency units
-    amount_max: Optional[int]
-    currency_code: Optional[str]           # ISO 4217
+    amount_min: int | None              # In minor currency units
+    amount_max: int | None
+    currency_code: str | None           # ISO 4217
     language: str                          # ISO 639-1
-    summary: Optional[str]                 # AI-generated ≤ 5 lines
-    eligibility_text: Optional[str]        # Verbatim from source
+    summary: str | None                 # AI-generated ≤ 5 lines
+    eligibility_text: str | None        # Verbatim from source
     # Metadata
     collected_at: datetime
-    analysed_at: Optional[datetime]
-    verified_at: Optional[datetime]
+    analysed_at: datetime | None
+    verified_at: datetime | None
     is_ai_generated: bool
     source_ids: list[UUID] = field(default_factory=list)
 
@@ -103,7 +101,7 @@ class Opportunity:
         except ValueError:
             return False
 
-    def deadline_days_remaining(self, now: datetime) -> Optional[int]:
+    def deadline_days_remaining(self, now: datetime) -> int | None:
         if self.deadline.value is None:
             return None
         try:
@@ -122,7 +120,7 @@ class CriterionScore:
     name: str
     score: float          # 0.0 – 1.0
     weight: float
-    explanation: Optional[str]
+    explanation: str | None
     not_evaluated: bool = False   # True when criterion has no data
 
 
@@ -199,9 +197,9 @@ class Application:
     saved_opportunity_id: UUID
     user_id: UUID
     status: ApplicationStatus
-    submitted_at: Optional[datetime]
+    submitted_at: datetime | None
     priority: str          # "high" | "medium" | "low"
-    notes: Optional[str]
+    notes: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -233,12 +231,12 @@ class Source:
     id: UUID
     name: str
     base_url: str
-    country_code: Optional[str]
-    language_code: Optional[str]
+    country_code: str | None
+    language_code: str | None
     status: SourceStatus
     is_official: bool
     reliability_score: float    # 0.0 – 1.0
-    last_success_at: Optional[datetime]
+    last_success_at: datetime | None
     consecutive_failures: int
     min_crawl_interval_minutes: int   # ≥ 60 as per database constraint
 
@@ -256,8 +254,8 @@ class Source:
 @dataclass(frozen=True)
 class DedupKey:
     """Composite deduplication key for an opportunity."""
-    normalized_url: Optional[str]
-    external_id: Optional[str]
-    source_id: Optional[UUID]
-    title_org_deadline_hash: Optional[str]   # SHA-256
-    simhash: Optional[int]                   # 64-bit simhash
+    normalized_url: str | None
+    external_id: str | None
+    source_id: UUID | None
+    title_org_deadline_hash: str | None   # SHA-256
+    simhash: int | None                   # 64-bit simhash

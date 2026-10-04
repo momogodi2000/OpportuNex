@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ApplicationsPage extends StatelessWidget {
-  const ApplicationsPage({Key? key}) : super(key: key);
+  const ApplicationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,16 +10,16 @@ class ApplicationsPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'Mes Candidatures',
             style: TextStyle(
-              color: Color(0xFF0D1B3E),
+              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
             ),
           ),
           backgroundColor: Colors.white,
-          bottom: const TabBar(
-            labelColor: Color(0xFF0D1B3E),
+          bottom: TabBar(
+            labelColor: Theme.of(context).colorScheme.primary,
             indicatorColor: Color(0xFF22C55E),
             tabs: [
               Tab(text: 'Kanban', icon: Icon(Icons.view_kanban)),
@@ -37,7 +37,7 @@ class ApplicationsPage extends StatelessWidget {
 }
 
 class _KanbanTab extends StatelessWidget {
-  const _KanbanTab({Key? key}) : super(key: key);
+  const _KanbanTab();
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class _KanbanTab extends StatelessWidget {
                     color: color,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     '2',
                     style: TextStyle(color: Colors.white, fontSize: 12),
                   ),
@@ -127,25 +127,25 @@ class _KanbanTab extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Chip(
-                  label: const Text(
+                  label: Text(
                     'Haute',
                     style: TextStyle(fontSize: 10, color: Colors.white),
                   ),
                   backgroundColor: Colors.red[400],
                   padding: EdgeInsets.zero,
                 ),
-                const Text(
+                Text(
                   'Mis à jour il y a 2j',
                   style: TextStyle(fontSize: 10, color: Colors.grey),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               "Bourse d'excellence Francophonie",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Row(
               children: const [
                 Icon(Icons.calendar_today, size: 14, color: Colors.grey),
@@ -164,7 +164,7 @@ class _KanbanTab extends StatelessWidget {
 }
 
 class _ListTab extends StatelessWidget {
-  const _ListTab({Key? key}) : super(key: key);
+  const _ListTab();
 
   @override
   Widget build(BuildContext context) {
@@ -176,17 +176,17 @@ class _ListTab extends StatelessWidget {
           children: [
             ElevatedButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.filter_list),
-              label: const Text('Filtrer'),
+              icon: Icon(Icons.filter_list),
+              label: Text('Filtrer'),
             ),
             ElevatedButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.edit),
-              label: const Text('Action groupée'),
+              icon: Icon(Icons.edit),
+              label: Text('Action groupée'),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         DataTable(
           columns: const [
             DataColumn(label: Text('Titre')),
@@ -200,7 +200,7 @@ class _ListTab extends StatelessWidget {
                 const DataCell(Text('Bourse Eiffel')),
                 DataCell(
                   Chip(
-                    label: const Text('En préparation'),
+                    label: Text('En préparation'),
                     backgroundColor: Colors.orange[100],
                   ),
                 ),
@@ -216,7 +216,7 @@ class _ListTab extends StatelessWidget {
 }
 
 class _CalendarTab extends StatelessWidget {
-  const _CalendarTab({Key? key}) : super(key: key);
+  const _CalendarTab();
 
   @override
   Widget build(BuildContext context) {
@@ -235,3 +235,4 @@ class _CalendarTab extends StatelessWidget {
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import '../domain/opportunity_models.dart';
-import '../data/opportunity_repository.dart';
+import '../../domain/opportunity_models.dart';
+import '../../data/opportunity_repository.dart';
 
 class SearchFilters {
   final String? category;

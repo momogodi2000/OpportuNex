@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../../core/engine/engine_supervisor.dart';
-import '../data/auth_repository.dart';
-import '../domain/auth_state.dart';
+import 'package:opportunex/core/engine/engine_supervisor.dart';
+import '../../data/auth_repository.dart';
+import '../../domain/auth_state.dart';
 
 final authRepositoryProvider = Provider<AuthRepository?>((ref) {
   final engineState = ref.watch(engineSupervisorProvider);

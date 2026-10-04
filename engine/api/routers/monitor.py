@@ -1,6 +1,7 @@
+from typing import Any
+
 import structlog
-from typing import Optional, Dict, Any
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 logger = structlog.get_logger(__name__)
@@ -8,15 +9,15 @@ router = APIRouter(prefix="/monitors", tags=["Monitors"])
 
 class CreateMonitorRequest(BaseModel):
     name: str
-    filters_json: Dict[str, Any]
+    filters_json: dict[str, Any]
     frequency: str  # e.g., 'daily', 'weekly'
-    min_score: Optional[int] = 50
+    min_score: int | None = 50
 
 class UpdateMonitorRequest(BaseModel):
-    name: Optional[str] = None
-    filters_json: Optional[Dict[str, Any]] = None
-    frequency: Optional[str] = None
-    min_score: Optional[int] = None
+    name: str | None = None
+    filters_json: dict[str, Any] | None = None
+    frequency: str | None = None
+    min_score: int | None = None
 
 @router.get("")
 async def list_monitors():

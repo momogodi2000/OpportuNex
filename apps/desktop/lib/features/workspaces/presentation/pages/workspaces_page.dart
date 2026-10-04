@@ -1,43 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/workspaces_provider.dart';
 
-class WorkspacesPage extends StatelessWidget {
+class WorkspacesPage extends ConsumerWidget {
   const WorkspacesPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final workspacesAsync = ref.watch(workspacesProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Espaces de travail',
-          style: TextStyle(color: Color(0xFF0D1B3E)),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateWorkspaceDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Créer un espace'),
-        backgroundColor: const Color(0xFF0D1B3E),
+        icon: Icon(Icons.add),
+        label: Text('Créer un espace'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(24),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 400,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.5,
-        ),
-        itemCount: 4, // Mock data
-        itemBuilder: (context, index) {
-          final titles = [
-            "Recherche d'emploi",
-            "Bourses d'études",
-            "Appels d'offres",
-            'Freelance 2026',
-          ];
-          return _WorkspaceCard(title: titles[index]);
+      body: workspacesAsync.when(
+        data: (items) {
+          if (items.isEmpty) {
+            return const Center(child: Text("Aucun espace de travail"));
+          }
+          return GridView.builder(
+            padding: const EdgeInsets.all(24),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 400,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.5,
+            ),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return _WorkspaceCard(title: item['name'] ?? 'Espace inconnu');
+            },
+          );
         },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text("Erreur: $e")),
       ),
     );
   }
@@ -46,7 +54,7 @@ class WorkspacesPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Nouvel espace de travail'),
+        title: Text('Nouvel espace de travail'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -56,9 +64,9 @@ class WorkspacesPage extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: 'emploi',
+              initialValue: 'emploi',
               decoration: const InputDecoration(
                 labelText: 'Modèle',
                 border: OutlineInputBorder(),
@@ -82,7 +90,7 @@ class WorkspacesPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
@@ -90,7 +98,7 @@ class WorkspacesPage extends StatelessWidget {
               backgroundColor: const Color(0xFF22C55E),
               foregroundColor: Colors.white,
             ),
-            child: const Text('Créer'),
+            child: Text('Créer'),
           ),
         ],
       ),
@@ -124,10 +132,10 @@ class _WorkspaceCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D1B3E),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -148,7 +156,7 @@ class _WorkspaceCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 'Créé le 01/10/2026',
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 12),

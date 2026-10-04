@@ -1,7 +1,8 @@
 import ipaddress
-from urllib.parse import urlparse
 import socket
 from typing import Any
+from urllib.parse import urlparse
+
 try:
     import httpx
 except ImportError:

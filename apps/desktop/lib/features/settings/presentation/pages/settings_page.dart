@@ -1,36 +1,37 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/settings/settings_provider.dart';
+import '../../../../core/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   int _selectedCategoryIndex = 0;
-
-  final List<String> _categories = [
-    'COMPTE',
-    'APPARENCE',
-    'CONFIDENTIALITÉ',
-    'SAUVEGARDES',
-    'CORRESPONDANCE',
-    'NOTIFICATIONS',
-    'RÉSEAU',
-    'IA',
-    'SOURCES',
-    'À PROPOS',
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLoc.of(context);
+    final categories = [
+      loc.get('account'),
+      loc.get('appearance'),
+      loc.get('privacy'),
+      loc.get('backups'),
+      loc.get('matching'),
+      loc.get('notifications'),
+      loc.get('network'),
+      'IA',
+      'Sources',
+      loc.get('about'),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Paramètres',
-          style: TextStyle(color: Color(0xFF0D1B3E)),
-        ),
+        title: Text(loc.get('settings')),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -40,19 +41,19 @@ class _SettingsPageState extends State<SettingsPage> {
           SizedBox(
             width: 250,
             child: ListView.builder(
-              itemCount: _categories.length,
+              itemCount: categories.length,
               itemBuilder: (context, index) {
                 final isSelected = index == _selectedCategoryIndex;
                 return ListTile(
                   title: Text(
-                    _categories[index],
+                    categories[index],
                     style: TextStyle(
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,
                       color: isSelected
                           ? const Color(0xFFF97316)
-                          : const Color(0xFF0D1B3E),
+                          : Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   selected: isSelected,
@@ -108,54 +109,54 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildAccountSettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Profil',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
-        const TextField(
+        SizedBox(height: 16),
+        TextField(
           decoration: InputDecoration(
             labelText: 'Nom',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 16),
-        const TextField(
+        SizedBox(height: 16),
+        TextField(
           decoration: InputDecoration(
             labelText: 'Email',
             border: OutlineInputBorder(),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         ListTile(
-          leading: const Icon(Icons.lock),
-          title: const Text('Changer le mot de passe'),
+          leading: Icon(Icons.lock),
+          title: Text('Changer le mot de passe'),
           onTap: () {},
         ),
         ListTile(
-          leading: const Icon(Icons.security),
-          title: const Text('Phrase de récupération'),
-          subtitle: const Text('Afficher ou régénérer (Attention)'),
+          leading: Icon(Icons.security),
+          title: Text('Phrase de récupération'),
+          subtitle: Text('Afficher ou régénérer (Attention)'),
           onTap: () {},
         ),
         ListTile(
-          leading: const Icon(Icons.screen_lock_portrait),
-          title: const Text('Verrouiller la session'),
+          leading: Icon(Icons.screen_lock_portrait),
+          title: Text('Verrouiller la session'),
           onTap: () {},
         ),
         ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text('Déconnexion'),
+          leading: Icon(Icons.logout),
+          title: Text('Déconnexion'),
           onTap: () {},
         ),
         const Divider(),
         ListTile(
-          leading: const Icon(Icons.delete_forever, color: Colors.red),
-          title: const Text(
+          leading: Icon(Icons.delete_forever, color: Colors.red),
+          title: Text(
             'Supprimer le compte',
             style: TextStyle(color: Colors.red),
           ),
@@ -166,56 +167,69 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildAppearanceSettings() {
+    final settings = ref.watch(settingsProvider);
+    final loc = AppLoc.of(context);
+    String themeVal = 'system';
+    if (settings.themeMode == ThemeMode.light) themeVal = 'light';
+    if (settings.themeMode == ThemeMode.dark) themeVal = 'dark';
     return ListView(
       children: [
-        const Text(
-          'Apparence',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
-          ),
+        Text(
+          loc.get('appearance'),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 16),
-        const Text('Thème'),
+        SizedBox(height: 16),
+        Text(loc.get('theme')),
         Row(
           children: [
-            Radio(value: 'clair', groupValue: 'clair', onChanged: (v) {}),
-            const Text('Clair'),
-            Radio(value: 'sombre', groupValue: 'clair', onChanged: (v) {}),
-            const Text('Sombre'),
-            Radio(value: 'auto', groupValue: 'clair', onChanged: (v) {}),
-            const Text('Automatique'),
+            Radio(
+              value: 'light',
+              groupValue: themeVal,
+              onChanged: (v) {
+                ref
+                    .read(settingsProvider.notifier)
+                    .updateThemeMode(ThemeMode.light);
+              },
+            ),
+            Text(loc.get('light')),
+            Radio(
+              value: 'dark',
+              groupValue: themeVal,
+              onChanged: (v) {
+                ref
+                    .read(settingsProvider.notifier)
+                    .updateThemeMode(ThemeMode.dark);
+              },
+            ),
+            Text(loc.get('dark')),
+            Radio(
+              value: 'system',
+              groupValue: themeVal,
+              onChanged: (v) {
+                ref
+                    .read(settingsProvider.notifier)
+                    .updateThemeMode(ThemeMode.system);
+              },
+            ),
+            Text(loc.get('system')),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: 'fr',
-          decoration: const InputDecoration(
-            labelText: 'Langue',
-            border: OutlineInputBorder(),
+          initialValue: settings.locale.languageCode,
+          decoration: InputDecoration(
+            labelText: loc.get('language'),
+            border: const OutlineInputBorder(),
           ),
           items: const [
             DropdownMenuItem(value: 'fr', child: Text('Français')),
             DropdownMenuItem(value: 'en', child: Text('English')),
           ],
-          onChanged: (v) {},
-        ),
-        const SizedBox(height: 16),
-        const Text('Taille de police'),
-        Slider(
-          value: 1,
-          min: 0,
-          max: 3,
-          divisions: 3,
-          label: 'Taille',
-          onChanged: (v) {},
-        ),
-        SwitchListTile(
-          title: const Text('Mode compact pour les listes'),
-          value: false,
-          onChanged: (v) {},
-          activeColor: const Color(0xFF22C55E),
+          onChanged: (v) {
+            if (v != null) {
+              ref.read(settingsProvider.notifier).updateLocale(Locale(v));
+            }
+          },
         ),
       ],
     );
@@ -224,33 +238,33 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildPrivacySettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Confidentialité',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         ListTile(
-          leading: const Icon(Icons.receipt_long),
-          title: const Text('Journal de sécurité'),
+          leading: Icon(Icons.receipt_long),
+          title: Text('Journal de sécurité'),
           onTap: () {},
         ),
         SwitchListTile(
-          title: const Text('Consentement au suivi analytique'),
+          title: Text('Consentement au suivi analytique'),
           value: true,
           onChanged: (v) {},
         ),
         ListTile(
-          leading: const Icon(Icons.download),
-          title: const Text('Exporter mes données'),
+          leading: Icon(Icons.download),
+          title: Text('Exporter mes données'),
           onTap: () {},
         ),
         ListTile(
-          leading: const Icon(Icons.cleaning_services),
-          title: const Text('Purger les opportunités'),
+          leading: Icon(Icons.cleaning_services),
+          title: Text('Purger les opportunités'),
           onTap: () {},
         ),
       ],
@@ -260,38 +274,38 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildBackupSettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Sauvegardes',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text("Dernière sauvegarde: Aujourd'hui à 10:00 (Succès)"),
-        const Text('Prochaine sauvegarde: Demain à 02:00'),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
+        Text("Dernière sauvegarde: Aujourd'hui à 10:00 (Succès)"),
+        Text('Prochaine sauvegarde: Demain à 02:00'),
+        SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.backup),
-          label: const Text('Créer une sauvegarde maintenant'),
+          icon: Icon(Icons.backup),
+          label: Text('Créer une sauvegarde maintenant'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0D1B3E),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
           ),
         ),
-        const SizedBox(height: 24),
-        const Text('Historique', style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 24),
+        Text('Historique', style: TextStyle(fontWeight: FontWeight.bold)),
         ListTile(
-          title: const Text('backup_20261002.zip'),
-          subtitle: const Text('2 oct. 2026 - 15MB'),
+          title: Text('backup_20261002.zip'),
+          subtitle: Text('2 oct. 2026 - 15MB'),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(icon: const Icon(Icons.restore), onPressed: () {}),
+              IconButton(icon: Icon(Icons.restore), onPressed: () {}),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
+                icon: Icon(Icons.delete, color: Colors.red),
                 onPressed: () {},
               ),
             ],
@@ -304,24 +318,24 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildMatchSettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Correspondance',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text('Poids des critères (Total: 100%)'),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
+        Text('Poids des critères (Total: 100%)'),
+        SizedBox(height: 16),
         _buildSliderRow('Compétences', 40),
         _buildSliderRow('Localisation', 20),
         _buildSliderRow('Salaire', 10),
         _buildSliderRow('Expérience', 20),
         _buildSliderRow('Langues', 10),
-        const SizedBox(height: 16),
-        const Text("Seuil minimum d'affichage"),
+        SizedBox(height: 16),
+        Text("Seuil minimum d'affichage"),
         Slider(
           value: 50,
           min: 0,
@@ -331,10 +345,7 @@ class _SettingsPageState extends State<SettingsPage> {
           activeColor: const Color(0xFFF97316),
           onChanged: (v) {},
         ),
-        TextButton(
-          onPressed: () {},
-          child: const Text('Réinitialiser les poids'),
-        ),
+        TextButton(onPressed: () {}, child: Text('Réinitialiser les poids')),
       ],
     );
   }
@@ -360,23 +371,23 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildNotificationSettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Notifications',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         SwitchListTile(
-          title: const Text('Rappels de deadline'),
-          subtitle: const Text("Notifier avant l'expiration"),
+          title: Text('Rappels de deadline'),
+          subtitle: Text("Notifier avant l'expiration"),
           value: true,
           onChanged: (v) {},
         ),
         DropdownButtonFormField<int>(
-          value: 3,
+          initialValue: 3,
           decoration: const InputDecoration(
             labelText: 'Jours avant',
             border: OutlineInputBorder(),
@@ -390,17 +401,13 @@ class _SettingsPageState extends State<SettingsPage> {
           onChanged: (v) {},
         ),
         SwitchListTile(
-          title: const Text('Alertes des veilles'),
+          title: Text('Alertes des veilles'),
           value: true,
           onChanged: (v) {},
         ),
+        SwitchListTile(title: Text('Sons'), value: false, onChanged: (v) {}),
         SwitchListTile(
-          title: const Text('Sons'),
-          value: false,
-          onChanged: (v) {},
-        ),
-        SwitchListTile(
-          title: const Text('Notifications de bureau'),
+          title: Text('Notifications de bureau'),
           value: true,
           onChanged: (v) {},
         ),
@@ -411,19 +418,19 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildNetworkSettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Réseau',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text('Proxy', style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 16),
+        Text('Proxy', style: TextStyle(fontWeight: FontWeight.bold)),
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: TextField(
                 decoration: InputDecoration(
                   labelText: 'Hôte',
@@ -431,8 +438,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            const SizedBox(
+            SizedBox(width: 8),
+            SizedBox(
               width: 100,
               child: TextField(
                 decoration: InputDecoration(
@@ -441,11 +448,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             SizedBox(
               width: 120,
               child: DropdownButtonFormField<String>(
-                value: 'HTTP',
+                initialValue: 'HTTP',
                 decoration: const InputDecoration(
                   labelText: 'Type',
                   border: OutlineInputBorder(),
@@ -459,8 +466,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
-        const Text('Max requêtes simultanées'),
+        SizedBox(height: 24),
+        Text('Max requêtes simultanées'),
         Slider(
           value: 8,
           min: 1,
@@ -470,8 +477,8 @@ class _SettingsPageState extends State<SettingsPage> {
           activeColor: const Color(0xFF22C55E),
           onChanged: (v) {},
         ),
-        const SizedBox(height: 16),
-        const Text('Timeout (secondes)'),
+        SizedBox(height: 16),
+        Text('Timeout (secondes)'),
         Slider(
           value: 30,
           min: 10,
@@ -481,8 +488,8 @@ class _SettingsPageState extends State<SettingsPage> {
           activeColor: const Color(0xFFF97316),
           onChanged: (v) {},
         ),
-        const SizedBox(height: 16),
-        const TextField(
+        SizedBox(height: 16),
+        TextField(
           decoration: InputDecoration(
             labelText: 'User-Agent',
             border: OutlineInputBorder(),
@@ -498,25 +505,25 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildAISettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Intelligence Artificielle',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.add),
-          label: const Text('Ajouter un fournisseur IA'),
+          icon: Icon(Icons.add),
+          label: Text('Ajouter un fournisseur IA'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0D1B3E),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -526,7 +533,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'OpenAI',
                       style: TextStyle(
                         fontSize: 16,
@@ -535,24 +542,21 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     Row(
                       children: [
+                        IconButton(icon: Icon(Icons.edit), onPressed: () {}),
                         IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () {},
                         ),
                       ],
                     ),
                   ],
                 ),
-                const Text('Modèle: gpt-4o-mini'),
-                const Text('Clé API: sk-...abcd'),
-                const SizedBox(height: 8),
+                Text('Modèle: gpt-4o-mini'),
+                Text('Clé API: sk-...abcd'),
+                SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {},
-                  child: const Text('Tester la connexion'),
+                  child: Text('Tester la connexion'),
                 ),
               ],
             ),
@@ -565,37 +569,37 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildSourcesSettings() {
     return ListView(
       children: [
-        const Text(
+        Text(
           'Sources',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.add_link),
-          label: const Text('Ajouter une source personnalisée'),
+          icon: Icon(Icons.add_link),
+          label: Text('Ajouter une source personnalisée'),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF22C55E),
             foregroundColor: Colors.white,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         SwitchListTile(
-          title: const Text('Emploi.cm'),
+          title: Text('Emploi.cm'),
           value: true,
           onChanged: (v) {},
         ),
         SwitchListTile(
-          title: const Text('LinkedIn Afrique'),
+          title: Text('LinkedIn Afrique'),
           value: true,
           onChanged: (v) {},
         ),
         SwitchListTile(
-          title: const Text('ReliefWeb'),
+          title: Text('ReliefWeb'),
           value: false,
           onChanged: (v) {},
         ),
@@ -607,32 +611,32 @@ class _SettingsPageState extends State<SettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "À propos d'OpportuNex",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF0D1B3E),
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 16),
-        const Text('Version: 1.0.0 (Production)'),
-        const SizedBox(height: 8),
-        const Text('Développé par: ING Momo Godi Yvan'),
-        const SizedBox(height: 8),
-        const Text('Financé par: Association PROTEGE QV'),
-        const SizedBox(height: 8),
-        const Text('Licence: GNU AGPL v3'),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
+        Text('Version: 1.0.0 (Production)'),
+        SizedBox(height: 8),
+        Text('Développé par: ING Momo Godi Yvan'),
+        SizedBox(height: 8),
+        Text('Financé par: Association PROTEGE QV'),
+        SizedBox(height: 8),
+        Text('Licence: GNU AGPL v3'),
+        SizedBox(height: 16),
         TextButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.code),
-          label: const Text('Code source sur GitHub'),
+          icon: Icon(Icons.code),
+          label: Text('Code source sur GitHub'),
         ),
         TextButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.history),
-          label: const Text('Journal des modifications (Changelog)'),
+          icon: Icon(Icons.history),
+          label: Text('Journal des modifications (Changelog)'),
         ),
       ],
     );

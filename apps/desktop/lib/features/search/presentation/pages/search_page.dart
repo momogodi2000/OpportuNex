@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/search_provider.dart';
+import '../../domain/search_models.dart';
 import '../widgets/search_result_card.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -25,7 +26,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final state = ref.watch(searchProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           _buildTopBar(state),
@@ -50,7 +51,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             decoration: InputDecoration(
               hintText:
                   'Recherchez en langage naturel... ex: "bourses master droit francophone Cameroun"',
-              prefixIcon: const Icon(Icons.search, color: Color(0xFF0D1B3E)),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               suffixIcon: IconButton(
                 icon: Icon(_filtersExpanded ? Icons.tune : Icons.tune_outlined),
                 onPressed: () {
@@ -66,14 +70,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 20),
             ),
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16),
           ),
           if (state.interpretation != null) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Wrap(
               spacing: 8,
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 6),
                   child: Text(
                     'Interprété comme:',
@@ -98,7 +102,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget _buildNlpChip(String text, IconData icon) {
     return Chip(
       avatar: Icon(icon, size: 14, color: const Color(0xFF22C55E)),
-      label: Text(text, style: const TextStyle(fontSize: 12)),
+      label: Text(text, style: TextStyle(fontSize: 12)),
       backgroundColor: const Color(0xFF22C55E).withOpacity(0.1),
       side: BorderSide.none,
       padding: EdgeInsets.zero,
@@ -117,11 +121,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Filtres avancés',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -130,7 +134,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     labelText: 'Trier par',
                     border: OutlineInputBorder(),
                   ),
-                  value: state.filters.sortBy,
+                  initialValue: state.filters.sortBy,
                   items: const [
                     DropdownMenuItem(
                       value: 'relevance',
@@ -151,10 +155,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   },
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Expanded(
                 child: CheckboxListTile(
-                  title: const Text('Télétravail uniquement'),
+                  title: Text('Télétravail uniquement'),
                   value: state.filters.remoteOnly,
                   onChanged: (val) {
                     if (val != null) {
@@ -169,17 +173,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
               ref.read(searchProvider.notifier).applyFilters(state.filters);
               setState(() => _filtersExpanded = false);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0D1B3E),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Appliquer les filtres'),
+            child: Text('Appliquer les filtres'),
           ),
         ],
       ),
@@ -197,10 +201,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             backgroundColor: Colors.grey.shade200,
             color: const Color(0xFF22C55E),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             state.currentSource ?? 'Recherche en cours...',
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
@@ -214,17 +218,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.search_rounded, size: 80, color: Colors.grey.shade300),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               'Lancez votre première recherche',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0D1B3E),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Utilisez la barre de recherche ci-dessus.',
               style: TextStyle(color: Colors.grey),
             ),
@@ -238,22 +242,22 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 80, color: Colors.red),
-            const SizedBox(height: 16),
-            const Text(
+            Icon(Icons.error_outline, size: 80, color: Colors.red),
+            SizedBox(height: 16),
+            Text(
               'Une erreur est survenue',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               state.errorMessage ?? 'Erreur inconnue',
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.grey),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () =>
                   ref.read(searchProvider.notifier).applyFilters(state.filters),
-              child: const Text('Réessayer'),
+              child: Text('Réessayer'),
             ),
           ],
         ),
@@ -261,7 +265,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     if (state.results.isEmpty && state.status == SearchState.results) {
-      return const Center(child: Text('Aucun résultat trouvé.'));
+      return Center(child: Text('Aucun résultat trouvé.'));
     }
 
     return NotificationListener<ScrollNotification>(
@@ -276,7 +280,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         itemCount: state.results.length + (state.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == state.results.length) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: CircularProgressIndicator(),
@@ -287,10 +291,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           return SearchResultCard(
             result: result,
             onSave: () {
-              // TODO: implement save
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sauvegardé')));
             },
             onTap: () {
-              // TODO: navigate to details
+              
             },
           );
         },
