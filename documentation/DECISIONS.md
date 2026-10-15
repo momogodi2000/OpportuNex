@@ -1,73 +1,51 @@
-# DECISIONS
+# Decision register — Opportunex (PIO)
 
-— treat as decided unless the owner overrides
+Treat each decision below as settled unless the owner overrides it. Each line can be confirmed or changed in a single pass.
 
+**Order of authority** when sources conflict:
+1. Cahier des charges
+2. Document technique d'architecture
+3. `pio_schema.sql`
+4. This register
+5. Agent rules in `documentation/Ai-agents-rule/`
 
-
-Every question the specification leaves open is resolved below. Implement these; list them in `documentation\DECISIONS.md` (one line each) so the owner can confirm or change any in one pass. Do not stop to ask about them.
-
-
-
-| # | Open question | Decision (best option) | Why |
-
+| # | Question | Decision | Why |
 | --- | --- | --- | --- |
+| D-01 | Product name | **Opportunex** is the product name. **PIO** is the technical name (data folder `PIO`). | Already used in the visual identity. A trademark search is still needed (owner action). |
+| D-02 | Code licence | **GNU AGPL v3** (spec ADR-014). The copyright holders may also grant a separate commercial licence. | Confirmed by the owner on 2026-10-15. |
+| D-03 | Contribution terms | DCO sign-off plus an inbound licence grant that allows relicensing (text in `CONTRIBUTING.md`). No copyright assignment. | A DCO alone would not allow a later dual licence. |
+| D-04 | Copyright line | `Copyright © 2026 Momo Godi Yvan / ETS Monthe Network and Opportunex contributors` | **Amended 2026-10-15 by the owner.** |
+| D-05 | Organisation | **ETS Monthe Network** develops and maintains the software and publishes it (About screen, installer, `.deb`, README, user guide). **Momo Godi Yvan** is the lead developer and author. Association PROTEGE QV is no longer credited. | **Amended 2026-10-15 by the owner.** Replaces "co-builder and co-funder". |
+| D-06 | Brand | The name and logo are reserved (`TRADEMARKS.md`). The code licence grants no brand rights, so forks must rename. | Spec §11.1 |
+| D-07 | Licences for docs and connectors | Docs under CC BY-SA 4.0. Declarative connectors under Apache 2.0. | Spec |
+| D-08 | Product Owner | Until a PO is named, the spec's acceptance criteria (US-xxx, §13.3 scenario) act as acceptance. | No PO designated yet. |
+| D-09 | Release scope | Desktop 1.0 = M01–M16 and M18, Must and Should. M17 is limited to: E2EE, device pairing, outbox/pull sync, organisation roles, leave-with-data, and a minimal Docker sync server. | Covers 100 % of Must requirements. |
+| D-10 | Platforms | Windows 10/11 x64 first (installer and portable ZIP). Linux x86_64 second (.deb). macOS: build configured but untested. | Spec §1 |
+| D-11 | Windows installer | **Inno Setup**, installed per user by default (no admin rights needed); per-machine install is optional. | Fits low-privilege office PCs |
+| D-12 | Code signing | Apply to SignPath Foundation. Until approved, ship unsigned and say so in the user guide (with SmartScreen steps). | Free route for open-source projects |
+| D-13 | Engine bundling | **PyInstaller `--onedir`**. Playwright's Chromium is not bundled. | ENF-PERF-01 / -08 |
+| D-14 | SQLCipher binding | `sqlcipher3-wheels` (a cp314 win_amd64 wheel was confirmed available on 2026-10-15). | Removes a packaging risk |
+| D-15 | AI | **AI off by default.** Offered choices: none / local (Ollama, LM Studio) / cloud with the user's own key. | Privacy and quota limits |
+| D-16 | Theme and language | Theme follows the system. Language follows the OS (FR or EN), falling back to French. | Francophone target audience |
+| D-17 | Regional settings | Currency **XAF**; dates shown as `dd/MM/yyyy`; times stored in UTC. | Spec §6.8 |
+| D-18 | Slogan | FR « Découvrez. Comprenez. Candidatez. » / EN "Discover. Understand. Apply." | |
+| D-19 | Palette and typeface | Colours derived from `opportunex.png`: navy #0B2545, amber #F2A900, teal #13A89E. Typeface: Inter (OFL). | |
+| D-20 | Source catalogue | At least 60 sources, each with its terms of use reviewed. A source without clear permission ships **disabled** and links to the official site. | Legal risk R04 |
+| D-21 | Sync server | Docker Compose plus documentation. The default URL is a placeholder (`https://sync.example.invalid`) until an official instance exists. | Avoids inventing infrastructure |
+| D-22 | Telemetry | **None.** Crash reports only with explicit opt-in, as a local export. | Spec §6.3 |
+| D-23 | Updates | Signed manifest on GitHub Releases. Update checks stay **disabled** until a release channel and signing keys exist. | Spec §12.4 |
+| D-24 | State, navigation, i18n | Riverpod + go_router + ARB. The engine returns stable error codes; the UI translates them. | ADR-013, §6.8 |
+| D-25 | Demo data | **No fake data in production.** A test-only local fixture server provides deterministic pages for CI. | Definition of done |
+| D-26 | Single instance | One instance per OS user (lock file). | Prevents two engines on the same encrypted database |
+| D-27 | Data location | Windows `%APPDATA%\PIO`; Linux `~/.local/share/pio`; macOS `~/Library/Application Support/PIO`. Subfolders: `profiles/<id>/{db,vault}`, `backups/`, `logs/`, `cache/`, `connectors/`. | Spec §12.3 |
+| D-28 | Exchange rates | Indicative rates, dated, always labelled "indicatif". | Spec §6.8 |
 
-| D-01 | Final commercial name | **OpportuNex** (product) · **PIO** (technical/project name, repo, engine package `pio_engine`, data folder `PIO`) | Already used in the identity image; short, memorable. Run a trademark search before public launch (owner action). |
+## Conflicts between agent rules and the spec
 
-| D-02 | Licence for code | **GNU AGPL v3** (spec ADR-014) + **dual-licence option**: the copyright holder may grant commercial licences to organisations that cannot comply with AGPL | Keeps the product free for everyone, gives the "professional licence" protection the owner wants without closing the code. |
-
-| D-03 | Contribution terms | **DCO sign-off + inbound licence grant that allows relicensing by the project owner** (lightweight CLA text in `CONTRIBUTING`), no copyright assignment | DCO alone does not allow later dual licensing; this does and still leaves authors their copyright (spec §11.2). |
-
-| D-04 | Copyright holder line | `Copyright © 2026 ING Momo Godi Yvan and PIO contributors` in SPDX headers/NOTICE; **funders credited, not named as holders**, until a funding agreement states otherwise | Safest default; spec names the author as maintainer and PROTEGE QV as funder. |
-
-| D-05 | ETS MONTHE NETWORK role | Credited as **co-builder and co-funder** in About screen, installer metadata, README, user guide ("Developed by ING Momo Godi Yvan — funded by Association PROTEGE QV and ETS MONTHE NETWORK") | Reflects the owner's statement; flag in `LEGAL_DECISIONS_NEEDED.md` so the funding agreement matches. |
-
-| D-06 | Logo/brand | Name and logo reserved via `TRADEMARKS.md`; code licence does not grant brand rights; forks must rename | Matches spec §11.1. |
-
-| D-07 | Documentation / connectors licences | Docs **CC BY-SA 4.0**; declarative connectors **Apache 2.0** (spec) | Spec. |
-
-| D-08 | Product Owner | Spec acceptance criteria (US-xxx Given/When/Then, §13.3 scenario) act as the PO's acceptance for this build; a human PO designated by PROTEGE QV signs the final PV | PO not yet designated. |
-
-| D-09 | Release scope of this build | **Desktop 1.0 = M01–M16 and M18 in full for Must + Should; M17 limited to: E2EE crypto layer, device pairing, outbox/pull sync, organisation roles, leave-with-data (EF-17.05, 17.12 Must) and a minimal Docker sync server.** Could items only after the gate. | Meets 100% Must; avoids a half-built collaboration suite. |
-
-| D-10 | Platform priority | **Windows 10/11 x64 first (installer + portable ZIP), Linux x86_64 second (.deb primary, AppImage secondary), macOS = pipeline configured, marked untested.** | Spec §1 priority; only what can be verified is claimed. |
-
-| D-11 | Windows installer | **Inno Setup**, per-user install by default (no admin needed), optional per-machine | Common on low-privilege African office PCs; simple, scriptable. |
-
-| D-12 | Code signing | **SignPath Foundation** application for OSS; until approved, ship unsigned and state it on the download page and in the guide (SmartScreen workaround steps) | Free path for open source (spec R10). |
-
-| D-13 | Engine bundling | **PyInstaller `--onedir` for the engine** (faster start and fewer antivirus false positives than `--onefile`), placed in the app folder; Chromium for Playwright **not** bundled | Meets ENF-PERF-01 (≤4 s start) and ENF-PERF-08 (≤150 MB). |
-
-| D-14 | SQLCipher binding | Use a maintained prebuilt binding (e.g. `sqlcipher3-wheels`); verify wheels for Windows/Linux x64 in sprint-zero spike; if missing, build from source in CI and cache the wheel | Removes the biggest packaging risk early. |
-
-| D-15 | Default AI posture | **AI OFF by default.** Onboarding offers three choices: *No AI*, *Local model (Ollama/LM Studio)*, *Cloud provider with my own key*. Recommended order in UI: local → Gemini/Mistral free tiers → others. | Privacy and quota reality (R02). |
-
-| D-16 | Default theme / language | Theme **System**; language follows the OS (FR or EN), fallback **French** | Francophone target. |
-
-| D-17 | Default currency / region | **XAF**, ISO date format `dd/MM/yyyy` displayed, UTC stored | Spec §6.8. |
-
-| D-18 | Slogan | FR **« Découvrez. Comprenez. Candidatez. »** · EN **"Discover. Understand. Apply."** | Short, mirrors the product's three promises. |
-
-| D-19 | Identity palette and type | Derive the palette from `opportunex.png`; if it lacks one, use deep navy (#0B2545), African-sun amber (#F2A900), teal (#13A89E) accents, neutral greys; typeface **Inter** (UI) with system fallback, bundled under OFL | Professional, accessible contrast, free font. |
-
-| D-20 | Initial source catalog policy | Ship **≥60 sources**, each with a recorded terms-of-use review date; prefer official APIs/RSS; sources lacking clear permission ship **disabled** with the official link only | Legal safety (R04). See §6.3 for candidate list. |
-
-| D-21 | Sync server hosting | Provide Docker Compose + docs; the official PROTEGE QV instance URL is a **configurable default placeholder** (`https://sync.example.invalid`) until the association provides the real one | Do not invent infrastructure. |
-
-| D-22 | Telemetry | **None.** Crash reports only by explicit opt-in, local file export | Spec §6.3. |
-
-| D-23 | Update channel | Signed manifest on GitHub Releases, stable and beta channels, check ≤1×/day, user can disable | Spec §12.4. |
-
-| D-24 | State/nav/i18n | Riverpod + go_router + ARB (Flutter); gettext/Babel catalog for engine strings but **engine returns stable error codes**, UI localises | Spec ADR-013 and §6.8. |
-
-| D-25 | Demo data | **No fake opportunities anywhere in production.** First launch shows guided empty states; "Run my first search" performs a real search. A *test-only* local fixture web server supplies deterministic pages for CI. | DoD: "aucune donnée fictive dans le parcours de production". |
-
-| D-26 | Single instance | Only one app instance per OS user (named mutex / lock file); second launch focuses the first window | Prevents two engines on one encrypted DB. |
-
-| D-27 | Data location | Windows `%APPDATA%\PIO`; Linux `~/.local/share/pio`; macOS `~/Library/Application Support/PIO`; subfolders `db/ vault/ backups/ logs/ cache/ connectors/` | Spec §12.3. |
-
-| D-28 | Currency conversion rates | Indicative rates from a free public source, refreshed weekly, stored with date; conversions always labelled "indicatif" | Spec §6.8. |
-
-
-
----
+| # | Conflict | Ruling |
+| --- | --- | --- |
+| C-01 | `ai-agents-backend.md` requires a `{data, meta, errors}` envelope; the spec (§5.1) requires RFC 9457 Problem Details. | **Spec wins:** errors use `application/problem+json` with a stable `code`; successful responses return the resource directly, and lists use `{items, next_cursor}`. |
+| C-02 | The storage/backup master prompt asks for weekly backups kept 6 weeks; arch §13.2 asks for daily backups, keeping 7, plus pre-migration and pre-restore backups. | **Spec wins:** daily, keep 7, plus `pre_migration` / `pre_restore` / `manual`. |
+| C-03 | The storage master prompt describes a cloud chain (Cloudinary → UploadThing → R2) and a Super Admin dashboard. | **Not applicable** to a local-first desktop app. Only its integrity, encryption, metadata, retention, restore and audit rules apply. |
+| C-04 | `ai-agents-flutter.md` organises code as data/domain/presentation; the spec uses presentation/application/data. | Keep the existing `features/<x>/{data,domain,presentation}` layout, which is compatible. No reorganisation churn. |
+| C-05 | The third-party skill packs in `Ai-agents-rule/*-main` were written for web or other ecosystems. | Kept as reference documentation. Not applied to Flutter or Python code. |

@@ -1,0 +1,41 @@
+# --- Python -------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist-venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# --- Secrets / local config ---------------------------------------------
+.env
+.env.*
+!.env.example
+
+# --- Build outputs --------------------------------------------------------
+/build/
+/dist/
+engine/build/
+engine/dist/
+packaging/**/build/
+packaging/**/output/
+
+# --- Local runtime data / logs ---------------------------------------------
+/data/
+*.log
+
+# --- OS / editors ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+
+# --- Agent-internal working files (not part of the product) ---------------
+/Voici une version*.md
