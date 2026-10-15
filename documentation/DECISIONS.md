@@ -28,8 +28,8 @@ Treat each decision below as settled unless the owner overrides it. Each line ca
 | D-15 | AI | **AI off by default.** Offered choices: none / local (Ollama, LM Studio) / cloud with the user's own key. | Privacy and quota limits |
 | D-16 | Theme and language | Theme follows the system. Language follows the OS (FR or EN), falling back to French. | Francophone target audience |
 | D-17 | Regional settings | Currency **XAF**; dates shown as `dd/MM/yyyy`; times stored in UTC. | Spec §6.8 |
-| D-18 | Slogan | FR « Découvrez. Comprenez. Candidatez. » / EN "Discover. Understand. Apply." | |
-| D-19 | Palette and typeface | Colours derived from `opportunex.png`: navy #0B2545, amber #F2A900, teal #13A89E. Typeface: Inter (OFL). | |
+| D-18 | Slogan | FR « Trouvez · Analysez · Réalisez » / EN "Find · Analyse · Achieve", as printed on the brand sheet `opportunex.png`. | Brand sheet takes precedence over the earlier proposal. |
+| D-19 | Palette and typeface | Taken from `opportunex.png`: navy ink #0B1F4D, royal blue #1E5BC6 (primary), green #1E9E4A (success/brand accent), amber #F2A900 (deadlines/warnings). Typeface: Inter (SIL OFL). All pairs checked for WCAG AA contrast in light and dark themes. | Palette derived from the actual logo, as D-19 required. |
 | D-20 | Source catalogue | At least 60 sources, each with its terms of use reviewed. A source without clear permission ships **disabled** and links to the official site. | Legal risk R04 |
 | D-21 | Sync server | Docker Compose plus documentation. The default URL is a placeholder (`https://sync.example.invalid`) until an official instance exists. | Avoids inventing infrastructure |
 | D-22 | Telemetry | **None.** Crash reports only with explicit opt-in, as a local export. | Spec §6.3 |

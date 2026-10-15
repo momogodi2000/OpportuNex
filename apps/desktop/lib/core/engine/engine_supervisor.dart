@@ -2,161 +2,294 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:crypto/crypto.dart';
-import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 
-enum EngineState { starting, healthy, restarting, failed }
+import '../platform/app_paths.dart';
+import 'engine_locator.dart';
 
-class EngineData {
-  final String engineUrl;
-  final String sessionToken;
-  final Stream<dynamic>? websocketStream;
-  final EngineState state;
-  final String? diagnosticInfo;
+final _log = Logger('EngineSupervisor');
 
-  EngineData({
-    required this.engineUrl,
-    required this.sessionToken,
-    this.websocketStream,
-    required this.state,
-    this.diagnosticInfo,
+enum EngineRunState { starting, ready, restarting, failed, stopped }
+
+enum EngineFailure { notFound, alreadyRunning, handshakeTimeout, crashed, healthTimeout }
+
+@immutable
+class EngineStatus {
+  const EngineStatus({
+    required this.phase,
+    this.port,
+    this.token,
+    this.failure,
+    this.attempt = 0,
+    this.detail,
+    this.logTail = const [],
   });
+
+  final EngineRunState phase;
+  final int? port;
+  final String? token;
+  final EngineFailure? failure;
+  final int attempt;
+  final String? detail;
+  final List<String> logTail;
+
+  bool get isReady => phase == EngineRunState.ready && port != null && token != null;
+  String get baseUrl => 'http://127.0.0.1:$port/api/v1';
+
+  EngineStatus copyWith({
+    EngineRunState? phase,
+    int? port,
+    String? token,
+    EngineFailure? failure,
+    int? attempt,
+    String? detail,
+    List<String>? logTail,
+  }) =>
+      EngineStatus(
+        phase: phase ?? this.phase,
+        port: port ?? this.port,
+        token: token ?? this.token,
+        failure: failure ?? this.failure,
+        attempt: attempt ?? this.attempt,
+        detail: detail ?? this.detail,
+        logTail: logTail ?? this.logTail,
+      );
 }
 
-class EngineSupervisor extends AsyncNotifier<EngineData> {
-  Process? _engineProcess;
-  WebSocketChannel? _wsChannel;
-  int _restartCount = 0;
-  static const int _maxRestarts = 3;
-  String _sessionToken = '';
-  String _engineUrl = '';
+/// Starts and watches the local engine (arch §3.4, ADR-002):
+/// random token on stdin → `PORT:<n>` on stdout → `/health` polled ≤ 10 s → ready.
+/// Unexpected exits are retried 3 times with exponential back-off, then the UI shows a
+/// diagnostics screen.
+class EngineSupervisor extends Notifier<EngineStatus> {
+  static const maxRestarts = 3;
+  static const handshakeTimeout = Duration(seconds: 20);
+  static const healthTimeout = Duration(seconds: 10);
+  static const _tailLines = 80;
+
+  Process? _process;
+  final _tail = <String>[];
+  IOSink? _logSink;
+  bool _stopping = false;
+  int _restarts = 0;
+
+  /// Injected in tests.
+  EngineCommand Function() locate = EngineLocator.resolve;
+  Future<Process> Function(EngineCommand) spawn = _defaultSpawn;
+  Future<bool> Function(String baseUrl, String token) probe = _defaultProbe;
 
   @override
-  FutureOr<EngineData> build() async {
-    _sessionToken = _generateSessionToken();
-    return _startEngine();
+  EngineStatus build() {
+    ref.onDispose(() => unawaited(stop()));
+    return const EngineStatus(phase: EngineRunState.stopped);
   }
 
-  String _generateSessionToken() {
-    final random = Random.secure();
-    final values = List<int>.generate(32, (i) => random.nextInt(256));
-    return sha256.convert(values).toString();
-  }
+  static Future<Process> _defaultSpawn(EngineCommand c) => Process.start(
+        c.executable,
+        c.arguments,
+        workingDirectory: c.workingDirectory,
+        environment: const {'PYTHONUNBUFFERED': '1', 'PYTHONIOENCODING': 'utf-8'},
+      );
 
-  Future<EngineData> _startEngine() async {
+  static Future<bool> _defaultProbe(String baseUrl, String token) async {
+    final dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 1),
+      receiveTimeout: const Duration(seconds: 2),
+      headers: {'X-Engine-Token': token},
+    ));
     try {
-      final String enginePath = _getEnginePath();
+      final r = await dio.get<Map<String, dynamic>>('$baseUrl/health');
+      return r.statusCode == 200 && r.data?['status'] == 'ok';
+    } on DioException {
+      return false;
+    } finally {
+      dio.close(force: true);
+    }
+  }
 
-      _engineProcess = await Process.start(enginePath, []);
+  static String newToken() {
+    final rnd = Random.secure();
+    final bytes = List<int>.generate(32, (_) => rnd.nextInt(256));
+    return base64Url.encode(bytes).replaceAll('=', '');
+  }
 
-      // Send token via stdin
-      _engineProcess!.stdin.writeln(_sessionToken);
-      await _engineProcess!.stdin.flush();
+  void _remember(String line) {
+    _tail.add(line);
+    if (_tail.length > _tailLines) _tail.removeAt(0);
+    _logSink?.writeln(line);
+  }
 
-      // Read PORT from stdout
-      final completer = Completer<int>();
-      _engineProcess!.stdout
-          .transform(utf8.decoder)
-          .transform(const LineSplitter())
-          .listen((line) {
-            if (line.startsWith('PORT:') && !completer.isCompleted) {
-              final port = int.tryParse(line.substring(5));
-              if (port != null) {
-                completer.complete(port);
-              }
-            }
-          });
+  Future<void> start() async {
+    if (state.phase == EngineRunState.starting || state.isReady) return;
+    _stopping = false;
+    _restarts = 0;
+    await _launch(EngineRunState.starting);
+  }
 
-      final port = await completer.future.timeout(const Duration(seconds: 5));
-      _engineUrl = 'http://localhost:$port';
+  Future<void> retry() async {
+    await _kill();
+    _restarts = 0;
+    await _launch(EngineRunState.starting);
+  }
 
-      // Health check poll
-      await _waitForHealth();
+  Future<void> _openLog() async {
+    if (_logSink != null) return;
+    try {
+      final dir = Directory(AppPaths.logsDir());
+      await dir.create(recursive: true);
+      _logSink = File(p.join(dir.path, 'engine-process.log')).openWrite(mode: FileMode.append);
+    } on FileSystemException catch (e) {
+      _log.warning('cannot open engine log: $e');
+    }
+  }
 
-      // Open WebSocket
-      _wsChannel = WebSocketChannel.connect(
-        Uri.parse('ws://localhost:$port/api/v1/events'),
-      );
+  Future<void> _launch(EngineRunState phase) async {
+    await _kill();
+    final token = newToken();
+    state = EngineStatus(phase: phase, attempt: _restarts, logTail: List.of(_tail));
+    await _openLog();
 
-      _engineProcess!.exitCode.then((code) {
-        if (code != 0 && _restartCount < _maxRestarts) {
-          _restartCount++;
-          state = const AsyncLoading();
-          _startEngine().then((data) => state = AsyncData(data));
-        } else if (code != 0) {
-          state = AsyncData(
-            EngineData(
-              engineUrl: _engineUrl,
-              sessionToken: _sessionToken,
-              state: EngineState.failed,
-              diagnosticInfo:
-                  'Engine exited with code $code after $_maxRestarts restarts',
-            ),
-          );
-        }
-      });
+    final EngineCommand command;
+    try {
+      command = locate();
+    } on EngineNotFound catch (e) {
+      _fail(EngineFailure.notFound, e.toString());
+      return;
+    }
+    _remember('[ui] starting engine: $command');
 
-      return EngineData(
-        engineUrl: _engineUrl,
-        sessionToken: _sessionToken,
-        websocketStream: _wsChannel?.stream,
-        state: EngineState.healthy,
-      );
-    } catch (e) {
-      if (_restartCount < _maxRestarts) {
-        _restartCount++;
-        await Future.delayed(Duration(seconds: pow(2, _restartCount).toInt()));
-        return _startEngine();
+    final Process process;
+    try {
+      process = await spawn(command);
+    } on ProcessException catch (e) {
+      _fail(EngineFailure.notFound, e.message);
+      return;
+    }
+    _process = process;
+    final portCompleter = Completer<int>();
+
+    process.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
+      _remember('[out] $line');
+      if (line.startsWith('PORT:') && !portCompleter.isCompleted) {
+        final port = int.tryParse(line.substring(5).trim());
+        if (port != null) portCompleter.complete(port);
       }
-      return EngineData(
-        engineUrl: '',
-        sessionToken: _sessionToken,
-        state: EngineState.failed,
-        diagnosticInfo: e.toString(),
-      );
+    });
+    process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen(_remember);
+
+    var exitCodeSeen = false;
+    unawaited(process.exitCode.then((code) {
+      exitCodeSeen = true;
+      _remember('[ui] engine exited with code $code');
+      if (identical(_process, process)) _onExit(code);
+    }));
+
+    process.stdin.writeln(token);
+    await process.stdin.flush();
+    unawaited(process.stdin.close());
+
+    final int port;
+    try {
+      port = await portCompleter.future.timeout(handshakeTimeout);
+    } on TimeoutException {
+      if (!exitCodeSeen) _fail(EngineFailure.handshakeTimeout, 'no PORT line within ${handshakeTimeout.inSeconds}s');
+      return;
+    }
+
+    final base = 'http://127.0.0.1:$port/api/v1';
+    final deadline = DateTime.now().add(healthTimeout);
+    while (DateTime.now().isBefore(deadline)) {
+      if (!identical(_process, process)) return;
+      if (await probe(base, token)) {
+        state = EngineStatus(phase: EngineRunState.ready, port: port, token: token, attempt: _restarts);
+        _remember('[ui] engine ready on port $port');
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+    _fail(EngineFailure.healthTimeout, 'health check did not succeed within ${healthTimeout.inSeconds}s');
+  }
+
+  void _onExit(int code) {
+    _process = null;
+    if (_stopping) {
+      state = const EngineStatus(phase: EngineRunState.stopped);
+      return;
+    }
+    if (code == 3) {
+      _fail(EngineFailure.alreadyRunning, 'another Opportunex engine is already running');
+      return;
+    }
+    if (_restarts >= maxRestarts) {
+      _fail(EngineFailure.crashed, 'engine exited with code $code after $_restarts restarts');
+      return;
+    }
+    _restarts++;
+    final delay = Duration(seconds: 1 << (_restarts - 1));
+    state = state.copyWith(phase: EngineRunState.restarting, attempt: _restarts, logTail: List.of(_tail));
+    unawaited(Future<void>.delayed(delay, () {
+      if (!_stopping) unawaited(_launch(EngineRunState.restarting));
+    }));
+  }
+
+  void _fail(EngineFailure failure, String detail) {
+    _log.severe('engine failure: $failure $detail');
+    _remember('[ui] failure: $failure — $detail');
+    state = EngineStatus(
+      phase: EngineRunState.failed,
+      failure: failure,
+      detail: detail,
+      attempt: _restarts,
+      logTail: List.of(_tail),
+    );
+    unawaited(_kill());
+  }
+
+  Future<void> _kill() async {
+    final proc = _process;
+    _process = null;
+    if (proc == null) return;
+    proc.kill();
+    try {
+      await proc.exitCode.timeout(const Duration(seconds: 3));
+    } on TimeoutException {
+      proc.kill(ProcessSignal.sigkill);
     }
   }
 
-  Future<void> _waitForHealth() async {
-    int attempts = 0;
-    while (attempts < 5) {
+  /// Graceful stop: ask the engine to close the profile (WAL checkpoint), then kill.
+  Future<void> stop() async {
+    _stopping = true;
+    final s = state;
+    final proc = _process;
+    if (s.isReady && proc != null) {
+      final dio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 1),
+        receiveTimeout: const Duration(seconds: 2),
+        headers: {'X-Engine-Token': s.token},
+      ));
       try {
-        final response = await http.get(Uri.parse('$_engineUrl/api/v1/health'));
-        if (response.statusCode == 200) {
-          return;
-        }
-      } catch (_) {}
-      attempts++;
-      await Future.delayed(Duration(seconds: pow(2, attempts).toInt()));
+        await dio.post<void>('${s.baseUrl}/system/shutdown');
+        await proc.exitCode.timeout(const Duration(seconds: 4));
+      } on Object {
+        // fall through to kill
+      } finally {
+        dio.close(force: true);
+      }
     }
-    throw Exception('Engine health check failed after max attempts');
+    await _kill();
+    await _logSink?.flush();
+    await _logSink?.close();
+    _logSink = null;
+    state = const EngineStatus(phase: EngineRunState.stopped);
   }
 
-  String _getEnginePath() {
-    final executable = Platform.resolvedExecutable;
-    final dir = p.dirname(executable);
-    if (Platform.isWindows) {
-      return p.join(dir, 'engine.exe');
-    } else {
-      return p.join(dir, 'engine');
-    }
-  }
-
-  Future<void> shutdown() async {
-    if (_engineUrl.isNotEmpty) {
-      try {
-        await http.post(Uri.parse('$_engineUrl/api/v1/shutdown'));
-      } catch (_) {}
-    }
-    _wsChannel?.sink.close();
-    _engineProcess?.kill();
-  }
+  List<String> get logTail => List.unmodifiable(_tail);
 }
 
 final engineSupervisorProvider =
-    AsyncNotifierProvider<EngineSupervisor, EngineData>(() {
-      return EngineSupervisor();
-    });
+    NotifierProvider<EngineSupervisor, EngineStatus>(EngineSupervisor.new);

@@ -111,6 +111,24 @@ Almost all of the previous engine code was built on an ORM that no longer matche
 
 Also found: the old "60+ sources" catalogue contained **about 46 fake entries** (`www.source16.africa` … `source61.africa`). It will be rebuilt from verified sources in phase 3.
 
+### Phase 2 — Desktop launches, supervises the engine, real auth flow
+The old Flutter `lib/` and `test/` were moved with `git mv` to `apps/desktop/_legacy_lib/` (nothing deleted). Feature pages will be rebuilt against the real engine in Phase 3 instead of being patched twice. New core:
+
+| Area | File(s) | What it fixes / adds |
+| --- | --- | --- |
+| Engine supervisor (arch §3.4) | `lib/core/engine/engine_supervisor.dart`, `engine_locator.dart` | Locates the packaged engine (`engine/opportunex-engine.exe`) or the dev checkout (`engine/.venv` + `main.py`) or `OPX_ENGINE_CMD`. Sends a 256-bit token on stdin, reads `PORT:`, runs an authenticated `/health` poll for up to 10 s, retries 3 times with back-off, kills the old process before a restart, writes stderr to `logs/engine-process.log`, shuts down gracefully when the window closes |
+| Diagnostics screen | `lib/features/startup/startup_page.dart` | Replaces the infinite spinner: cause (not found / already running / timeout / crash), log tail, copy, open logs folder, retry |
+| Single API client | `lib/core/api/api_client.dart`, `api_exception.dart` | One Dio instance with the engine token and session bearer, RFC 9457 → `ApiException`. The fictitious hosts (`api.opportunex.*`) and the duplicate `http` client are gone |
+| Events | `lib/core/api/engine_events.dart` | `/api/v1/events` WebSocket with the token header and reconnect |
+| Auth state machine + guarded router | `lib/features/auth/auth_controller.dart`, `lib/core/router/app_router.dart` | Unknown → signed out → locked → signed in. Redirects are pure and unit-tested. Reacts to auto-lock events and 401 `session_locked` |
+| Real auth screens | `lib/features/auth/pages/*` | Profile picker, sign-in, registration with a live strength meter (engine zxcvbn), one-time recovery phrase, unlock, recovery, import from backup |
+| Settings | `lib/features/settings/*` | Language, theme, auto-lock, password change, lock, account deletion (type DELETE + password), backups (create / verify / restore with type RESTORE + password / delete / auto toggle), maintenance (integrity, optimise, storage, log export), About (version, publisher, author, licence, third-party licences) |
+| Offline legal texts (EF-18.09) | `assets/legal/*.md`, `lib/features/legal/legal_page.dart` | FR/EN terms of use and privacy policy describing the real behaviour |
+| Design tokens + themes | `lib/core/theme/tokens.dart`, `app_theme.dart` | Palette taken from the logo (D-19 updated), AA contrast light/dark, semantic status colours, motion tokens honouring reduced motion |
+| i18n | `lib/l10n/app_fr.arb`, `app_en.arb` (gen-l10n) | Replaces the hand-rolled 23-key map; every string in the new code is localised |
+| Fonts and icons | `assets/fonts/Inter-*.ttf` + OFL, `packaging/branding/make_icons.py` | The "Inter" files were **6-byte placeholders**, replaced with Inter 4.1. The `.ico` and in-app icon were the whole brand sheet shrunk down; the real app tile is now cropped reproducibly (Windows `.ico` 16–256, Linux hicolor 16–512) |
+| Platform metadata | `windows/runner/Runner.rc`, `main.cpp`, `linux/CMakeLists.txt`, `my_application.cc`, macOS config | ETS Monthe Network / Opportunex / AGPL instead of "com.protegeqv … All rights reserved" |
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -121,7 +139,11 @@ Also found: the old "60+ sources" catalogue contained **about 46 fake entries** 
 | 2026-10-15 | `.venv\Scripts\python main.py --self-test` | `SELF-TEST OK engine=1.0.0 schema=0002_product_identity` |
 | 2026-10-15 | Real subprocess launch (token on stdin) | `PORT:` after 1.1 s; `/health` ready after 3.9 s (first cold start); a second instance is refused (exit code 3); clean shutdown |
 
-Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.51.1).
+| 2026-10-15 | `flutter analyze` (apps/desktop) | No issues |
+| 2026-10-15 | `flutter test` | **20 passed** (redirect rules, locator, supervisor handshake/failures, problem parsing, auth widgets) |
+| 2026-10-15 | `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (14 s)**: real Windows build + real engine — register → recovery phrase → settings → Ctrl+L lock → unlock → encrypted backup created on disk |
+
+Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.51.1), Flutter 3.41.2.
 
 ## D. Deliverables
 

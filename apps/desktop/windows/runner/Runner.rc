@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.protegeqv" "\0"
-            VALUE "FileDescription", "opportunex" "\0"
+            VALUE "CompanyName", "ETS Monthe Network" "\0"
+            VALUE "FileDescription", "Opportunex" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "opportunex" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.protegeqv. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Momo Godi Yvan / ETS Monthe Network. Licensed under GNU AGPL v3." "\0"
             VALUE "OriginalFilename", "opportunex.exe" "\0"
-            VALUE "ProductName", "opportunex" "\0"
+            VALUE "ProductName", "Opportunex" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

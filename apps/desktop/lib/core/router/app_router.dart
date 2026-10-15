@@ -1,189 +1,78 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/register_page.dart';
-import '../../features/dashboard/presentation/pages/dashboard_page.dart';
-import '../../features/search/presentation/pages/search_page.dart';
-import '../../features/saved/presentation/pages/saved_page.dart';
-import '../../features/applications/presentation/pages/applications_page.dart';
-import '../../features/opportunity/presentation/pages/opportunity_detail_page.dart';
-import '../../features/monitors/presentation/pages/monitors_page.dart';
-import '../../features/workspaces/presentation/pages/workspaces_page.dart';
-import '../../features/settings/presentation/pages/settings_page.dart';
-import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/auth/auth_controller.dart';
+import '../../features/auth/auth_models.dart';
+import '../../features/auth/pages/import_profile_page.dart';
+import '../../features/auth/pages/login_page.dart';
+import '../../features/auth/pages/recover_page.dart';
+import '../../features/auth/pages/register_page.dart';
+import '../../features/auth/pages/welcome_page.dart';
+import '../../features/legal/legal_page.dart';
+import '../../features/settings/settings_page.dart';
+import '../../features/shell/app_shell.dart';
+import '../../features/shell/nav_items.dart';
+import '../../features/startup/startup_page.dart';
+import '../engine/engine_supervisor.dart';
 
-final rootNavigatorKey = GlobalKey<NavigatorState>();
-final shellNavigatorKey = GlobalKey<NavigatorState>();
+const _signedOutRoutes = {'/welcome', '/login', '/register', '/recover', '/import-profile', '/legal'};
+const _lockedRoutes = {'/login', '/welcome', '/recover', '/legal'};
 
-final appRouterProvider = Provider<GoRouter>((ref) {
-  return GoRouter(
-    navigatorKey: rootNavigatorKey,
-    initialLocation: '/login',
+/// Pure redirect rules, unit-tested without a widget tree.
+String? redirectFor({required EngineStatus engine, required AuthState auth, required String location}) {
+  if (!engine.isReady || auth is AuthUnknown) return location == '/startup' ? null : '/startup';
+  switch (auth) {
+    case SignedOut():
+      return _signedOutRoutes.contains(location) ? null : '/welcome';
+    case LockedOut():
+      return _lockedRoutes.contains(location) ? null : '/login';
+    case SignedIn(:final recoveryPhrase):
+      if (recoveryPhrase != null) return location == '/register' ? null : '/register';
+      if (location == '/startup' || (_signedOutRoutes.contains(location) && location != '/legal')) return homePath;
+      return null;
+    case AuthUnknown():
+      return '/startup';
+  }
+}
+
+final routerProvider = Provider<GoRouter>((ref) {
+  final refresh = ValueNotifier<int>(0);
+  ref
+    ..listen(engineSupervisorProvider, (_, _) => refresh.value++)
+    ..listen(authControllerProvider, (_, _) => refresh.value++)
+    ..onDispose(refresh.dispose);
+
+  final router = GoRouter(
+    initialLocation: '/startup',
+    refreshListenable: refresh,
+    redirect: (context, state) => redirectFor(
+      engine: ref.read(engineSupervisorProvider),
+      auth: ref.read(authControllerProvider),
+      location: state.matchedLocation,
+    ),
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: '/recover',
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Recover'))),
-      ),
-      GoRoute(
-        path: '/local-profiles',
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Local Profiles'))),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        builder: (context, state) => const OnboardingPage(),
-      ),
+      GoRoute(path: '/', redirect: (_, _) => homePath),
+      GoRoute(path: '/startup', builder: (_, _) => const StartupPage()),
+      GoRoute(path: '/welcome', builder: (_, _) => const WelcomePage()),
+      GoRoute(path: '/login', builder: (_, s) => LoginPage(profileId: s.uri.queryParameters['profile'])),
+      GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
+      GoRoute(path: '/recover', builder: (_, _) => const RecoverPage()),
+      GoRoute(path: '/import-profile', builder: (_, _) => const ImportProfilePage()),
+      GoRoute(path: '/legal', builder: (_, _) => const LegalPage()),
       ShellRoute(
-        navigatorKey: shellNavigatorKey,
-        builder: (context, state, child) {
-          return Scaffold(
-            body: Row(
-              children: [
-                SizedBox(
-                  width: 250,
-                  child: ListView(
-                    children: [
-                      ListTile(
-                        title: const Text('Dashboard'),
-                        onTap: () => context.go('/dashboard'),
-                      ),
-                      ListTile(
-                        title: const Text('Search'),
-                        onTap: () => context.go('/search'),
-                      ),
-                      ListTile(
-                        title: const Text('Saved'),
-                        onTap: () => context.go('/saved'),
-                      ),
-                      ListTile(
-                        title: const Text('Applications'),
-                        onTap: () => context.go('/applications'),
-                      ),
-                      ListTile(
-                        title: const Text('Monitors'),
-                        onTap: () => context.go('/monitors'),
-                      ),
-                      ListTile(
-                        title: const Text('Settings'),
-                        onTap: () => context.go('/settings/account'),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(child: child),
-              ],
-            ),
-          );
-        },
+        builder: (context, state, child) => AppShell(location: state.matchedLocation, child: child),
         routes: [
           GoRoute(
-            path: '/dashboard',
-            builder: (context, state) => const DashboardPage(),
-          ),
-          GoRoute(
-            path: '/search',
-            builder: (context, state) => const SearchPage(),
-          ),
-          GoRoute(
-            path: '/results/:runId',
-            builder: (context, state) => Scaffold(
-              body: Center(
-                child: Text('Results ${state.pathParameters['runId']}'),
-              ),
+            path: '/settings',
+            pageBuilder: (_, s) => NoTransitionPage(
+              child: SettingsPage(initialTab: int.tryParse(s.uri.queryParameters['tab'] ?? '') ?? 0),
             ),
-          ),
-          GoRoute(
-            path: '/saved',
-            builder: (context, state) => const SavedPage(),
-          ),
-          GoRoute(
-            path: '/applications',
-            builder: (context, state) => const ApplicationsPage(),
-            routes: [
-              GoRoute(
-                path: ':id',
-                builder: (context, state) => Scaffold(
-                  body: Center(
-                    child: Text('Application ${state.pathParameters['id']}'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          GoRoute(
-            path: '/monitors',
-            builder: (context, state) => const MonitorsPage(),
-          ),
-          GoRoute(
-            path: '/workspaces',
-            builder: (context, state) => const WorkspacesPage(),
-          ),
-          GoRoute(
-            path: '/sources',
-            builder: (context, state) =>
-                const Scaffold(body: Center(child: Text('Sources'))),
-          ),
-          GoRoute(
-            path: '/organizations',
-            builder: (context, state) =>
-                const Scaffold(body: Center(child: Text('Organizations'))),
-          ),
-          GoRoute(
-            path: '/opportunities/:id',
-            builder: (context, state) => OpportunityDetailPage(
-              opportunityId: state.pathParameters['id'] ?? '',
-            ),
-          ),
-          GoRoute(
-            path: '/settings/account',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/profile',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/ai',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/privacy',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/notifications',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/appearance',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/network',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/backups',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/sync',
-            builder: (context, state) => const SettingsPage(),
-          ),
-          GoRoute(
-            path: '/settings/about',
-            builder: (context, state) => const SettingsPage(),
           ),
         ],
       ),
     ],
   );
+  ref.onDispose(router.dispose);
+  return router;
 });
