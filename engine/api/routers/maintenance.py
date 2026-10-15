@@ -33,7 +33,7 @@ class BackupSettingsIn(BaseModel):
 @router.get("/backups")
 def list_backups(active: Active, svc: Svc) -> dict[str, Any]:
     svc.reconcile_records(active)
-    return {"items": svc.backups(active).list(), "settings": svc.backup_settings(active)}
+    return {"items": svc.backups(active).list_items(), "settings": svc.backup_settings(active)}
 
 
 @router.post("/backups", status_code=201)
@@ -63,8 +63,9 @@ def delete_backup(backup_id: str, active: Active, svc: Svc) -> None:
 
 
 @router.post("/auth/profiles/import", status_code=201)
-async def import_profile(svc: Svc, file: Annotated[UploadFile, File()],
-                         password: Annotated[str, Form(min_length=1, max_length=256)]) -> dict[str, Any]:
+async def import_profile(
+    svc: Svc, file: Annotated[UploadFile, File()], password: Annotated[str, Form(min_length=1, max_length=256)]
+) -> dict[str, Any]:
     data = await file.read(MAX_IMPORT_BYTES + 1)
     if not data:
         raise ValidationFailed("empty file", code="file_empty")
@@ -91,5 +92,8 @@ def storage(active: Active, svc: Svc) -> dict[str, Any]:
 
 @router.get("/maintenance/logs")
 def export_logs(_active: Active, svc: Svc) -> Response:
-    return Response(content=svc.export_logs(), media_type="application/zip",
-                    headers={"Content-Disposition": 'attachment; filename="opportunex-logs.zip"'})
+    return Response(
+        content=svc.export_logs(),
+        media_type="application/zip",
+        headers={"Content-Disposition": 'attachment; filename="opportunex-logs.zip"'},
+    )

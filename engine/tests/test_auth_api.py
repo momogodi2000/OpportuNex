@@ -24,8 +24,9 @@ def test_health_is_public_but_everything_else_needs_engine_token(engine_client: 
 
 def test_browser_origin_and_foreign_host_are_rejected(engine_client: EngineClient) -> None:
     assert engine_client.get("/version", headers={"Origin": "https://evil.example"}).status_code == 403
-    r = engine_client.client.get("/api/v1/version", headers={
-        "X-Engine-Token": engine_client.engine_token, "Host": "evil.example"})
+    r = engine_client.client.get(
+        "/api/v1/version", headers={"X-Engine-Token": engine_client.engine_token, "Host": "evil.example"}
+    )
     assert r.status_code == 421
 
 
@@ -53,23 +54,40 @@ def test_register_returns_session_and_recovery_phrase(engine_client: EngineClien
     assert body["recovery_phrase"].split()[0] not in raw.split('"')
 
 
-@pytest.mark.parametrize("change,code", [
-    ({"password": "short", "confirm_password": "short"}, "password_policy"),
-    ({"confirm_password": "Different-Password-2026!"}, "password_mismatch"),
-    ({"accept_terms": False}, "terms_not_accepted"),
-])
+@pytest.mark.parametrize(
+    "change,code",
+    [
+        ({"password": "short", "confirm_password": "short"}, "password_policy"),
+        ({"confirm_password": "Different-Password-2026!"}, "password_mismatch"),
+        ({"accept_terms": False}, "terms_not_accepted"),
+    ],
+)
 def test_register_validation(engine_client: EngineClient, change: dict[str, object], code: str) -> None:
-    payload = {"display_name": "Awa", "email": "awa@example.com", "password": STRONG_PASSWORD,
-               "confirm_password": STRONG_PASSWORD, "locale": "fr", "accept_terms": True} | change
+    payload = {
+        "display_name": "Awa",
+        "email": "awa@example.com",
+        "password": STRONG_PASSWORD,
+        "confirm_password": STRONG_PASSWORD,
+        "locale": "fr",
+        "accept_terms": True,
+    } | change
     r = engine_client.post("/auth/register", json=payload)
     assert r.status_code == 422
     assert r.json()["code"] == code
 
 
 def test_register_rejects_duplicate_email(signed_in: EngineClient) -> None:
-    r = signed_in.post("/auth/register", json={
-        "display_name": "Dup", "email": "AWA@example.com", "password": OTHER_PASSWORD,
-        "confirm_password": OTHER_PASSWORD, "locale": "en", "accept_terms": True})
+    r = signed_in.post(
+        "/auth/register",
+        json={
+            "display_name": "Dup",
+            "email": "AWA@example.com",
+            "password": OTHER_PASSWORD,
+            "confirm_password": OTHER_PASSWORD,
+            "locale": "en",
+            "accept_terms": True,
+        },
+    )
     assert r.status_code == 409 and r.json()["code"] == "email_taken"
 
 
@@ -90,8 +108,10 @@ def test_login_wrong_password_then_success(signed_in: EngineClient) -> None:
 def test_progressive_lockout_after_five_failures(signed_in: EngineClient) -> None:
     assert [lockout_minutes(n) for n in (4, 5, 6, 7, 20)] == [0, 1, 2, 4, 60]
     signed_in.post("/auth/logout")
-    codes = [signed_in.post("/auth/login", json={"email": "awa@example.com", "password": "bad"}).status_code
-             for _ in range(5)]
+    codes = [
+        signed_in.post("/auth/login", json={"email": "awa@example.com", "password": "bad"}).status_code
+        for _ in range(5)
+    ]
     assert codes == [401, 401, 401, 401, 423]
     locked = signed_in.post("/auth/login", json={"email": "awa@example.com", "password": STRONG_PASSWORD})
     assert locked.status_code == 423 and locked.json()["retry_after_seconds"] > 0
@@ -135,8 +155,9 @@ def test_auto_lock_after_inactivity(signed_in: EngineClient) -> None:
 def test_old_session_token_is_useless_after_relogin(signed_in: EngineClient) -> None:
     old = signed_in.session
     signed_in.post("/auth/lock")
-    signed_in.session = signed_in.post("/auth/login", json={
-        "email": "awa@example.com", "password": STRONG_PASSWORD}).json()["session_token"]
+    signed_in.session = signed_in.post(
+        "/auth/login", json={"email": "awa@example.com", "password": STRONG_PASSWORD}
+    ).json()["session_token"]
     assert signed_in.get("/auth/me", headers={"Authorization": f"Bearer {old}"}).status_code == 401
 
 
@@ -144,28 +165,47 @@ def test_old_session_token_is_useless_after_relogin(signed_in: EngineClient) -> 
 def test_recover_with_phrase_sets_new_password(engine_client: EngineClient) -> None:
     phrase = engine_client.register()["recovery_phrase"]
     engine_client.post("/auth/logout")
-    bad = engine_client.post("/auth/recover", json={
-        "email": "awa@example.com", "recovery_phrase": "abandon " * 12,
-        "new_password": OTHER_PASSWORD, "confirm_password": OTHER_PASSWORD})
+    bad = engine_client.post(
+        "/auth/recover",
+        json={
+            "email": "awa@example.com",
+            "recovery_phrase": "abandon " * 12,
+            "new_password": OTHER_PASSWORD,
+            "confirm_password": OTHER_PASSWORD,
+        },
+    )
     assert bad.status_code == 401
-    r = engine_client.post("/auth/recover", json={
-        "email": "awa@example.com", "recovery_phrase": phrase.upper(),
-        "new_password": OTHER_PASSWORD, "confirm_password": OTHER_PASSWORD})
+    r = engine_client.post(
+        "/auth/recover",
+        json={
+            "email": "awa@example.com",
+            "recovery_phrase": phrase.upper(),
+            "new_password": OTHER_PASSWORD,
+            "confirm_password": OTHER_PASSWORD,
+        },
+    )
     assert r.status_code == 200, r.text
     engine_client.post("/auth/logout")
-    assert engine_client.post("/auth/login", json={
-        "email": "awa@example.com", "password": STRONG_PASSWORD}).status_code == 401
-    assert engine_client.post("/auth/login", json={
-        "email": "awa@example.com", "password": OTHER_PASSWORD}).status_code == 200
+    assert (
+        engine_client.post("/auth/login", json={"email": "awa@example.com", "password": STRONG_PASSWORD}).status_code
+        == 401
+    )
+    assert (
+        engine_client.post("/auth/login", json={"email": "awa@example.com", "password": OTHER_PASSWORD}).status_code
+        == 200
+    )
 
 
 def test_change_password_rewraps_key_without_losing_data(signed_in: EngineClient) -> None:
-    r = signed_in.put("/auth/password", json={"current_password": "wrong", "new_password": OTHER_PASSWORD,
-                                              "confirm_password": OTHER_PASSWORD})
+    r = signed_in.put(
+        "/auth/password",
+        json={"current_password": "wrong", "new_password": OTHER_PASSWORD, "confirm_password": OTHER_PASSWORD},
+    )
     assert r.status_code == 401
-    r = signed_in.put("/auth/password", json={"current_password": STRONG_PASSWORD,
-                                              "new_password": OTHER_PASSWORD,
-                                              "confirm_password": OTHER_PASSWORD})
+    r = signed_in.put(
+        "/auth/password",
+        json={"current_password": STRONG_PASSWORD, "new_password": OTHER_PASSWORD, "confirm_password": OTHER_PASSWORD},
+    )
     assert r.status_code == 204
     signed_in.patch("/auth/me", json={"theme": "dark"})
     signed_in.post("/auth/logout")
@@ -175,8 +215,7 @@ def test_change_password_rewraps_key_without_losing_data(signed_in: EngineClient
 
 
 def test_preferences_update(signed_in: EngineClient) -> None:
-    r = signed_in.patch("/auth/me", json={"preferred_locale": "en", "auto_lock_minutes": 30,
-                                          "display_name": "Awa N."})
+    r = signed_in.patch("/auth/me", json={"preferred_locale": "en", "auto_lock_minutes": 30, "display_name": "Awa N."})
     assert r.status_code == 200
     body = r.json()
     assert body["preferred_locale"] == "en" and body["auto_lock_minutes"] == 30
@@ -218,11 +257,14 @@ def test_password_strength_endpoint(engine_client: EngineClient) -> None:
 def test_events_websocket_requires_token_and_streams_auth_events(engine_client: EngineClient) -> None:
     from starlette.websockets import WebSocketDisconnect
 
-    with pytest.raises(WebSocketDisconnect), \
-            engine_client.client.websocket_connect("ws://127.0.0.1/api/v1/events") as ws:
+    with (
+        pytest.raises(WebSocketDisconnect),
+        engine_client.client.websocket_connect("ws://127.0.0.1/api/v1/events") as ws,
+    ):
         ws.receive_text()
     with engine_client.client.websocket_connect(
-            "ws://127.0.0.1/api/v1/events", headers={"X-Engine-Token": engine_client.engine_token}) as ws:
+        "ws://127.0.0.1/api/v1/events", headers={"X-Engine-Token": engine_client.engine_token}
+    ) as ws:
         assert json.loads(ws.receive_text())["type"] == "connected"
         engine_client.register()
         assert json.loads(ws.receive_text())["type"] == "auth.signed_in"
@@ -231,7 +273,10 @@ def test_events_websocket_requires_token_and_streams_auth_events(engine_client: 
 def test_websocket_from_foreign_host_is_rejected(engine_client: EngineClient) -> None:
     from starlette.websockets import WebSocketDisconnect
 
-    with pytest.raises(WebSocketDisconnect), engine_client.client.websocket_connect(
-            "ws://evil.example/api/v1/events",
-            headers={"X-Engine-Token": engine_client.engine_token}) as ws:
+    with (
+        pytest.raises(WebSocketDisconnect),
+        engine_client.client.websocket_connect(
+            "ws://evil.example/api/v1/events", headers={"X-Engine-Token": engine_client.engine_token}
+        ) as ws,
+    ):
         ws.receive_text()

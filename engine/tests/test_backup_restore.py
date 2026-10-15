@@ -59,11 +59,11 @@ def test_restore_requires_password_and_brings_data_back(signed_in: EngineClient)
     backup = signed_in.post("/backups").json()
     _add_workspace(signed_in, "Emplois")
     assert _count_workspaces(signed_in) == 2
-    bad = signed_in.post(f"/backups/{backup['id']}/restore",
-                         json={"password": "wrong", "confirmation": "RESTORE"})
+    bad = signed_in.post(f"/backups/{backup['id']}/restore", json={"password": "wrong", "confirmation": "RESTORE"})
     assert bad.status_code == 401
-    r = signed_in.post(f"/backups/{backup['id']}/restore",
-                       json={"password": STRONG_PASSWORD, "confirmation": "RESTORE"})
+    r = signed_in.post(
+        f"/backups/{backup['id']}/restore", json={"password": STRONG_PASSWORD, "confirmation": "RESTORE"}
+    )
     assert r.status_code == 200, r.text
     assert _count_workspaces(signed_in) == 1
     # Still signed in, and the pre-restore safety backup is known after reconciliation.
@@ -75,14 +75,17 @@ def test_restore_requires_password_and_brings_data_back(signed_in: EngineClient)
 
 def test_retention_keeps_seven_scheduled_backups(signed_in: EngineClient) -> None:
     active = signed_in.state.active
-    svc = BackupService(db=active.db, user_id=active.user_id,
-                        backups_dir=signed_in.state.paths.profile_backups(active.user_id),
-                        vault_dir=signed_in.state.paths.profile_vault(active.user_id),
-                        record=signed_in.state.registry.get(active.user_id))
+    svc = BackupService(
+        db=active.db,
+        user_id=active.user_id,
+        backups_dir=signed_in.state.paths.profile_backups(active.user_id),
+        vault_dir=signed_in.state.paths.profile_vault(active.user_id),
+        record=signed_in.state.registry.get(active.user_id),
+    )
     for _ in range(KEEP["scheduled"] + 2):
         svc.create("scheduled")
     svc.create("manual")
-    items = svc.list()
+    items = svc.list_items()
     assert sum(1 for b in items if b["kind"] == "scheduled") == KEEP["scheduled"]
     assert sum(1 for b in items if b["kind"] == "manual") == 1
     files = list(svc.dir.glob("*.opxbak"))
@@ -100,8 +103,7 @@ def test_scheduled_backup_runs_once_per_day(signed_in: EngineClient) -> None:
     assert signed_in.get("/backups").json()["settings"]["auto_enabled"] is False
 
 
-def test_import_profile_from_backup_on_new_machine(signed_in: EngineClient, tmp_path: Path,
-                                                   settings: object) -> None:
+def test_import_profile_from_backup_on_new_machine(signed_in: EngineClient, tmp_path: Path, settings: object) -> None:
     import secrets
 
     from fastapi.testclient import TestClient
@@ -117,15 +119,23 @@ def test_import_profile_from_backup_on_new_machine(signed_in: EngineClient, tmp_
     token = secrets.token_urlsafe(32)
     with TestClient(create_app(other, token), base_url="http://127.0.0.1") as client:
         h = {"X-Engine-Token": token}
-        bad = client.post("/api/v1/auth/profiles/import", headers=h,
-                          files={"file": ("b.opxbak", archive.read_bytes())}, data={"password": "x"})
+        bad = client.post(
+            "/api/v1/auth/profiles/import",
+            headers=h,
+            files={"file": ("b.opxbak", archive.read_bytes())},
+            data={"password": "x"},
+        )
         assert bad.status_code == 401
-        ok = client.post("/api/v1/auth/profiles/import", headers=h,
-                         files={"file": ("b.opxbak", archive.read_bytes())},
-                         data={"password": STRONG_PASSWORD})
+        ok = client.post(
+            "/api/v1/auth/profiles/import",
+            headers=h,
+            files={"file": ("b.opxbak", archive.read_bytes())},
+            data={"password": STRONG_PASSWORD},
+        )
         assert ok.status_code == 201, ok.text
-        login = client.post("/api/v1/auth/login", headers=h,
-                            json={"email": "awa@example.com", "password": STRONG_PASSWORD})
+        login = client.post(
+            "/api/v1/auth/login", headers=h, json={"email": "awa@example.com", "password": STRONG_PASSWORD}
+        )
         assert login.status_code == 200
         state = client.app.state.engine
         T = state.active.tables

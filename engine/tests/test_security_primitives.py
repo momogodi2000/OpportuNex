@@ -78,8 +78,10 @@ def test_password_policy_rejects_short_compromised_and_weak() -> None:
 
 
 def test_redaction_masks_secrets_but_keeps_dates() -> None:
-    text = ("mail awa@example.com token=abc123 Bearer abc.def sk-0123456789abcdef "
-            "tel +237 6 99 88 77 66 date 2026-10-15T09:40:00Z")
+    text = (
+        "mail awa@example.com token=abc123 Bearer abc.def sk-0123456789abcdef "
+        "tel +237 6 99 88 77 66 date 2026-10-15T09:40:00Z"
+    )
     out = redact(text)
     assert "awa@example.com" not in out and "[email]" in out
     assert "abc123" not in out and "sk-0123456789abcdef" not in out

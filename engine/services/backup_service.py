@@ -64,8 +64,9 @@ def snapshot_db_file(db_path: Path, target: Path, key: bytes) -> None:
 
 
 class BackupService:
-    def __init__(self, *, db: ProfileDatabase, user_id: str, backups_dir: Path,
-                 vault_dir: Path, record: ProfileRecord) -> None:
+    def __init__(
+        self, *, db: ProfileDatabase, user_id: str, backups_dir: Path, vault_dir: Path, record: ProfileRecord
+    ) -> None:
         self.db = db
         self.user_id = user_id
         self.dir = backups_dir
@@ -112,32 +113,50 @@ class BackupService:
         digest = _sha256_file(final)
         T = self.db.tables
         with self.db.tx() as conn:
-            conn.execute(insert(T.backup_records).values(
-                id=backup_id, user_id=self.user_id, kind=kind, file_path=final.name,
-                size_bytes=size, sha256=digest, schema_version=self.db.revision,
-                encrypted=1, status="ok",
-            ))
+            conn.execute(
+                insert(T.backup_records).values(
+                    id=backup_id,
+                    user_id=self.user_id,
+                    kind=kind,
+                    file_path=final.name,
+                    size_bytes=size,
+                    sha256=digest,
+                    schema_version=self.db.revision,
+                    encrypted=1,
+                    status="ok",
+                )
+            )
         log.info("backup_created", kind=kind, size=size)
         self.apply_retention()
         return self.get(backup_id)
 
     # ------------------------------------------------------------------- query
-    def list(self) -> list[dict[str, Any]]:
+    def list_items(self) -> list[dict[str, Any]]:
         T = self.db.tables
         with self.db.read() as conn:
-            rows = conn.execute(
-                select(T.backup_records).where(T.backup_records.c.user_id == self.user_id,
-                                               T.backup_records.c.status != "deleted")
-                .order_by(desc(T.backup_records.c.created_at), desc(T.backup_records.c.id))
-            ).mappings().all()
+            rows = (
+                conn.execute(
+                    select(T.backup_records)
+                    .where(T.backup_records.c.user_id == self.user_id, T.backup_records.c.status != "deleted")
+                    .order_by(desc(T.backup_records.c.created_at), desc(T.backup_records.c.id))
+                )
+                .mappings()
+                .all()
+            )
         return [self._present(dict(r)) for r in rows]
 
     def get(self, backup_id: str) -> dict[str, Any]:
         T = self.db.tables
         with self.db.read() as conn:
-            row = conn.execute(select(T.backup_records).where(
-                T.backup_records.c.id == backup_id, T.backup_records.c.user_id == self.user_id)
-            ).mappings().first()
+            row = (
+                conn.execute(
+                    select(T.backup_records).where(
+                        T.backup_records.c.id == backup_id, T.backup_records.c.user_id == self.user_id
+                    )
+                )
+                .mappings()
+                .first()
+            )
         if row is None:
             raise NotFound("backup not found", code="backup_not_found")
         return self._present(dict(row))
@@ -151,10 +170,13 @@ class BackupService:
         with self.db.read() as conn:
             return conn.execute(
                 select(T.backup_records.c.created_at)
-                .where(T.backup_records.c.user_id == self.user_id,
-                       T.backup_records.c.kind == "scheduled",
-                       T.backup_records.c.status == "ok")
-                .order_by(desc(T.backup_records.c.created_at)).limit(1)
+                .where(
+                    T.backup_records.c.user_id == self.user_id,
+                    T.backup_records.c.kind == "scheduled",
+                    T.backup_records.c.status == "ok",
+                )
+                .order_by(desc(T.backup_records.c.created_at))
+                .limit(1)
             ).scalar_one_or_none()
 
     def scheduled_backup_due(self) -> bool:
@@ -209,18 +231,20 @@ class BackupService:
             with self.db.read() as conn:
                 stale = conn.execute(
                     select(T.backup_records.c.id, T.backup_records.c.file_path)
-                    .where(T.backup_records.c.user_id == self.user_id,
-                           T.backup_records.c.kind == kind,
-                           T.backup_records.c.status.in_(("ok", "restored")))
+                    .where(
+                        T.backup_records.c.user_id == self.user_id,
+                        T.backup_records.c.kind == kind,
+                        T.backup_records.c.status.in_(("ok", "restored")),
+                    )
                     .order_by(desc(T.backup_records.c.created_at), desc(T.backup_records.c.id))
                     .offset(keep)
                 ).all()
             for backup_id, file_name in stale:
                 self._delete_file(file_name)
                 with self.db.tx() as conn:
-                    conn.execute(update(T.backup_records)
-                                 .where(T.backup_records.c.id == backup_id)
-                                 .values(status="deleted"))
+                    conn.execute(
+                        update(T.backup_records).where(T.backup_records.c.id == backup_id).values(status="deleted")
+                    )
                 removed += 1
         return removed
 
@@ -239,8 +263,11 @@ class BackupService:
 
 def _safe_member(name: str) -> bool:
     p = Path(name)
-    return not p.is_absolute() and ".." not in p.parts and (
-        name in ("db/pio.db", "profile.json") or name.startswith("vault/"))
+    return (
+        not p.is_absolute()
+        and ".." not in p.parts
+        and (name in ("db/pio.db", "profile.json") or name.startswith("vault/"))
+    )
 
 
 def extract_restore_payload(archive: Path, workdir: Path) -> dict[str, Any]:

@@ -21,8 +21,9 @@ ALLOWED_HOSTS = ("127.0.0.1", "localhost", "[::1]")
 
 
 def _problem(status: int, code: str, title: str) -> bytes:
-    return json.dumps({"type": f"https://opportunex.app/problems/{code}", "title": title,
-                       "status": status, "code": code}).encode()
+    return json.dumps(
+        {"type": f"https://opportunex.app/problems/{code}", "title": title, "status": status, "code": code}
+    ).encode()
 
 
 class EngineGuard:
@@ -59,8 +60,7 @@ class EngineGuard:
         start: dict[str, Any] = {
             "type": "http.response.start",
             "status": status,
-            "headers": [(b"content-type", b"application/problem+json"),
-                        (b"content-length", str(len(body)).encode())],
+            "headers": [(b"content-type", b"application/problem+json"), (b"content-length", str(len(body)).encode())],
         }
         await send(start)
         await send({"type": "http.response.body", "body": body})

@@ -14,6 +14,7 @@ from typing import Any
 import structlog
 from sqlalchemy import insert, select, update
 
+from collection.catalog import sync_catalog
 from core.errors import AppError, Conflict, Locked, NotFound, Unauthorized, ValidationFailed
 from core.ids import uuid7
 from core.timeutil import iso, now_iso, parse_iso, utcnow
@@ -80,12 +81,12 @@ class AuthService:
 
     def password_strength(self, password: str, hints: list[str]) -> dict[str, Any]:
         a = passwords.assess(password, hints)
-        return {"score": a.score, "acceptable": a.acceptable, "problems": a.problems,
-                "suggestions": a.suggestions}
+        return {"score": a.score, "acceptable": a.acceptable, "problems": a.problems, "suggestions": a.suggestions}
 
     # --------------------------------------------------------------- register
-    def register(self, *, display_name: str, email: str, password: str, confirm_password: str,
-                 locale: str, accept_terms: bool) -> SignInResult:
+    def register(
+        self, *, display_name: str, email: str, password: str, confirm_password: str, locale: str, accept_terms: bool
+    ) -> SignInResult:
         display_name = display_name.strip()
         email = email.strip()
         if not display_name:
@@ -98,8 +99,7 @@ class AuthService:
             raise ValidationFailed("unsupported locale", code="locale_unsupported")
         assessment = passwords.assess(password, [display_name, email])
         if not assessment.acceptable:
-            raise ValidationFailed("password rejected", code="password_policy",
-                                   extra={"problems": assessment.problems})
+            raise ValidationFailed("password rejected", code="password_policy", extra={"problems": assessment.problems})
         registry = self.state.registry
         if registry.find_by_email(email) is not None:
             raise Conflict("an account already uses this e-mail", code="email_taken")
@@ -117,12 +117,12 @@ class AuthService:
             created_at=now_iso(),
             auth_hash=hash_secret(password, self.kdf),
             pw_salt=b64e(pw_salt),
-            pw_wrapped_key=b64e(wrap_key(data_key, derive_kek(password, pw_salt, self.kdf),
-                                         _aad(profile_id, "pw"))),
+            pw_wrapped_key=b64e(wrap_key(data_key, derive_kek(password, pw_salt, self.kdf), _aad(profile_id, "pw"))),
             recovery_hash=hash_secret(norm_phrase, self.kdf),
             rec_salt=b64e(rec_salt),
-            rec_wrapped_key=b64e(wrap_key(data_key, derive_kek(norm_phrase, rec_salt, self.kdf),
-                                          _aad(profile_id, "rec"))),
+            rec_wrapped_key=b64e(
+                wrap_key(data_key, derive_kek(norm_phrase, rec_salt, self.kdf), _aad(profile_id, "rec"))
+            ),
             kdf_memory_kib=self.kdf.memory_kib,
             kdf_iterations=self.kdf.iterations,
         )
@@ -131,20 +131,33 @@ class AuthService:
         try:
             T = db.tables
             with db.tx() as conn:
-                conn.execute(insert(T.users).values(
-                    id=profile_id, email=email, display_name=display_name,
-                    password_hash=record.auth_hash, recovery_key_hash=record.recovery_hash,
-                    wrapped_db_key=b64d(record.pw_wrapped_key), account_mode="local",
-                    preferred_locale=locale, theme="system", password_changed_at=now_iso(),
-                ))
+                conn.execute(
+                    insert(T.users).values(
+                        id=profile_id,
+                        email=email,
+                        display_name=display_name,
+                        password_hash=record.auth_hash,
+                        recovery_key_hash=record.recovery_hash,
+                        wrapped_db_key=b64d(record.pw_wrapped_key),
+                        account_mode="local",
+                        preferred_locale=locale,
+                        theme="system",
+                        password_changed_at=now_iso(),
+                    )
+                )
                 conn.execute(insert(T.user_profiles).values(user_id=profile_id, full_name=display_name))
                 conn.execute(insert(T.matching_weights).values(user_id=profile_id))
                 for purpose in ("terms", "privacy_policy"):
-                    conn.execute(insert(T.consents).values(
-                        id=uuid7(), user_id=profile_id, purpose=purpose, policy_version="1.0",
-                        granted=1))
-                conn.execute(insert(T.audit_logs).values(user_id=profile_id, action="account.create",
-                                                         entity_table="users", entity_id=profile_id))
+                    conn.execute(
+                        insert(T.consents).values(
+                            id=uuid7(), user_id=profile_id, purpose=purpose, policy_version="1.0", granted=1
+                        )
+                    )
+                conn.execute(
+                    insert(T.audit_logs).values(
+                        user_id=profile_id, action="account.create", entity_table="users", entity_id=profile_id
+                    )
+                )
             registry.add(record)
         except BaseException:
             db.close()
@@ -175,14 +188,11 @@ class AuthService:
         record.pending_attempts = [*record.pending_attempts, attempt][-50:]
         self.state.registry.update(record)
         if minutes:
-            raise Locked("too many failed attempts",
-                         extra={"retry_after_seconds": minutes * 60})
+            raise Locked("too many failed attempts", extra={"retry_after_seconds": minutes * 60})
 
-    def sign_in(self, *, email: str | None = None, profile_id: str | None = None,
-                password: str) -> SignInResult:
+    def sign_in(self, *, email: str | None = None, profile_id: str | None = None, password: str) -> SignInResult:
         registry = self.state.registry
-        record = (registry.get(profile_id) if profile_id
-                  else registry.find_by_email(email or ""))
+        record = registry.get(profile_id) if profile_id else registry.find_by_email(email or "")
         if record is None:
             self._dummy_verify(password)
             raise Unauthorized("invalid credentials", code="invalid_credentials")
@@ -195,8 +205,7 @@ class AuthService:
             kek = derive_kek(password, b64d(record.pw_salt), params)
             data_key = unwrap_key(b64d(record.pw_wrapped_key), kek, _aad(record.id, "pw"))
         except UnwrapError as exc:
-            raise AppError("profile key cannot be unwrapped", code="profile_corrupted",
-                           status=500) from exc
+            raise AppError("profile key cannot be unwrapped", code="profile_corrupted", status=500) from exc
         db = self._open_db(record, data_key)
         return self._activate(record, db, bytearray(data_key))
 
@@ -212,11 +221,9 @@ class AuthService:
             log.info("pre_migration_snapshot", from_revision=current, to_revision=head)
 
         try:
-            return ProfileDatabase(db_path, data_key, echo=self.state.settings.sql_echo,
-                                   before_migrate=pre_migration)
+            return ProfileDatabase(db_path, data_key, echo=self.state.settings.sql_echo, before_migrate=pre_migration)
         except WrongKeyError as exc:
-            raise AppError("profile database cannot be decrypted", code="profile_corrupted",
-                           status=500) from exc
+            raise AppError("profile database cannot be decrypted", code="profile_corrupted", status=500) from exc
 
     def _activate(self, record: ProfileRecord, db: ProfileDatabase, data_key: bytearray) -> SignInResult:
         token = secrets.token_urlsafe(32)
@@ -225,14 +232,24 @@ class AuthService:
         T = db.tables
         now = now_iso()
         with db.tx() as conn:
+            sync_catalog(conn, T)
             for attempt in record.pending_attempts:
                 conn.execute(insert(T.login_attempts).values(email=record.email_sha256[:12], **attempt))
             conn.execute(insert(T.login_attempts).values(email=record.email_sha256[:12], succeeded=1))
-            conn.execute(insert(T.user_sessions).values(
-                id=session_id, user_id=record.id, token_hash=token_hash(token),
-                device_name="desktop", expires_at=iso(utcnow() + timedelta(hours=ttl_hours))))
-            conn.execute(update(T.users).where(T.users.c.id == record.id).values(
-                last_login_at=now, failed_login_count=0, locked_until=None))
+            conn.execute(
+                insert(T.user_sessions).values(
+                    id=session_id,
+                    user_id=record.id,
+                    token_hash=token_hash(token),
+                    device_name="desktop",
+                    expires_at=iso(utcnow() + timedelta(hours=ttl_hours)),
+                )
+            )
+            conn.execute(
+                update(T.users)
+                .where(T.users.c.id == record.id)
+                .values(last_login_at=now, failed_login_count=0, locked_until=None)
+            )
             user = conn.execute(select(T.users).where(T.users.c.id == record.id)).mappings().one()
         record.failed_count = 0
         record.locked_until = None
@@ -240,9 +257,12 @@ class AuthService:
         record.last_login_at = now
         self.state.registry.update(record)
         active = ActiveProfile(
-            user_id=record.id, db=db,
+            user_id=record.id,
+            db=db,
             vault=Vault(self.state.paths.profile_vault(record.id), bytes(data_key)),
-            data_key=data_key, session_hash=token_hash(token), session_id=session_id,
+            data_key=data_key,
+            session_hash=token_hash(token),
+            session_id=session_id,
             session_expires=time.time() + ttl_hours * 3600,
             auto_lock_minutes=int(user["auto_lock_minutes"]),
         )
@@ -259,8 +279,9 @@ class AuthService:
     def sign_out(self, active: ActiveProfile) -> None:
         T = active.tables
         with active.db.tx() as conn:
-            conn.execute(update(T.user_sessions).where(T.user_sessions.c.id == active.session_id)
-                         .values(revoked_at=now_iso()))
+            conn.execute(
+                update(T.user_sessions).where(T.user_sessions.c.id == active.session_id).values(revoked_at=now_iso())
+            )
         self.state.close_active(reason="signed_out", remember_lock=False)
 
     # --------------------------------------------------------------- recovery
@@ -273,8 +294,7 @@ class AuthService:
             raise ValidationFailed("passwords differ", code="password_mismatch")
         assessment = passwords.assess(new_password, [record.display_name, email])
         if not assessment.acceptable:
-            raise ValidationFailed("password rejected", code="password_policy",
-                                   extra={"problems": assessment.problems})
+            raise ValidationFailed("password rejected", code="password_policy", extra={"problems": assessment.problems})
         params = self._params_of(record)
         norm = recovery.normalize_phrase(phrase)
         if not verify_secret(norm, record.recovery_hash, params):
@@ -284,21 +304,24 @@ class AuthService:
         try:
             data_key = unwrap_key(b64d(record.rec_wrapped_key), kek, _aad(record.id, "rec"))
         except UnwrapError as exc:
-            raise AppError("profile key cannot be unwrapped", code="profile_corrupted",
-                           status=500) from exc
+            raise AppError("profile key cannot be unwrapped", code="profile_corrupted", status=500) from exc
         self._rewrap_password(record, data_key, new_password)
         db = self._open_db(record, data_key)
         self._sync_user_hash(db, record)
         with db.tx() as conn:
-            conn.execute(insert(db.tables.audit_logs).values(
-                user_id=record.id, action="account.recover", entity_table="users", entity_id=record.id))
+            conn.execute(
+                insert(db.tables.audit_logs).values(
+                    user_id=record.id, action="account.recover", entity_table="users", entity_id=record.id
+                )
+            )
         return self._activate(record, db, bytearray(data_key))
 
     def _rewrap_password(self, record: ProfileRecord, data_key: bytes, new_password: str) -> None:
         salt = new_salt()
         record.pw_salt = b64e(salt)
-        record.pw_wrapped_key = b64e(wrap_key(data_key, derive_kek(new_password, salt, self.kdf),
-                                              _aad(record.id, "pw")))
+        record.pw_wrapped_key = b64e(
+            wrap_key(data_key, derive_kek(new_password, salt, self.kdf), _aad(record.id, "pw"))
+        )
         record.auth_hash = hash_secret(new_password, self.kdf)
         record.kdf_memory_kib = self.kdf.memory_kib
         record.kdf_iterations = self.kdf.iterations
@@ -308,13 +331,20 @@ class AuthService:
     def _sync_user_hash(self, db: ProfileDatabase, record: ProfileRecord) -> None:
         T = db.tables
         with db.tx() as conn:
-            conn.execute(update(T.users).where(T.users.c.id == record.id).values(
-                password_hash=record.auth_hash, wrapped_db_key=b64d(record.pw_wrapped_key),
-                password_changed_at=now_iso()))
+            conn.execute(
+                update(T.users)
+                .where(T.users.c.id == record.id)
+                .values(
+                    password_hash=record.auth_hash,
+                    wrapped_db_key=b64d(record.pw_wrapped_key),
+                    password_changed_at=now_iso(),
+                )
+            )
 
     # --------------------------------------------------------- change password
-    def change_password(self, active: ActiveProfile, *, current_password: str, new_password: str,
-                        confirm_password: str) -> None:
+    def change_password(
+        self, active: ActiveProfile, *, current_password: str, new_password: str, confirm_password: str
+    ) -> None:
         record = self.state.registry.get(active.user_id)
         if record is None:
             raise NotFound("profile not found", code="profile_not_found")
@@ -326,14 +356,15 @@ class AuthService:
             raise ValidationFailed("new password must differ", code="password_unchanged")
         assessment = passwords.assess(new_password, [record.display_name])
         if not assessment.acceptable:
-            raise ValidationFailed("password rejected", code="password_policy",
-                                   extra={"problems": assessment.problems})
+            raise ValidationFailed("password rejected", code="password_policy", extra={"problems": assessment.problems})
         self._rewrap_password(record, active.key_bytes, new_password)
         self._sync_user_hash(active.db, record)
         with active.db.tx() as conn:
-            conn.execute(insert(active.tables.audit_logs).values(
-                user_id=record.id, action="account.password_change", entity_table="users",
-                entity_id=record.id))
+            conn.execute(
+                insert(active.tables.audit_logs).values(
+                    user_id=record.id, action="account.password_change", entity_table="users", entity_id=record.id
+                )
+            )
 
     # ---------------------------------------------------------------- delete
     def delete_account(self, active: ActiveProfile, *, password: str) -> None:

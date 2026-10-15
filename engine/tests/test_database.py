@@ -28,8 +28,7 @@ def _db(tmp_path: Path, key: bytes | None = None) -> tuple[ProfileDatabase, byte
 
 
 def test_bundled_schema_is_identical_to_reference_document() -> None:
-    assert hashlib.sha256(ENGINE_SCHEMA.read_bytes()).hexdigest() == \
-        hashlib.sha256(DOC_SCHEMA.read_bytes()).hexdigest()
+    assert hashlib.sha256(ENGINE_SCHEMA.read_bytes()).hexdigest() == hashlib.sha256(DOC_SCHEMA.read_bytes()).hexdigest()
 
 
 def test_fresh_database_has_every_schema_object(tmp_path: Path) -> None:
@@ -42,8 +41,7 @@ def test_fresh_database_has_every_schema_object(tmp_path: Path) -> None:
         assert expected_tables <= reflected
         assert expected_views <= reflected
         with db.read() as conn:
-            triggers = conn.exec_driver_sql(
-                "SELECT count(*) FROM sqlite_master WHERE type='trigger'").scalar()
+            triggers = conn.exec_driver_sql("SELECT count(*) FROM sqlite_master WHERE type='trigger'").scalar()
             assert triggers == len(re.findall(r"CREATE TRIGGER", sql))
             assert conn.exec_driver_sql("PRAGMA foreign_keys").scalar() == 1
             assert conn.exec_driver_sql("PRAGMA journal_mode").scalar() == "wal"
@@ -67,14 +65,24 @@ def test_fts5_index_follows_opportunity_rows(tmp_path: Path) -> None:
     T = db.tables
     try:
         with db.tx() as conn:
-            conn.execute(insert(T.opportunities).values(
-                id="o1", canonical_url="https://a.example/1", normalized_url="https://a.example/1",
-                dedup_fingerprint="f", title="Bourse de master en géomatique",
-                organization_name="Université de Douala"))
+            conn.execute(
+                insert(T.opportunities).values(
+                    id="o1",
+                    canonical_url="https://a.example/1",
+                    normalized_url="https://a.example/1",
+                    dedup_fingerprint="f",
+                    title="Bourse de master en géomatique",
+                    organization_name="Université de Douala",
+                )
+            )
         with db.read() as conn:
-            hit = conn.execute(text(
-                "SELECT o.id FROM opportunities_fts f JOIN opportunities o ON o.rowid = f.rowid "
-                "WHERE opportunities_fts MATCH :q"), {"q": "geomatique"}).scalar()
+            hit = conn.execute(
+                text(
+                    "SELECT o.id FROM opportunities_fts f JOIN opportunities o ON o.rowid = f.rowid "
+                    "WHERE opportunities_fts MATCH :q"
+                ),
+                {"q": "geomatique"},
+            ).scalar()
         assert hit == "o1"
     finally:
         db.close()
@@ -127,8 +135,10 @@ def test_schema_constraints_are_enforced(tmp_path: Path) -> None:
     T = db.tables
     try:
         with pytest.raises(IntegrityError), db.tx() as conn:
-            conn.execute(insert(T.users).values(
-                id="u", email="a@b.c", display_name="x", password_hash="h",
-                recovery_key_hash="r", theme="purple"))
+            conn.execute(
+                insert(T.users).values(
+                    id="u", email="a@b.c", display_name="x", password_hash="h", recovery_key_hash="r", theme="purple"
+                )
+            )
     finally:
         db.close()

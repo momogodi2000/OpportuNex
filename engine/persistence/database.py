@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import threading
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -83,7 +84,7 @@ def make_engine(path: Path, key: bytes, *, echo: bool = False) -> Engine:
         except sqlcipher3.DatabaseError as exc:
             raise WrongKeyError("cannot decrypt database") from exc
         cur.execute("PRAGMA foreign_keys = ON")
-        cur.execute("PRAGMA busy_timeout = 5000")
+        cur.execute("PRAGMA busy_timeout = 30000")
         cur.execute("PRAGMA journal_mode = WAL")
         cur.execute("PRAGMA synchronous = NORMAL")
         cur.close()
@@ -96,7 +97,10 @@ def make_engine(path: Path, key: bytes, *, echo: bool = False) -> Engine:
 
     @event.listens_for(engine, "begin")
     def _begin(conn: Connection) -> None:
-        conn.exec_driver_sql("BEGIN")
+        # Write transactions take the write lock up front: a deferred transaction that
+        # upgrades from read to write fails with "database is locked" instead of waiting.
+        immediate = conn.get_execution_options().get("immediate", False)
+        conn.exec_driver_sql("BEGIN IMMEDIATE" if immediate else "BEGIN")
 
     return engine
 
@@ -211,10 +215,12 @@ def tables() -> Tables:
 class ProfileDatabase:
     """Open, migrated and integrity-checked encrypted database of one local profile."""
 
-    def __init__(self, path: Path, key: bytes, *, echo: bool = False,
-                 before_migrate: Callable[[str, str], None] | None = None) -> None:
+    def __init__(
+        self, path: Path, key: bytes, *, echo: bool = False, before_migrate: Callable[[str, str], None] | None = None
+    ) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
+        self._write_lock = threading.RLock()
         self.engine = make_engine(path, key, echo=echo)
         try:
             if not _is_empty(self.engine):
@@ -227,7 +233,9 @@ class ProfileDatabase:
 
     @contextmanager
     def tx(self) -> Iterator[Connection]:
-        with self.engine.begin() as conn:
+        # One writer at a time inside the engine process: concurrent jobs queue here instead
+        # of racing for SQLite's write lock (which surfaces as "database is locked").
+        with self._write_lock, self.engine.connect().execution_options(immediate=True) as conn, conn.begin():
             yield conn
 
     @contextmanager

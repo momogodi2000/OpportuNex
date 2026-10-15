@@ -6,6 +6,7 @@ import asyncio
 import contextlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import date
 
 import structlog
 from fastapi import FastAPI, Request, WebSocket
@@ -13,7 +14,19 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from api.events import EventBus
-from api.routers import auth, maintenance, system
+from api.routers import (
+    auth,
+    cv_import,
+    insights,
+    maintenance,
+    opportunities,
+    profile,
+    reference,
+    search,
+    sources,
+    system,
+    tracking,
+)
 from api.security import EngineGuard
 from core.config import Settings
 from core.errors import AppError
@@ -28,6 +41,7 @@ log = structlog.get_logger(__name__)
 PREFIX = "/api/v1"
 AUTO_LOCK_TICK_SECONDS = 30.0
 BACKUP_CHECK_SECONDS = 600.0
+SCHEDULER_TICK_SECONDS = 60.0
 
 PROBLEM = "application/problem+json"
 
@@ -62,7 +76,37 @@ def create_app(settings: Settings, engine_token: str) -> FastAPI:
                 except Exception as exc:  # noqa: BLE001 - retried at next tick
                     log.warning("scheduled_backup_failed", error=type(exc).__name__)
 
-        tickers = [asyncio.create_task(auto_lock_loop()), asyncio.create_task(scheduled_backup_loop())]
+        async def scheduler_loop() -> None:
+            """Monitors, reminders, source alerts and expiry sweep for the signed-in profile."""
+            from services.monitor_service import MonitorService
+            from services.tracking_service import TrackingService
+
+            last_daily = ""
+            while True:
+                await asyncio.sleep(SCHEDULER_TICK_SECONDS)
+                active = state.active
+                if active is None:
+                    continue
+                try:
+                    monitors = MonitorService(active, state)
+                    for m in await asyncio.to_thread(monitors.due):
+                        await monitors.run(m["id"])
+                    await asyncio.to_thread(monitors.due_reminders)
+                    await asyncio.to_thread(monitors.source_failure_alerts)
+                    today = date.today().isoformat()
+                    if last_daily != today:
+                        tracking = TrackingService(active)
+                        await asyncio.to_thread(tracking.mark_expired)
+                        await asyncio.to_thread(tracking.auto_archive)
+                        last_daily = today
+                except Exception as exc:  # noqa: BLE001 - retried at next tick
+                    log.warning("scheduler_tick_failed", error=type(exc).__name__)
+
+        tickers = [
+            asyncio.create_task(auto_lock_loop()),
+            asyncio.create_task(scheduled_backup_loop()),
+            asyncio.create_task(scheduler_loop()),
+        ]
         log.info("engine_api_started", version=ENGINE_VERSION)
         try:
             yield
@@ -91,24 +135,47 @@ def create_app(settings: Settings, engine_token: str) -> FastAPI:
 
     @app.exception_handler(RequestValidationError)
     async def _validation(request: Request, exc: RequestValidationError) -> JSONResponse:
-        errors = [{"loc": [str(p) for p in e.get("loc", ())], "type": e.get("type"),
-                   "msg": e.get("msg")} for e in exc.errors()]
-        return _problem_response(422, {
-            "type": "https://opportunex.app/problems/validation_failed", "title": "Validation failed",
-            "status": 422, "code": "validation_failed", "instance": request.url.path,
-            "errors": errors})
+        errors = [
+            {"loc": [str(p) for p in e.get("loc", ())], "type": e.get("type"), "msg": e.get("msg")}
+            for e in exc.errors()
+        ]
+        return _problem_response(
+            422,
+            {
+                "type": "https://opportunex.app/problems/validation_failed",
+                "title": "Validation failed",
+                "status": 422,
+                "code": "validation_failed",
+                "instance": request.url.path,
+                "errors": errors,
+            },
+        )
 
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
-        log.error("unhandled_error", path=request.url.path, error=type(exc).__name__,
-                  message=redact(str(exc))[:300])
-        return _problem_response(500, {
-            "type": "https://opportunex.app/problems/internal_error", "title": "Internal error",
-            "status": 500, "code": "internal_error", "instance": request.url.path})
+        log.error("unhandled_error", path=request.url.path, error=type(exc).__name__, message=redact(str(exc))[:300])
+        return _problem_response(
+            500,
+            {
+                "type": "https://opportunex.app/problems/internal_error",
+                "title": "Internal error",
+                "status": 500,
+                "code": "internal_error",
+                "instance": request.url.path,
+            },
+        )
 
     app.include_router(system.router, prefix=PREFIX)
     app.include_router(auth.router, prefix=PREFIX)
     app.include_router(maintenance.router, prefix=PREFIX)
+    app.include_router(reference.router, prefix=PREFIX)
+    app.include_router(profile.router, prefix=PREFIX)
+    app.include_router(cv_import.router, prefix=PREFIX)
+    app.include_router(sources.router, prefix=PREFIX)
+    app.include_router(search.router, prefix=PREFIX)
+    app.include_router(opportunities.router, prefix=PREFIX)
+    app.include_router(tracking.router, prefix=PREFIX)
+    app.include_router(insights.router, prefix=PREFIX)
 
     @app.websocket(f"{PREFIX}/events")
     async def events_ws(websocket: WebSocket) -> None:

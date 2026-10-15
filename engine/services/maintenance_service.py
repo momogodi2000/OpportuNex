@@ -50,10 +50,13 @@ class MaintenanceService:
 
     def backups(self, active: ActiveProfile) -> BackupService:
         paths = self.state.paths
-        return BackupService(db=active.db, user_id=active.user_id,
-                             backups_dir=paths.profile_backups(active.user_id),
-                             vault_dir=paths.profile_vault(active.user_id),
-                             record=self._record(active.user_id))
+        return BackupService(
+            db=active.db,
+            user_id=active.user_id,
+            backups_dir=paths.profile_backups(active.user_id),
+            vault_dir=paths.profile_vault(active.user_id),
+            record=self._record(active.user_id),
+        )
 
     def _require_password(self, active: ActiveProfile, password: str) -> None:
         record = self._record(active.user_id)
@@ -70,8 +73,9 @@ class MaintenanceService:
     def run_scheduled_backup_if_due(self, active: ActiveProfile) -> dict[str, Any] | None:
         T = active.tables
         with active.db.read() as conn:
-            enabled = conn.execute(select(T.application_settings.c.value).where(
-                T.application_settings.c.key == "backup.auto_enabled")).scalar_one_or_none()
+            enabled = conn.execute(
+                select(T.application_settings.c.value).where(T.application_settings.c.key == "backup.auto_enabled")
+            ).scalar_one_or_none()
         if enabled != "true":
             return None
         svc = self.backups(active)
@@ -82,20 +86,29 @@ class MaintenanceService:
     def set_auto_backup(self, active: ActiveProfile, enabled: bool) -> None:
         T = active.tables
         with active.db.tx() as conn:
-            conn.execute(T.application_settings.update()
-                         .where(T.application_settings.c.key == "backup.auto_enabled")
-                         .values(value="true" if enabled else "false", updated_at=now_iso()))
+            conn.execute(
+                T.application_settings.update()
+                .where(T.application_settings.c.key == "backup.auto_enabled")
+                .values(value="true" if enabled else "false", updated_at=now_iso())
+            )
 
     def backup_settings(self, active: ActiveProfile) -> dict[str, Any]:
         T = active.tables
         with active.db.read() as conn:
-            rows = dict(conn.execute(select(T.application_settings.c.key, T.application_settings.c.value)
-                                     .where(T.application_settings.c.key.like("backup.%"))).all())
+            rows = dict(
+                conn.execute(
+                    select(T.application_settings.c.key, T.application_settings.c.value).where(
+                        T.application_settings.c.key.like("backup.%")
+                    )
+                ).all()
+            )
         svc = self.backups(active)
-        return {"auto_enabled": rows.get("backup.auto_enabled") == "true",
-                "retention_count": int(rows.get("backup.retention_count", "7")),
-                "last_scheduled_at": svc.last_scheduled_at(),
-                "directory": str(svc.dir)}
+        return {
+            "auto_enabled": rows.get("backup.auto_enabled") == "true",
+            "retention_count": int(rows.get("backup.retention_count", "7")),
+            "last_scheduled_at": svc.last_scheduled_at(),
+            "directory": str(svc.dir),
+        }
 
     def reconcile_records(self, active: ActiveProfile) -> int:
         """Re-create metadata for archives on disk that the (restored) database doesn't know."""
@@ -120,15 +133,27 @@ class MaintenanceService:
 
             digest = hashlib.sha256(archive.read_bytes()).hexdigest()
             with active.db.tx() as conn:
-                exists = conn.execute(select(func.count()).select_from(T.backup_records)
-                                      .where(T.backup_records.c.id == manifest["backup_id"])).scalar()
+                exists = conn.execute(
+                    select(func.count())
+                    .select_from(T.backup_records)
+                    .where(T.backup_records.c.id == manifest["backup_id"])
+                ).scalar()
                 if exists:
                     continue
-                conn.execute(insert(T.backup_records).values(
-                    id=manifest["backup_id"], user_id=active.user_id, kind=manifest["kind"],
-                    file_path=archive.name, size_bytes=archive.stat().st_size, sha256=digest,
-                    schema_version=manifest["schema_revision"], encrypted=1, status="ok",
-                    created_at=manifest["created_at"]))
+                conn.execute(
+                    insert(T.backup_records).values(
+                        id=manifest["backup_id"],
+                        user_id=active.user_id,
+                        kind=manifest["kind"],
+                        file_path=archive.name,
+                        size_bytes=archive.stat().st_size,
+                        sha256=digest,
+                        schema_version=manifest["schema_revision"],
+                        encrypted=1,
+                        status="ok",
+                        created_at=manifest["created_at"],
+                    )
+                )
             added += 1
         return added
 
@@ -152,8 +177,7 @@ class MaintenanceService:
             extract_restore_payload(archive, workdir)
             rollback = swap_in_restored(profile_dir, workdir)
         try:
-            new_db = ProfileDatabase(self.state.paths.profile_db(user_id), key,
-                                     echo=self.state.settings.sql_echo)
+            new_db = ProfileDatabase(self.state.paths.profile_db(user_id), key, echo=self.state.settings.sql_echo)
             integrity_check(new_db.engine)
         except Exception:
             log.exception("restore_failed_rolling_back")
@@ -167,10 +191,12 @@ class MaintenanceService:
         self.reconcile_records(active)
         T = active.tables
         with active.db.tx() as conn:
-            conn.execute(T.backup_records.update().where(T.backup_records.c.id == backup_id)
-                         .values(status="restored"))
-            conn.execute(insert(T.audit_logs).values(user_id=user_id, action="backup.restore",
-                                                     entity_table="backup_records", entity_id=backup_id))
+            conn.execute(T.backup_records.update().where(T.backup_records.c.id == backup_id).values(status="restored"))
+            conn.execute(
+                insert(T.audit_logs).values(
+                    user_id=user_id, action="backup.restore", entity_table="backup_records", entity_id=backup_id
+                )
+            )
         self.state.events.publish("restore.completed", {"backup_id": backup_id})
         return {"restored": True, "backup_id": backup_id, "schema_revision": active.db.revision}
 
@@ -193,9 +219,11 @@ class MaintenanceService:
             if any(p.email_sha256 == record.email_sha256 for p in self.state.registry.all()):
                 raise Conflict("an account already uses this e-mail", code="email_taken")
             try:
-                key = unwrap_key(b64d(record.pw_wrapped_key),
-                                 derive_kek(password, b64d(record.pw_salt), _record_params(record)),
-                                 f"opportunex:{record.id}:pw".encode())
+                key = unwrap_key(
+                    b64d(record.pw_wrapped_key),
+                    derive_kek(password, b64d(record.pw_salt), _record_params(record)),
+                    f"opportunex:{record.id}:pw".encode(),
+                )
             except UnwrapError as exc:
                 raise ValidationFailed("backup key cannot be unwrapped", code="backup_corrupted") from exc
             profile_dir = self.state.paths.profile_dir(record.id)
@@ -221,8 +249,7 @@ class MaintenanceService:
     def integrity(self, active: ActiveProfile) -> dict[str, Any]:
         integrity_check(active.db.engine)
         with active.db.read() as conn:
-            conn.exec_driver_sql(
-                "INSERT INTO opportunities_fts(opportunities_fts) VALUES ('integrity-check')")
+            conn.exec_driver_sql("INSERT INTO opportunities_fts(opportunities_fts) VALUES ('integrity-check')")
         return {"ok": True, "checked_at": now_iso()}
 
     def optimize(self, active: ActiveProfile) -> dict[str, Any]:
@@ -230,7 +257,8 @@ class MaintenanceService:
         try:
             drv = raw.driver_connection
             drv.execute(  # type: ignore[union-attr]
-                "INSERT INTO opportunities_fts(opportunities_fts) VALUES ('optimize')")
+                "INSERT INTO opportunities_fts(opportunities_fts) VALUES ('optimize')"
+            )
             drv.execute("PRAGMA optimize")  # type: ignore[union-attr]
             drv.execute("VACUUM")  # type: ignore[union-attr]
         finally:
@@ -242,10 +270,15 @@ class MaintenanceService:
         db_file = paths.profile_db(active.user_id)
         db_bytes = sum(p.stat().st_size for p in db_file.parent.glob("pio.db*") if p.is_file())
         backups_dir = paths.profile_backups(active.user_id)
-        backup_bytes = sum(p.stat().st_size for p in backups_dir.glob("*") if p.is_file()) \
-            if backups_dir.exists() else 0
-        return {"database_bytes": db_bytes, "vault_bytes": active.vault.size_bytes(),
-                "backups_bytes": backup_bytes, "data_dir": str(paths.root)}
+        backup_bytes = (
+            sum(p.stat().st_size for p in backups_dir.glob("*") if p.is_file()) if backups_dir.exists() else 0
+        )
+        return {
+            "database_bytes": db_bytes,
+            "vault_bytes": active.vault.size_bytes(),
+            "backups_bytes": backup_bytes,
+            "data_dir": str(paths.root),
+        }
 
     def export_logs(self) -> bytes:
         """ZIP of the technical logs, re-redacted line by line (EF-18.12)."""

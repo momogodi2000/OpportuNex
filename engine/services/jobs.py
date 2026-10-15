@@ -50,17 +50,22 @@ class JobContext:
         percent = max(0, min(100, int(percent)))
         T = self.active.tables
         values = {"progress": percent, "heartbeat_at": now_iso()}
-        await asyncio.to_thread(self._write, update(T.background_jobs)
-                                .where(T.background_jobs.c.id == self.job_id).values(**values))
-        self.manager.state.events.publish("job.progress", {
-            "job_id": self.job_id, "job_type": self.job_type, "progress": percent,
-            "message": message, **data})
+        await asyncio.to_thread(
+            self._write, update(T.background_jobs).where(T.background_jobs.c.id == self.job_id).values(**values)
+        )
+        self.manager.state.events.publish(
+            "job.progress",
+            {"job_id": self.job_id, "job_type": self.job_type, "progress": percent, "message": message, **data},
+        )
 
     async def checkpoint(self, data: dict[str, Any]) -> None:
         T = self.active.tables
-        await asyncio.to_thread(self._write, update(T.background_jobs)
-                                .where(T.background_jobs.c.id == self.job_id)
-                                .values(checkpoint=json.dumps(data), heartbeat_at=now_iso()))
+        await asyncio.to_thread(
+            self._write,
+            update(T.background_jobs)
+            .where(T.background_jobs.c.id == self.job_id)
+            .values(checkpoint=json.dumps(data), heartbeat_at=now_iso()),
+        )
 
     def _write(self, stmt: Any) -> None:
         with self.active.db.tx() as conn:
@@ -78,24 +83,47 @@ class JobManager:
     def has_running_for(self, user_id: str) -> bool:
         return any(uid == user_id and not task.done() for uid, task, _ in self._tasks.values())
 
-    def submit(self, active: ActiveProfile, job_type: str, params: dict[str, Any],
-               runner: JobRunner, *, job_id: str | None = None,
-               checkpoint: dict[str, Any] | None = None) -> str:
+    def submit(
+        self,
+        active: ActiveProfile,
+        job_type: str,
+        params: dict[str, Any],
+        runner: JobRunner,
+        *,
+        job_id: str | None = None,
+        checkpoint: dict[str, Any] | None = None,
+    ) -> str:
         T = active.tables
         if job_id is None:
             job_id = uuid7()
             with active.db.tx() as conn:
-                conn.execute(insert(T.background_jobs).values(
-                    id=job_id, user_id=active.user_id, job_type=job_type, status="running",
-                    params=json.dumps(params), started_at=now_iso(), heartbeat_at=now_iso(),
-                    attempts=1))
+                conn.execute(
+                    insert(T.background_jobs).values(
+                        id=job_id,
+                        user_id=active.user_id,
+                        job_type=job_type,
+                        status="running",
+                        params=json.dumps(params),
+                        started_at=now_iso(),
+                        heartbeat_at=now_iso(),
+                        attempts=1,
+                    )
+                )
         else:
             with active.db.tx() as conn:
-                conn.execute(update(T.background_jobs).where(T.background_jobs.c.id == job_id)
-                             .values(status="running", started_at=now_iso(), cancel_requested=0,
-                                     attempts=T.background_jobs.c.attempts + 1))
-        ctx = JobContext(job_id=job_id, job_type=job_type, active=active, manager=self,
-                         params=params, checkpoint_data=checkpoint)
+                conn.execute(
+                    update(T.background_jobs)
+                    .where(T.background_jobs.c.id == job_id)
+                    .values(
+                        status="running",
+                        started_at=now_iso(),
+                        cancel_requested=0,
+                        attempts=T.background_jobs.c.attempts + 1,
+                    )
+                )
+        ctx = JobContext(
+            job_id=job_id, job_type=job_type, active=active, manager=self, params=params, checkpoint_data=checkpoint
+        )
         task = asyncio.get_running_loop().create_task(self._run(ctx, runner), name=f"job-{job_id}")
         self._tasks[job_id] = (active.user_id, task, ctx)
         self.state.events.publish("job.started", {"job_id": job_id, "job_type": job_type})
@@ -116,26 +144,34 @@ class JobManager:
             T = ctx.active.tables
             try:
                 with ctx.active.db.tx() as conn:
-                    conn.execute(update(T.background_jobs).where(T.background_jobs.c.id == ctx.job_id)
-                                 .values(status=status, finished_at=now_iso(), error_message=error,
-                                         progress=100 if status == "completed" else
-                                         T.background_jobs.c.progress))
+                    conn.execute(
+                        update(T.background_jobs)
+                        .where(T.background_jobs.c.id == ctx.job_id)
+                        .values(
+                            status=status,
+                            finished_at=now_iso(),
+                            error_message=error,
+                            progress=100 if status == "completed" else T.background_jobs.c.progress,
+                        )
+                    )
             except Exception:  # noqa: BLE001 - profile may have been locked meanwhile
                 log.warning("job_status_not_saved", job_type=ctx.job_type)
-        self.state.events.publish(f"job.{status}", {
-            "job_id": ctx.job_id, "job_type": ctx.job_type, "error": error, "result": result or {}})
+        self.state.events.publish(
+            f"job.{status}", {"job_id": ctx.job_id, "job_type": ctx.job_type, "error": error, "result": result or {}}
+        )
 
     def cancel(self, active: ActiveProfile, job_id: str) -> None:
         entry = self._tasks.get(job_id)
         T = active.tables
         with active.db.tx() as conn:
-            found = conn.execute(select(T.background_jobs.c.id).where(
-                T.background_jobs.c.id == job_id,
-                T.background_jobs.c.user_id == active.user_id)).first()
+            found = conn.execute(
+                select(T.background_jobs.c.id).where(
+                    T.background_jobs.c.id == job_id, T.background_jobs.c.user_id == active.user_id
+                )
+            ).first()
             if found is None:
                 raise NotFound("job not found", code="job_not_found")
-            conn.execute(update(T.background_jobs).where(T.background_jobs.c.id == job_id)
-                         .values(cancel_requested=1))
+            conn.execute(update(T.background_jobs).where(T.background_jobs.c.id == job_id).values(cancel_requested=1))
         if entry is not None:
             entry[2]._cancel.set()
 
@@ -149,11 +185,17 @@ class JobManager:
         """Jobs left running by a previous engine process (crash or close) — resumable."""
         T = active.tables
         with active.db.tx() as conn:
-            rows = conn.execute(select(T.background_jobs).where(
-                T.background_jobs.c.user_id == active.user_id,
-                T.background_jobs.c.status.in_(("running", "queued")))).mappings().all()
+            rows = (
+                conn.execute(
+                    select(T.background_jobs).where(
+                        T.background_jobs.c.user_id == active.user_id,
+                        T.background_jobs.c.status.in_(("running", "queued")),
+                    )
+                )
+                .mappings()
+                .all()
+            )
             ids = [r["id"] for r in rows if r["id"] not in self._tasks]
             if ids:
-                conn.execute(update(T.background_jobs).where(T.background_jobs.c.id.in_(ids))
-                             .values(status="paused"))
+                conn.execute(update(T.background_jobs).where(T.background_jobs.c.id.in_(ids)).values(status="paused"))
         return [dict(r) | {"status": "paused"} for r in rows if r["id"] in ids]

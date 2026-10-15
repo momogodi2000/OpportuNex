@@ -22,7 +22,7 @@ include = ["api*", "core*", "persistence*", "security*", "services*", "collectio
 
 [tool.ruff]
 target-version = "py312"
-line-length = 110
+line-length = 120
 extend-exclude = ["_legacy", "dist-venv", "build", "dist"]
 
 [tool.ruff.lint]
@@ -35,12 +35,17 @@ ignore = [
     "RUF003",
     "B008",   # FastAPI Depends() in defaults
     "N806",   # `T = db.tables` is the house alias for the reflected schema
+    "N803",   # ...also when passed as a parameter
     "N818",   # HTTP-semantic error names (NotFound, Conflict...) read better than *Error
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S105", "S106", "S311", "BLE001"]
-"persistence/migrations/**" = ["S608"]
+"tests/**" = ["S105", "S106", "S311", "BLE001", "E501", "UP031", "S104"]
+"persistence/migrations/**" = ["S608", "E501"]
+"search/interpreter.py" = ["E501"]
+"documents/generator.py" = ["E501"]
+"collection/normalize.py" = ["E501"]
+"tools/**" = ["E402", "T201"]
 
 [tool.mypy]
 python_version = "3.12"

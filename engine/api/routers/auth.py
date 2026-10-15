@@ -97,9 +97,16 @@ def password_strength(body: StrengthIn, auth: Auth) -> dict[str, Any]:
 
 @router.post("/register", status_code=201)
 def register(body: RegisterIn, auth: Auth) -> dict[str, Any]:
-    return _signed_in(auth.register(
-        display_name=body.display_name, email=str(body.email), password=body.password,
-        confirm_password=body.confirm_password, locale=body.locale, accept_terms=body.accept_terms))
+    return _signed_in(
+        auth.register(
+            display_name=body.display_name,
+            email=str(body.email),
+            password=body.password,
+            confirm_password=body.confirm_password,
+            locale=body.locale,
+            accept_terms=body.accept_terms,
+        )
+    )
 
 
 @router.post("/login")
@@ -114,9 +121,14 @@ def unlock(body: UnlockIn, auth: Auth) -> dict[str, Any]:
 
 @router.post("/recover")
 def recover(body: RecoverIn, auth: Auth) -> dict[str, Any]:
-    return _signed_in(auth.recover(email=str(body.email), phrase=body.recovery_phrase,
-                                   new_password=body.new_password,
-                                   confirm_password=body.confirm_password))
+    return _signed_in(
+        auth.recover(
+            email=str(body.email),
+            phrase=body.recovery_phrase,
+            new_password=body.new_password,
+            confirm_password=body.confirm_password,
+        )
+    )
 
 
 @router.post("/lock", status_code=204)
@@ -141,8 +153,12 @@ def update_me(body: PreferencesIn, active: Active, auth: Auth) -> dict[str, Any]
 
 @router.put("/password", status_code=204)
 def change_password(body: ChangePasswordIn, active: Active, auth: Auth) -> None:
-    auth.change_password(active, current_password=body.current_password,
-                         new_password=body.new_password, confirm_password=body.confirm_password)
+    auth.change_password(
+        active,
+        current_password=body.current_password,
+        new_password=body.new_password,
+        confirm_password=body.confirm_password,
+    )
 
 
 @router.post("/account/delete", status_code=204)

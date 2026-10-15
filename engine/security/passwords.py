@@ -17,8 +17,7 @@ MIN_SCORE = 3  # zxcvbn 0..4
 def _compromised() -> frozenset[str]:
     path = resource_dir() / "security" / "compromised_passwords.txt"
     lines = path.read_text(encoding="utf-8").splitlines()
-    return frozenset(
-        line.strip().lower() for line in lines if line.strip() and not line.startswith("#"))
+    return frozenset(line.strip().lower() for line in lines if line.strip() and not line.startswith("#"))
 
 
 @dataclass
@@ -40,5 +39,4 @@ def assess(password: str, user_inputs: list[str] | None = None) -> PasswordAsses
     if score < MIN_SCORE:
         problems.append("too_weak")
     suggestions = list(result.get("feedback", {}).get("suggestions", []))
-    return PasswordAssessment(score=score, acceptable=not problems, problems=problems,
-                              suggestions=suggestions)
+    return PasswordAssessment(score=score, acceptable=not problems, problems=problems, suggestions=suggestions)

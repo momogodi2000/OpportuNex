@@ -80,16 +80,19 @@ class EngineState:
             active = self.active
             if active is None:
                 if self.locked is not None:
-                    raise Unauthorized("session locked", code="session_locked",
-                                       extra={"profile_id": self.locked.user_id,
-                                              "reason": self.locked.reason})
+                    raise Unauthorized(
+                        "session locked",
+                        code="session_locked",
+                        extra={"profile_id": self.locked.user_id, "reason": self.locked.reason},
+                    )
                 raise Unauthorized("not signed in", code="not_authenticated")
             if not bearer or not constant_time_equals(token_hash(bearer), active.session_hash):
                 raise Unauthorized("invalid session token", code="invalid_session")
             if time.time() > active.session_expires:
                 self.close_active(reason="expired")
-                raise Unauthorized("session expired", code="session_locked",
-                                   extra={"profile_id": active.user_id, "reason": "expired"})
+                raise Unauthorized(
+                    "session expired", code="session_locked", extra={"profile_id": active.user_id, "reason": "expired"}
+                )
             active.last_activity = time.monotonic()
             return active
 

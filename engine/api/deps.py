@@ -17,8 +17,7 @@ def get_state(request: Request) -> EngineState:
 StateDep = Annotated[EngineState, Depends(get_state)]
 
 
-def current_profile(state: StateDep,
-                    authorization: Annotated[str | None, Header()] = None) -> ActiveProfile:
+def current_profile(state: StateDep, authorization: Annotated[str | None, Header()] = None) -> ActiveProfile:
     bearer = None
     if authorization and authorization.lower().startswith("bearer "):
         bearer = authorization[7:].strip()

@@ -92,8 +92,9 @@ def test_interrupted_jobs_are_marked_paused(signed_in: EngineClient) -> None:
     T = active.tables
     job_id = uuid7()
     with active.db.tx() as conn:
-        conn.execute(insert(T.background_jobs).values(id=job_id, user_id=active.user_id,
-                                                      job_type="search", status="running"))
+        conn.execute(
+            insert(T.background_jobs).values(id=job_id, user_id=active.user_id, job_type="search", status="running")
+        )
     paused = signed_in.state.jobs.interrupted_jobs(active)
     assert [j["id"] for j in paused] == [job_id]
     assert paused[0]["status"] == "paused"

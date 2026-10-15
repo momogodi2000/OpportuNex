@@ -1,0 +1,1614 @@
+{
+  "schema_version": 1,
+  "license": "Apache-2.0",
+  "reviewed_on": "2026-10-15",
+  "notes": "Declarative connectors. Feed/API entries are enabled only after live verification (tools/verify_sources.py). Portals without a public feed or API ship as official links (access_method manual_link) and are never scraped.",
+  "sources": [
+    {
+      "registry_id": "opportunitydesk",
+      "name": "Opportunity Desk",
+      "base_url": "https://opportunitydesk.org",
+      "publisher_name": "Opportunity Desk",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "grant",
+        "competition",
+        "training",
+        "call_for_applications"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://opportunitydesk.org/terms-of-use/",
+      "official_search_url": "https://opportunitydesk.org/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://opportunitydesk.org/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "opportunitiesforafricans",
+      "name": "Opportunities For Africans",
+      "base_url": "https://www.opportunitiesforafricans.com",
+      "publisher_name": "Opportunities For Africans",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "grant",
+        "employment",
+        "entrepreneurship",
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.opportunitiesforafricans.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.opportunitiesforafricans.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "afterschoolafrica",
+      "name": "After School Africa",
+      "base_url": "https://www.afterschoolafrica.com",
+      "publisher_name": "After School Africa",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "training",
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.afterschoolafrica.com/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.afterschoolafrica.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "robots_disallowed"
+    },
+    {
+      "registry_id": "scholars4dev",
+      "name": "Scholars4Dev",
+      "base_url": "https://www.scholars4dev.com",
+      "publisher_name": "Scholars4Dev",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.scholars4dev.com/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.scholars4dev.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "empty"
+    },
+    {
+      "registry_id": "scholarship-positions",
+      "name": "Scholarship Positions",
+      "base_url": "https://scholarship-positions.com",
+      "publisher_name": "Scholarship Positions",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "research"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://scholarship-positions.com/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://scholarship-positions.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "dns_failed"
+    },
+    {
+      "registry_id": "globalsouthopportunities",
+      "name": "Global South Opportunities",
+      "base_url": "https://www.globalsouthopportunities.com",
+      "publisher_name": "Global South Opportunities",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "grant",
+        "training",
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.globalsouthopportunities.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.globalsouthopportunities.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "opportunitiescircle",
+      "name": "Opportunities Circle",
+      "base_url": "https://www.opportunitiescircle.com",
+      "publisher_name": "Opportunities Circle",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "internship",
+        "competition",
+        "training"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.opportunitiescircle.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.opportunitiescircle.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "fundsforngos",
+      "name": "FundsforNGOs",
+      "base_url": "https://www2.fundsforngos.org",
+      "publisher_name": "FundsforNGOs",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "grant"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www2.fundsforngos.org/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www2.fundsforngos.org/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "mladiinfo",
+      "name": "Mladiinfo",
+      "base_url": "https://www.mladiinfo.eu",
+      "publisher_name": "Mladiinfo",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "training",
+        "volunteering"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.mladiinfo.eu/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.mladiinfo.eu/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "opportunitiescorners",
+      "name": "Opportunities Corners",
+      "base_url": "https://opportunitiescorners.com",
+      "publisher_name": "Opportunities Corners",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "internship",
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://opportunitiescorners.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://opportunitiescorners.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "scholarshipsads",
+      "name": "ScholarshipsAds",
+      "base_url": "https://www.scholarshipsads.com",
+      "publisher_name": "ScholarshipsAds",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.scholarshipsads.com/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.scholarshipsads.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "http_404"
+    },
+    {
+      "registry_id": "youthop",
+      "name": "Youth Opportunities",
+      "base_url": "https://www.youthop.com",
+      "publisher_name": "Youth Opportunities",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "competition",
+        "training",
+        "internship"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.youthop.com/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.youthop.com/feed",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "http_404"
+    },
+    {
+      "registry_id": "kamerpower",
+      "name": "Kamerpower (Cameroun)",
+      "base_url": "https://kamerpower.com",
+      "publisher_name": "Kamerpower",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "employment",
+        "internship",
+        "scholarship",
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://kamerpower.com/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://kamerpower.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "feed_malformed"
+    },
+    {
+      "registry_id": "auf",
+      "name": "Agence universitaire de la Francophonie (AUF)",
+      "base_url": "https://www.auf.org",
+      "publisher_name": "AUF",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "rss",
+      "language_code": "fr",
+      "categories": [
+        "scholarship",
+        "research",
+        "call_for_applications"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.auf.org/nouvelles/appels-a-candidatures/",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.auf.org/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "http_403"
+    },
+    {
+      "registry_id": "weworkremotely",
+      "name": "We Work Remotely",
+      "base_url": "https://weworkremotely.com",
+      "publisher_name": "We Work Remotely",
+      "publisher_type": "job_board",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "employment",
+        "freelance"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://weworkremotely.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://weworkremotely.com/remote-jobs.rss",
+        "detail": false,
+        "max_items": 50
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "himalayas",
+      "name": "Himalayas (emplois à distance)",
+      "base_url": "https://himalayas.app",
+      "publisher_name": "Himalayas",
+      "publisher_type": "job_board",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "employment"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://himalayas.app/api",
+      "official_search_url": "https://himalayas.app/jobs",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://himalayas.app/jobs/api?limit=20",
+        "items_path": "jobs",
+        "fields": {
+          "title": "title",
+          "url": "applicationLink",
+          "id": "guid",
+          "organization": "companyName",
+          "summary": "excerpt",
+          "description": "description",
+          "published": "pubDate",
+          "deadline": "expiryDate",
+          "location": "locationRestrictions"
+        },
+        "detail": false,
+        "max_items": 20
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "jobicy",
+      "name": "Jobicy (emplois à distance)",
+      "base_url": "https://jobicy.com",
+      "publisher_name": "Jobicy",
+      "publisher_type": "job_board",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "employment"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://jobicy.com/jobs-rss-feed",
+      "official_search_url": "https://jobicy.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://jobicy.com/api/v2/remote-jobs?count=50",
+        "items_path": "jobs",
+        "fields": {
+          "title": "jobTitle",
+          "url": "url",
+          "id": "id",
+          "organization": "companyName",
+          "summary": "jobExcerpt",
+          "description": "jobDescription",
+          "published": "pubDate",
+          "location": "jobGeo"
+        },
+        "detail": false,
+        "max_items": 50
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "arbeitnow",
+      "name": "Arbeitnow",
+      "base_url": "https://www.arbeitnow.com",
+      "publisher_name": "Arbeitnow",
+      "publisher_type": "job_board",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "employment"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://www.arbeitnow.com/blog/job-board-api",
+      "official_search_url": "https://www.arbeitnow.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://www.arbeitnow.com/api/job-board-api",
+        "items_path": "data",
+        "fields": {
+          "title": "title",
+          "url": "url",
+          "id": "slug",
+          "organization": "company_name",
+          "description": "description",
+          "location": "location",
+          "published": "created_at"
+        },
+        "detail": false,
+        "max_items": 50
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "workingnomads",
+      "name": "Working Nomads",
+      "base_url": "https://www.workingnomads.com",
+      "publisher_name": "Working Nomads",
+      "publisher_type": "job_board",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "employment"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.workingnomads.com/jobs",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://www.workingnomads.com/api/exposed_jobs/",
+        "fields": {
+          "title": "title",
+          "url": "url",
+          "organization": "company_name",
+          "description": "description",
+          "location": "location",
+          "published": "pub_date",
+          "category": "category_name"
+        },
+        "detail": false,
+        "max_items": 50
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "remoteok",
+      "name": "Remote OK",
+      "base_url": "https://remoteok.com",
+      "publisher_name": "Remote OK",
+      "publisher_type": "job_board",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "employment"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://remoteok.com/api",
+      "official_search_url": "https://remoteok.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://remoteok.com/api",
+        "fields": {
+          "title": "position",
+          "url": "url",
+          "id": "id",
+          "organization": "company",
+          "description": "description",
+          "location": "location",
+          "published": "date"
+        },
+        "detail": false,
+        "max_items": 50
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "reliefweb-jobs",
+      "name": "ReliefWeb — emplois humanitaires",
+      "base_url": "https://reliefweb.int",
+      "publisher_name": "UN OCHA ReliefWeb",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "employment.consultancy"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://reliefweb.int/terms-conditions",
+      "official_search_url": "https://reliefweb.int/jobs",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://api.reliefweb.int/v2/jobs?appname=opportunex&profile=list&preset=latest&limit=40&query%5Bvalue%5D={query}&fields%5Binclude%5D%5B%5D=date.closing&fields%5Binclude%5D%5B%5D=source.name&fields%5Binclude%5D%5B%5D=country.name&fields%5Binclude%5D%5B%5D=url",
+        "supports_query": true,
+        "items_path": "data",
+        "fields": {
+          "title": "fields.title",
+          "url": "fields.url",
+          "id": "id",
+          "organization": "fields.source.name",
+          "deadline": "fields.date.closing",
+          "country": "fields.country.name"
+        },
+        "detail": true,
+        "max_items": 40
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "robots_disallowed"
+    },
+    {
+      "registry_id": "reliefweb-training",
+      "name": "ReliefWeb — formations",
+      "base_url": "https://reliefweb.int",
+      "publisher_name": "UN OCHA ReliefWeb",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "training"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://reliefweb.int/terms-conditions",
+      "official_search_url": "https://reliefweb.int/training",
+      "enabled_by_default": false,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://api.reliefweb.int/v2/training?appname=opportunex&profile=list&preset=latest&limit=30&query%5Bvalue%5D={query}&fields%5Binclude%5D%5B%5D=date.registration&fields%5Binclude%5D%5B%5D=source.name&fields%5Binclude%5D%5B%5D=url",
+        "supports_query": true,
+        "items_path": "data",
+        "fields": {
+          "title": "fields.title",
+          "url": "fields.url",
+          "id": "id",
+          "organization": "fields.source.name",
+          "deadline": "fields.date.registration"
+        },
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "robots_disallowed"
+    },
+    {
+      "registry_id": "worldbank-procurement",
+      "name": "Banque mondiale — avis de passation de marchés",
+      "base_url": "https://projects.worldbank.org",
+      "publisher_name": "World Bank",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "official_search_url": "https://projects.worldbank.org/en/projects-operations/procurement",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://search.worldbank.org/api/v2/procnotices?format=json&rows=40&os=0&qterm={query}",
+        "supports_query": true,
+        "items_path": "procnotices",
+        "url_template": "https://projects.worldbank.org/en/projects-operations/procurement-detail/{value}",
+        "fields": {
+          "title": "bid_description",
+          "url": "id",
+          "id": "id",
+          "organization": "project_name",
+          "deadline": "submission_deadline_date",
+          "country": "project_ctry_name",
+          "published": "noticedate",
+          "category": "notice_type"
+        },
+        "detail": false,
+        "max_items": 40
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "grants-gov",
+      "name": "Grants.gov (subventions fédérales États-Unis)",
+      "base_url": "https://www.grants.gov",
+      "publisher_name": "U.S. Grants.gov",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "api",
+      "country_code": "US",
+      "language_code": "en",
+      "categories": [
+        "grant",
+        "grant.research"
+      ],
+      "allowed_status": "allowed",
+      "terms_url": "https://www.grants.gov/api",
+      "official_search_url": "https://www.grants.gov/search-grants",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "method": "POST",
+        "url": "https://api.grants.gov/v1/api/search2",
+        "body": {
+          "keyword": "{query}",
+          "oppStatuses": "forecasted|posted",
+          "rows": 25
+        },
+        "supports_query": true,
+        "items_path": "data.oppHits",
+        "url_template": "https://www.grants.gov/search-results-detail/{value}",
+        "fields": {
+          "title": "title",
+          "url": "id",
+          "id": "id",
+          "organization": "agency",
+          "deadline": "closeDate",
+          "published": "openDate"
+        },
+        "detail": false,
+        "max_items": 25
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "devpost",
+      "name": "Devpost — hackathons",
+      "base_url": "https://devpost.com",
+      "publisher_name": "Devpost",
+      "publisher_type": "company",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://devpost.com/hackathons",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://devpost.com/api/hackathons?status%5B%5D=open&search={query}",
+        "supports_query": true,
+        "items_path": "hackathons",
+        "fields": {
+          "title": "title",
+          "url": "url",
+          "id": "id",
+          "organization": "organization_name",
+          "location": "displayed_location.location",
+          "deadline": "submission_period_dates"
+        },
+        "detail": false,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "zindi",
+      "name": "Zindi — compétitions de science des données (Afrique)",
+      "base_url": "https://zindi.africa",
+      "publisher_name": "Zindi",
+      "publisher_type": "company",
+      "access_method": "api",
+      "language_code": "en",
+      "categories": [
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://zindi.africa/competitions",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "json_api",
+        "url": "https://api.zindi.africa/v1/competitions?per_page=40",
+        "items_path": "data",
+        "url_template": "https://zindi.africa/competitions/{value}",
+        "fields": {
+          "title": "title",
+          "url": "id",
+          "id": "id",
+          "summary": "subtitle",
+          "deadline": "end_time"
+        },
+        "detail": false,
+        "max_items": 40
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "scholarshiproar",
+      "name": "Scholarship Roar",
+      "base_url": "https://www.scholarshiproar.com",
+      "publisher_name": "Scholarship Roar",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.scholarshiproar.com/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.scholarshiproar.com/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "youthhubafrica",
+      "name": "Youth Hub Africa",
+      "base_url": "https://www.youthhubafrica.org",
+      "publisher_name": "Youth Hub Africa",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "grant",
+        "competition",
+        "training",
+        "call_for_applications"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.youthhubafrica.org/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.youthhubafrica.org/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "opportunitiesforyouth",
+      "name": "Opportunities for Youth",
+      "base_url": "https://www.opportunitiesforyouth.org",
+      "publisher_name": "Opportunities for Youth",
+      "publisher_type": "media",
+      "access_method": "rss",
+      "language_code": "en",
+      "categories": [
+        "scholarship",
+        "internship",
+        "training",
+        "competition"
+      ],
+      "allowed_status": "allowed",
+      "official_search_url": "https://www.opportunitiesforyouth.org/",
+      "enabled_by_default": true,
+      "adapter": {
+        "version": "1.0.0",
+        "kind": "rss",
+        "url": "https://www.opportunitiesforyouth.org/feed/",
+        "detail": true,
+        "max_items": 30
+      },
+      "verified_on": "2026-10-15",
+      "verification_status": "ok"
+    },
+    {
+      "registry_id": "un-careers",
+      "name": "Nations Unies — Carrières",
+      "base_url": "https://careers.un.org",
+      "publisher_name": "United Nations",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "internship"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://careers.un.org/jobopening?language=fr",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "undp-jobs",
+      "name": "PNUD — Offres d'emploi",
+      "base_url": "https://jobs.undp.org",
+      "publisher_name": "UNDP",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "employment.consultancy"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://jobs.undp.org/cj_view_jobs.cfm",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "undp-procurement",
+      "name": "PNUD — Avis de marchés",
+      "base_url": "https://procurement-notices.undp.org",
+      "publisher_name": "UNDP",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://procurement-notices.undp.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "unicef-careers",
+      "name": "UNICEF — Carrières",
+      "base_url": "https://jobs.unicef.org",
+      "publisher_name": "UNICEF",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "internship"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://jobs.unicef.org/fr-fr/listing/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "who-careers",
+      "name": "OMS — Carrières",
+      "base_url": "https://www.who.int",
+      "publisher_name": "World Health Organization",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "internship"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.who.int/fr/careers",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "fao-careers",
+      "name": "FAO — Emplois",
+      "base_url": "https://www.fao.org",
+      "publisher_name": "FAO",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.fao.org/employment/fr/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "unesco-careers",
+      "name": "UNESCO — Emplois",
+      "base_url": "https://careers.unesco.org",
+      "publisher_name": "UNESCO",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://careers.unesco.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "ilo-careers",
+      "name": "OIT — Emplois",
+      "base_url": "https://jobs.ilo.org",
+      "publisher_name": "International Labour Organization",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://jobs.ilo.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "iom-careers",
+      "name": "OIM — Offres d'emploi",
+      "base_url": "https://www.iom.int",
+      "publisher_name": "International Organization for Migration",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.iom.int/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "unhcr-careers",
+      "name": "HCR — Carrières",
+      "base_url": "https://www.unhcr.org",
+      "publisher_name": "UNHCR",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.unhcr.org/fr/carrieres",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "wfp-careers",
+      "name": "PAM — Carrières",
+      "base_url": "https://www.wfp.org",
+      "publisher_name": "World Food Programme",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.wfp.org/careers",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "ungm",
+      "name": "UNGM — Marché mondial des Nations Unies",
+      "base_url": "https://www.ungm.org",
+      "publisher_name": "United Nations Global Marketplace",
+      "publisher_type": "procurement_portal",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.ungm.org/Public/Notice",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "worldbank-careers",
+      "name": "Banque mondiale — Carrières",
+      "base_url": "https://www.worldbank.org",
+      "publisher_name": "World Bank",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "internship"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.worldbank.org/en/about/careers",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "afdb-careers",
+      "name": "Banque africaine de développement — Carrières",
+      "base_url": "https://www.afdb.org",
+      "publisher_name": "African Development Bank",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "employment",
+        "employment.international_org",
+        "internship"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.afdb.org/fr/about-us/careers",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "afdb-procurement",
+      "name": "Banque africaine de développement — Acquisitions",
+      "base_url": "https://www.afdb.org",
+      "publisher_name": "African Development Bank",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.afdb.org/fr/projects-and-operations/procurement",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "ted-europa",
+      "name": "TED — Appels d'offres de l'Union européenne",
+      "base_url": "https://ted.europa.eu",
+      "publisher_name": "Publications Office of the EU",
+      "publisher_type": "procurement_portal",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://ted.europa.eu/fr/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "eu-funding-tenders",
+      "name": "UE — Portail Financements et appels d'offres",
+      "base_url": "https://ec.europa.eu",
+      "publisher_name": "European Commission",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "grant",
+        "tender",
+        "research"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/calls-for-proposals",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "erasmus-plus",
+      "name": "Erasmus+ — Opportunités",
+      "base_url": "https://erasmus-plus.ec.europa.eu",
+      "publisher_name": "European Commission",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "scholarship",
+        "training",
+        "volunteering"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://erasmus-plus.ec.europa.eu/fr/opportunities",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "afd-appels",
+      "name": "AFD — Appels à projets",
+      "base_url": "https://www.afd.fr",
+      "publisher_name": "Agence française de développement",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "grant",
+        "tender"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.afd.fr/fr",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "giz-tenders",
+      "name": "GIZ — Appels d'offres",
+      "base_url": "https://www.giz.de",
+      "publisher_name": "GIZ",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.giz.de/en/html/index.html",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "campusfrance",
+      "name": "Campus France — Bourses",
+      "base_url": "https://www.campusfrance.org",
+      "publisher_name": "Campus France",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "FR",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://campusbourses.campusfrance.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "daad",
+      "name": "DAAD — Base de données des bourses",
+      "base_url": "https://www.daad.de",
+      "publisher_name": "DAAD",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "DE",
+      "categories": [
+        "scholarship",
+        "research"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "chevening",
+      "name": "Bourses Chevening",
+      "base_url": "https://www.chevening.org",
+      "publisher_name": "UK Foreign, Commonwealth & Development Office",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "GB",
+      "categories": [
+        "scholarship",
+        "scholarship.master"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.chevening.org/scholarships/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "commonwealth-scholarships",
+      "name": "Commonwealth Scholarships",
+      "base_url": "https://cscuk.fcdo.gov.uk",
+      "publisher_name": "Commonwealth Scholarship Commission",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "GB",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://cscuk.fcdo.gov.uk/scholarships/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "fulbright",
+      "name": "Programme Fulbright (étudiants étrangers)",
+      "base_url": "https://foreign.fulbrightonline.org",
+      "publisher_name": "U.S. Department of State",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "US",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://foreign.fulbrightonline.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "mastercard-foundation",
+      "name": "Mastercard Foundation Scholars",
+      "base_url": "https://mastercardfdn.org",
+      "publisher_name": "Mastercard Foundation",
+      "publisher_type": "foundation",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "scholarship"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://mastercardfdn.org/all/scholars/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "tef",
+      "name": "Fondation Tony Elumelu — Programme d'entrepreneuriat",
+      "base_url": "https://www.tonyelumelufoundation.org",
+      "publisher_name": "Tony Elumelu Foundation",
+      "publisher_type": "foundation",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "entrepreneurship",
+        "grant.startup"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.tonyelumelufoundation.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "africa-prize",
+      "name": "Africa Prize for Engineering Innovation",
+      "base_url": "https://raeng.org.uk",
+      "publisher_name": "Royal Academy of Engineering",
+      "publisher_type": "foundation",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "competition",
+        "entrepreneurship"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://raeng.org.uk/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "oif",
+      "name": "Organisation internationale de la Francophonie — Appels",
+      "base_url": "https://www.francophonie.org",
+      "publisher_name": "OIF",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "call_for_applications",
+        "grant",
+        "employment"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.francophonie.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-armp",
+      "name": "ARMP Cameroun — Marchés publics",
+      "base_url": "https://armp.cm",
+      "publisher_name": "Agence de Régulation des Marchés Publics",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://armp.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-coleps",
+      "name": "COLEPS — e-marchés publics du Cameroun",
+      "base_url": "https://www.marchespublics.cm",
+      "publisher_name": "MINMAP Cameroun",
+      "publisher_type": "procurement_portal",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "tender"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.marchespublics.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-minesup",
+      "name": "MINESUP — Bourses et concours",
+      "base_url": "https://minesup.gov.cm",
+      "publisher_name": "Ministère de l'Enseignement supérieur du Cameroun",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "scholarship",
+        "competition"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://minesup.gov.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-minfopra",
+      "name": "MINFOPRA — Concours administratifs",
+      "base_url": "https://www.minfopra.gov.cm",
+      "publisher_name": "Ministère de la Fonction publique du Cameroun",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "competition",
+        "employment"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.minfopra.gov.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-fne",
+      "name": "Fonds National de l'Emploi (Cameroun)",
+      "base_url": "https://www.fnecm.org",
+      "publisher_name": "Fonds National de l'Emploi",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "employment",
+        "internship",
+        "training"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.fnecm.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-minpmeesa",
+      "name": "MINPMEESA — Appui aux PME",
+      "base_url": "https://www.minpmeesa.gov.cm",
+      "publisher_name": "Ministère des PME du Cameroun",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "entrepreneurship",
+        "grant"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.minpmeesa.gov.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-apme",
+      "name": "Agence de Promotion des PME (Cameroun)",
+      "base_url": "https://www.apme.cm",
+      "publisher_name": "APME",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "entrepreneurship"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.apme.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cm-minefop",
+      "name": "MINEFOP — Emploi et formation professionnelle",
+      "base_url": "https://www.minefop.gov.cm",
+      "publisher_name": "Ministère de l'Emploi et de la Formation professionnelle",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "employment",
+        "training"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.minefop.gov.cm/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "beac",
+      "name": "BEAC — Recrutements",
+      "base_url": "https://www.beac.int",
+      "publisher_name": "Banque des États de l'Afrique Centrale",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "country_code": "CM",
+      "language_code": "fr",
+      "categories": [
+        "employment"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.beac.int/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "bdeac",
+      "name": "BDEAC — Avis et recrutements",
+      "base_url": "https://www.bdeac.org",
+      "publisher_name": "Banque de Développement des États de l'Afrique Centrale",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "language_code": "fr",
+      "categories": [
+        "tender",
+        "employment"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.bdeac.org/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "cemac",
+      "name": "Commission de la CEMAC — Appels",
+      "base_url": "https://www.cemac.int",
+      "publisher_name": "Commission de la CEMAC",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "language_code": "fr",
+      "categories": [
+        "call_for_applications",
+        "tender"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://www.cemac.int/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "yali",
+      "name": "YALI — Mandela Washington Fellowship",
+      "base_url": "https://yali.state.gov",
+      "publisher_name": "U.S. Department of State",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "call_for_applications",
+        "training"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://yali.state.gov/mwf/",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "kaggle",
+      "name": "Kaggle — Compétitions",
+      "base_url": "https://www.kaggle.com",
+      "publisher_name": "Kaggle",
+      "publisher_type": "company",
+      "access_method": "manual_link",
+      "categories": [
+        "competition"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.kaggle.com/competitions",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "coursera-aid",
+      "name": "Coursera — Aide financière et formations",
+      "base_url": "https://www.coursera.org",
+      "publisher_name": "Coursera",
+      "publisher_type": "company",
+      "access_method": "manual_link",
+      "categories": [
+        "training"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://www.coursera.org/courses",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "euraxess",
+      "name": "EURAXESS — Postes de recherche",
+      "base_url": "https://euraxess.ec.europa.eu",
+      "publisher_name": "European Commission",
+      "publisher_type": "government",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "research"
+      ],
+      "allowed_status": "unknown",
+      "official_search_url": "https://euraxess.ec.europa.eu/jobs/search",
+      "enabled_by_default": false
+    },
+    {
+      "registry_id": "unv",
+      "name": "Volontaires des Nations Unies (VNU)",
+      "base_url": "https://app.unv.org",
+      "publisher_name": "United Nations Volunteers",
+      "publisher_type": "international_org",
+      "is_official": true,
+      "access_method": "manual_link",
+      "categories": [
+        "volunteering"
+      ],
+      "allowed_status": "terms_restricted",
+      "official_search_url": "https://app.unv.org/",
+      "enabled_by_default": false
+    }
+  ]
+}

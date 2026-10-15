@@ -106,8 +106,7 @@ def serve() -> int:
 
     configure_logging(settings.paths.logs, settings.log_level)
     app = create_app(settings, token)
-    config = uvicorn.Config(app, log_config=None, access_log=False, ws="auto",
-                            timeout_graceful_shutdown=5)
+    config = uvicorn.Config(app, log_config=None, access_log=False, ws="auto", timeout_graceful_shutdown=5)
     server = uvicorn.Server(config)
     app.state.request_shutdown = lambda: setattr(server, "should_exit", True)
     server.run(sockets=[sock])
@@ -138,10 +137,18 @@ def self_test() -> int:
         headers = {"X-Engine-Token": token}
         with TestClient(app, base_url="http://127.0.0.1") as client:
             _check(client.get("/api/v1/health").json() == {"status": "ok"}, "health")
-            r = client.post("/api/v1/auth/register", headers=headers, json={
-                "display_name": "Self Test", "email": "self-test@opportunex.app",
-                "password": "correct horse battery staple 42", "accept_terms": True,
-                "confirm_password": "correct horse battery staple 42", "locale": "fr"})
+            r = client.post(
+                "/api/v1/auth/register",
+                headers=headers,
+                json={
+                    "display_name": "Self Test",
+                    "email": "self-test@opportunex.app",
+                    "password": "correct horse battery staple 42",
+                    "accept_terms": True,
+                    "confirm_password": "correct horse battery staple 42",
+                    "locale": "fr",
+                },
+            )
             _check(r.status_code == 201, f"register {r.status_code} {r.text}")
             session = r.json()["session_token"]
             me = client.get("/api/v1/auth/me", headers=headers | {"Authorization": f"Bearer {session}"})
@@ -167,4 +174,8 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    import multiprocessing
+
+    # Required for the isolated document parser when frozen by PyInstaller.
+    multiprocessing.freeze_support()
     sys.exit(main())
