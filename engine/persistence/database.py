@@ -1,128 +1,251 @@
-"""
-Database configuration and async session management.
-Uses SQLAlchemy 2 async with aiosqlite.
-Note: SQLCipher integration is handled via the sqlcipher3 package
-and the pragma configuration below.
+"""Encrypted per-profile database (ADR-003, arch §8.5 and §9.1).
+
+* SQLCipher 4 with a raw 256-bit key, WAL, foreign keys, busy timeout.
+* A brand-new database is created from ``pio_schema.sql`` (Alembic revision
+  ``0001_baseline``), then Alembic applies later revisions. A ``pre_migration`` hook runs
+  before pending revisions are applied to an existing database.
+* The engine refuses to open a database whose revision it does not know (newer code).
 """
 
 from __future__ import annotations
 
-import os
-from collections.abc import AsyncGenerator
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
+import sqlcipher3
 import structlog
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
-from sqlalchemy.pool import StaticPool
+from alembic import command
+from alembic.config import Config
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+from sqlalchemy import URL, Connection, Engine, MetaData, Table, create_engine, event, text
+from sqlalchemy.pool import QueuePool
+
+from core.config import resource_dir
+from core.errors import AppError
 
 log = structlog.get_logger(__name__)
 
-# ── Data directory ────────────────────────────────────────────────────────────
-_APP_DATA = Path(os.environ.get("OPX_DATA_DIR", Path.home() / ".opportunex"))
-_APP_DATA.mkdir(parents=True, exist_ok=True)
-_DB_PATH = _APP_DATA / "opportunex.db"
-
-# ── Cipher key (injected from the Vault after user unlocks the app) ───────────
-_db_key: str | None = None
+BASELINE_REVISION = "0001_baseline"
 
 
-def configure_db_key(key_hex: str) -> None:
-    """Set the SQLCipher database encryption key. Called after successful login."""
-    global _db_key
-    _db_key = key_hex
-
-def reset_engine() -> None:
-    """Resets the engine so it will be recreated with the new key."""
-    global _engine, _session_factory
-    _engine = None
-    _session_factory = None
+class WrongKeyError(Exception):
+    pass
 
 
+class SchemaTooNewError(AppError):
+    status = 409
+    code = "schema_too_new"
+    title = "Database was created by a newer version of Opportunex"
 
-def _get_engine():
-    """Create the async SQLAlchemy engine for the current session."""
-    # For aiosqlite (development), use plain SQLite.
-    # Production builds switch to sqlcipher3 by changing the URL scheme.
-    db_url = f"sqlite+aiosqlite:///{_DB_PATH}"
 
-    connect_args: dict = {
-        "check_same_thread": False,
-    }
+class IntegrityCheckFailed(AppError):
+    status = 500
+    code = "db_integrity_failed"
+    title = "Database integrity check failed"
 
-    if _db_key:
-        connect_args["timeout"] = 30
 
-    engine = create_async_engine(
-        db_url,
-        connect_args=connect_args,
-        poolclass=StaticPool,    # SQLite requires single connection in WAL mode
-        echo=os.environ.get("OPX_SQL_ECHO", "false").lower() == "true",
+def schema_sql_path() -> Path:
+    return resource_dir() / "persistence" / "schema" / "pio_schema.sql"
+
+
+def migrations_dir() -> Path:
+    return resource_dir() / "persistence" / "migrations"
+
+
+def _alembic_config(conn: Connection) -> Config:
+    cfg = Config()
+    cfg.set_main_option("script_location", str(migrations_dir()))
+    cfg.attributes["connection"] = conn
+    return cfg
+
+
+def make_engine(path: Path, key: bytes, *, echo: bool = False) -> Engine:
+    url = URL.create("sqlite+pysqlcipher", password=f"x'{key.hex()}'", database=str(path))
+    engine = create_engine(
+        url,
+        echo=echo,
+        hide_parameters=True,
+        poolclass=QueuePool,
+        pool_size=4,
+        max_overflow=4,
+        pool_pre_ping=False,
+        connect_args={"check_same_thread": False, "timeout": 5.0},
     )
 
-    if _db_key:
-        from sqlalchemy import event
-        @event.listens_for(engine.sync_engine, "connect")
-        def receive_connect(dbapi_connection, connection_record):
-            cursor = dbapi_connection.cursor()
-            cursor.execute(f"PRAGMA key = '{_db_key}';")
-            cursor.close()
+    @event.listens_for(engine, "connect")
+    def _pragmas(dbapi_conn: sqlcipher3.Connection, _record: object) -> None:
+        cur = dbapi_conn.cursor()
+        cur.execute("PRAGMA cipher_log_level = NONE")
+        try:
+            cur.execute("SELECT count(*) FROM sqlite_master")
+        except sqlcipher3.DatabaseError as exc:
+            raise WrongKeyError("cannot decrypt database") from exc
+        cur.execute("PRAGMA foreign_keys = ON")
+        cur.execute("PRAGMA busy_timeout = 5000")
+        cur.execute("PRAGMA journal_mode = WAL")
+        cur.execute("PRAGMA synchronous = NORMAL")
+        cur.close()
+
+    # The schema manages its own transactions; let SQLAlchemy emit BEGIN explicitly so
+    # pysqlite's legacy implicit-transaction handling does not interfere with DDL.
+    @event.listens_for(engine, "connect")
+    def _autocommit_mode(dbapi_conn: sqlcipher3.Connection, _record: object) -> None:
+        dbapi_conn.isolation_level = None
+
+    @event.listens_for(engine, "begin")
+    def _begin(conn: Connection) -> None:
+        conn.exec_driver_sql("BEGIN")
 
     return engine
 
 
-# Module-level engine and session factory (lazy-initialized)
-_engine = None
-_session_factory: async_sessionmaker[AsyncSession] | None = None
+def create_schema(engine: Engine) -> None:
+    sql = schema_sql_path().read_text(encoding="utf-8")
+    raw = engine.raw_connection()
+    try:
+        raw.driver_connection.executescript(sql)  # type: ignore[union-attr]
+    finally:
+        raw.close()
 
 
-def get_engine():
-    global _engine
-    if _engine is None:
-        _engine = _get_engine()
-    return _engine
+def vacuum_into(engine: Engine, target: Path) -> None:
+    """Write a consistent, still-encrypted snapshot of the database to ``target``."""
+    raw = engine.raw_connection()
+    try:
+        raw.driver_connection.execute("VACUUM INTO ?", (str(target),))  # type: ignore[union-attr]
+    finally:
+        raw.close()
 
 
-def get_session_factory() -> async_sessionmaker[AsyncSession]:
-    global _session_factory
-    if _session_factory is None:
-        _session_factory = async_sessionmaker(
-            get_engine(),
-            class_=AsyncSession,
-            expire_on_commit=False,
-        )
-    return _session_factory
+def _is_empty(engine: Engine) -> bool:
+    with engine.connect() as conn:
+        n = conn.exec_driver_sql("SELECT count(*) FROM sqlite_master WHERE type='table'").scalar_one()
+    return int(n) == 0
 
 
-async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
-    """FastAPI dependency: yields a database session."""
-    async with get_session_factory()() as session:
+def current_revision(engine: Engine) -> str | None:
+    with engine.connect() as conn:
+        return MigrationContext.configure(conn).get_current_revision()
+
+
+def head_revision() -> str:
+    cfg = Config()
+    cfg.set_main_option("script_location", str(migrations_dir()))
+    head = ScriptDirectory.from_config(cfg).get_current_head()
+    if head is None:
+        raise RuntimeError("no alembic head revision")
+    return head
+
+
+def migrate(engine: Engine, before_migrate: Callable[[str, str], None] | None = None) -> str:
+    """Bring the database to the head revision; returns the final revision."""
+    if _is_empty(engine):
+        create_schema(engine)
+        log.info("db_schema_created", revision=BASELINE_REVISION)
+    cfg = Config()
+    cfg.set_main_option("script_location", str(migrations_dir()))
+    script = ScriptDirectory.from_config(cfg)
+    known = {rev.revision for rev in script.walk_revisions()}
+    current = current_revision(engine)
+    if current is None or current not in known:
+        raise SchemaTooNewError(f"unknown schema revision {current!r}")
+    head = script.get_current_head()
+    if current != head:
+        if before_migrate is not None:
+            before_migrate(current, head or "")
+        with engine.begin() as conn:
+            command.upgrade(_alembic_config(conn), "head")
+        log.info("db_migrated", from_revision=current, to_revision=head)
+    return head or current
+
+
+def integrity_check(engine: Engine) -> None:
+    with engine.connect() as conn:
+        result = conn.exec_driver_sql("PRAGMA quick_check").scalar_one()
+        if result != "ok":
+            raise IntegrityCheckFailed(f"quick_check: {result}")
+        fk = conn.exec_driver_sql("PRAGMA foreign_key_check").fetchall()
+        if fk:
+            raise IntegrityCheckFailed(f"foreign_key_check reported {len(fk)} rows")
+
+
+class Tables:
+    """Schema tables reflected from the live database (single source of truth)."""
+
+    def __init__(self, metadata: MetaData) -> None:
+        self._metadata = metadata
+
+    def __getattr__(self, name: str) -> Table:
         try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
+            return self._metadata.tables[name]
+        except KeyError as exc:
+            raise AttributeError(name) from exc
+
+    @property
+    def metadata(self) -> MetaData:
+        return self._metadata
+
+
+_TABLES: Tables | None = None
+_TABLES_REVISION: str | None = None
+
+
+def reflect_tables(engine: Engine, revision: str) -> Tables:
+    global _TABLES, _TABLES_REVISION
+    if _TABLES is None or revision != _TABLES_REVISION:
+        md = MetaData()
+        md.reflect(bind=engine, views=True)
+        _TABLES = Tables(md)
+        _TABLES_REVISION = revision
+    return _TABLES
+
+
+def tables() -> Tables:
+    if _TABLES is None:
+        raise RuntimeError("tables not reflected yet: open a profile database first")
+    return _TABLES
+
+
+class ProfileDatabase:
+    """Open, migrated and integrity-checked encrypted database of one local profile."""
+
+    def __init__(self, path: Path, key: bytes, *, echo: bool = False,
+                 before_migrate: Callable[[str, str], None] | None = None) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.path = path
+        self.engine = make_engine(path, key, echo=echo)
+        try:
+            if not _is_empty(self.engine):
+                integrity_check(self.engine)
+            self.revision = migrate(self.engine, before_migrate)
+            self.tables = reflect_tables(self.engine, self.revision)
+        except BaseException:
+            self.engine.dispose()
             raise
 
+    @contextmanager
+    def tx(self) -> Iterator[Connection]:
+        with self.engine.begin() as conn:
+            yield conn
 
-async def init_db() -> None:
-    """
-    Initialize the database on first launch.
-    In production this runs Alembic migrations instead of create_all.
-    """
-    from persistence import models
-    from persistence.models.base import Base
+    @contextmanager
+    def read(self) -> Iterator[Connection]:
+        with self.engine.connect() as conn:
+            yield conn
 
-    async with get_engine().begin() as conn:
-        # Enable WAL mode for concurrent reads + single writer
-        await conn.execute(__import__("sqlalchemy").text("PRAGMA journal_mode=WAL"))
-        await conn.execute(__import__("sqlalchemy").text("PRAGMA foreign_keys=ON"))
-        await conn.execute(__import__("sqlalchemy").text("PRAGMA strict=ON"))
+    def checkpoint(self) -> None:
+        with self.engine.connect() as conn:
+            conn.exec_driver_sql("PRAGMA wal_checkpoint(TRUNCATE)")
 
-        # Create all tables if not already present (baseline migration)
-        await conn.run_sync(Base.metadata.create_all)
+    def close(self) -> None:
+        try:
+            self.checkpoint()
+        except Exception:  # noqa: BLE001 - closing must never raise
+            log.warning("db_checkpoint_failed")
+        self.engine.dispose()
 
-    log.info("database_initialized", path=str(_DB_PATH))
+
+def schema_user_version(conn: Connection) -> int:
+    return int(conn.execute(text("PRAGMA user_version")).scalar_one())

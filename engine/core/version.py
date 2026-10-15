@@ -1,0 +1,10 @@
+"""Single source of truth for the engine version and product identity."""
+
+ENGINE_VERSION = "1.0.0"
+API_VERSION = "v1"
+PRODUCT_NAME = "Opportunex"
+PUBLISHER = "ETS Monthe Network"
+AUTHOR = "Momo Godi Yvan"
+LICENSE_SPDX = "AGPL-3.0-or-later"
+PROJECT_URL = "https://github.com/momogodi2000/OpportuNex"
+USER_AGENT = f"Opportunex/{ENGINE_VERSION} (+{PROJECT_URL})"

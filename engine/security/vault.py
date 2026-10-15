@@ -1,55 +1,66 @@
+"""Encrypted document vault (EF-12.07, EF-03.05).
+
+Files are stored as AES-256-GCM blobs under ``<profile>/vault/<2-char shard>/<uuid>.bin``.
+Callers only ever handle opaque relative paths returned by :meth:`Vault.put`; any path
+that would resolve outside the vault root is rejected.
+"""
+
+from __future__ import annotations
+
 import os
-import re
-import uuid
 from pathlib import Path
 
-try:
-    import nacl.secret
-    import nacl.utils
-except ImportError:
-    pass
+from core.errors import NotFound, ValidationFailed
+from core.ids import uuid7
+from security.crypto import decrypt_blob, encrypt_blob
+
+MAX_FILE_BYTES = 25 * 1024 * 1024
+
 
 class Vault:
-    def __init__(self, key: bytes, base_dir: str = "~/.opportunex/vault/"):
-        self.key = key
-        self.base_dir = Path(base_dir).expanduser()
-        self.base_dir.mkdir(parents=True, exist_ok=True)
-        self.box = nacl.secret.SecretBox(self.key)
+    def __init__(self, root: Path, key: bytes) -> None:
+        self.root = root.resolve()
+        self._key = key
 
-    def is_initialized(self) -> bool:
-        return len(self.key) == nacl.secret.SecretBox.KEY_SIZE
+    def _resolve(self, rel: str) -> Path:
+        candidate = (self.root / rel).resolve()
+        if not candidate.is_relative_to(self.root) or candidate == self.root:
+            raise ValidationFailed("invalid vault path", code="vault_path_invalid")
+        return candidate
 
-    def _get_path(self, user_id: str, document_id: str) -> Path:
-        if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', document_id, re.IGNORECASE):
-            raise ValueError("Invalid document ID")
-        user_dir = (self.base_dir / user_id).resolve()
-        if not str(user_dir).startswith(str(self.base_dir.resolve())):
-            raise ValueError("Path traversal attempt")
-        user_dir.mkdir(parents=True, exist_ok=True)
-        doc_path = (user_dir / document_id).resolve()
-        if not str(doc_path).startswith(str(user_dir)):
-            raise ValueError("Path traversal attempt")
-        return doc_path
+    def put(self, data: bytes) -> str:
+        if not data:
+            raise ValidationFailed("empty file", code="file_empty")
+        if len(data) > MAX_FILE_BYTES:
+            raise ValidationFailed("file too large", code="file_too_large")
+        name = uuid7()
+        rel = f"{name[-2:]}/{name}.bin"
+        target = self._resolve(rel)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        tmp = target.with_suffix(".tmp")
+        tmp.write_bytes(encrypt_blob(data, self._key, rel.encode()))
+        os.replace(tmp, target)
+        return rel
 
-    def store(self, data: bytes, user_id: str) -> str:
-        nonce = nacl.utils.random(nacl.secret.SecretBox.NONCE_SIZE)
-        encrypted = self.box.encrypt(data, nonce)
-        document_id = str(uuid.uuid4())
-        doc_path = self._get_path(user_id, document_id)
-        doc_path.write_bytes(encrypted)
-        return document_id
+    def get(self, rel: str) -> bytes:
+        target = self._resolve(rel)
+        if not target.is_file():
+            raise NotFound("vault file missing", code="vault_file_missing")
+        return decrypt_blob(target.read_bytes(), self._key, rel.encode())
 
-    def retrieve(self, document_id: str, user_id: str) -> bytes:
-        doc_path = self._get_path(user_id, document_id)
-        encrypted = doc_path.read_bytes()
-        return self.box.decrypt(encrypted)
+    def delete(self, rel: str) -> None:
+        target = self._resolve(rel)
+        if target.is_file():
+            size = target.stat().st_size
+            # Best-effort overwrite before unlink; SSD wear-levelling may keep copies,
+            # which is acceptable because the content was encrypted at rest anyway.
+            with open(target, "r+b") as fh:
+                fh.write(os.urandom(size))
+                fh.flush()
+                os.fsync(fh.fileno())
+            target.unlink()
 
-    def delete(self, document_id: str, user_id: str) -> None:
-        doc_path = self._get_path(user_id, document_id)
-        if doc_path.exists():
-            size = doc_path.stat().st_size
-            with open(doc_path, "ba+") as f:
-                f.write(os.urandom(size))
-                f.flush()
-                os.fsync(f.fileno())
-            doc_path.unlink()
+    def size_bytes(self) -> int:
+        if not self.root.exists():
+            return 0
+        return sum(p.stat().st_size for p in self.root.rglob("*.bin"))

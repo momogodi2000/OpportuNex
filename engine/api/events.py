@@ -1,161 +1,81 @@
-"""
-WebSocket event bus for the OpportuNex engine.
-Provides real-time progress updates to the Flutter UI.
+"""Event bus feeding the ``/api/v1/events`` WebSocket (arch §5.3).
+
+Publishing is thread-safe: services running in the request thread pool or in background
+jobs call :meth:`EventBus.publish`, which hands the event to the event loop.
 """
 
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
-from dataclasses import dataclass
-from datetime import datetime
-from enum import StrEnum
+import threading
+from typing import Any
 
 import structlog
 from fastapi import WebSocket, WebSocketDisconnect
 
+from core.timeutil import now_iso
+
 log = structlog.get_logger(__name__)
 
-
-class EventType(StrEnum):
-    # Search and collection
-    SEARCH_STARTED = "search.started"
-    SEARCH_PROGRESS = "search.progress"
-    SEARCH_COMPLETED = "search.completed"
-    SEARCH_FAILED = "search.failed"
-    SEARCH_CANCELLED = "search.cancelled"
-
-    # Source scanning
-    SOURCE_SCAN_STARTED = "source.scan.started"
-    SOURCE_SCAN_PROGRESS = "source.scan.progress"
-    SOURCE_SCAN_COMPLETED = "source.scan.completed"
-    SOURCE_SCAN_FAILED = "source.scan.failed"
-
-    # AI analysis
-    AI_ANALYSIS_STARTED = "ai.analysis.started"
-    AI_ANALYSIS_PROGRESS = "ai.analysis.progress"
-    AI_ANALYSIS_COMPLETED = "ai.analysis.completed"
-    AI_ANALYSIS_FAILED = "ai.analysis.failed"
-
-    # Exports
-    EXPORT_STARTED = "export.started"
-    EXPORT_COMPLETED = "export.completed"
-    EXPORT_FAILED = "export.failed"
-
-    # Backup
-    BACKUP_STARTED = "backup.started"
-    BACKUP_COMPLETED = "backup.completed"
-    BACKUP_FAILED = "backup.failed"
-
-    # Monitor alerts
-    MONITOR_NEW_RESULTS = "monitor.new_results"
-    DEADLINE_REMINDER = "deadline.reminder"
-
-    # Sync
-    SYNC_STARTED = "sync.started"
-    SYNC_PROGRESS = "sync.progress"
-    SYNC_COMPLETED = "sync.completed"
-    SYNC_CONFLICT = "sync.conflict"
-
-
-@dataclass
-class ProgressEvent:
-    type: str
-    job_id: str | None
-    current: int
-    total: int
-    message: str
-    data: dict | None = None
-    timestamp: str = ""
-
-    def __post_init__(self) -> None:
-        if not self.timestamp:
-            self.timestamp = datetime.utcnow().isoformat() + "Z"
-
-    def to_json(self) -> str:
-        return json.dumps({
-            "type": self.type,
-            "job_id": self.job_id,
-            "current": self.current,
-            "total": self.total,
-            "message": self.message,
-            "data": self.data or {},
-            "timestamp": self.timestamp,
-        })
+KEEPALIVE_SECONDS = 25.0
+QUEUE_SIZE = 500
 
 
 class EventBus:
-    """
-    In-process pub/sub event bus.
-    Single subscriber per session (the Flutter WebSocket connection).
-    """
-
     def __init__(self) -> None:
-        self._queue: asyncio.Queue[str] = asyncio.Queue(maxsize=1000)
-        self._connected: bool = False
+        self._subscribers: set[asyncio.Queue[str]] = set()
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._lock = threading.Lock()
 
-    async def publish(self, event: ProgressEvent) -> None:
-        """Publish an event. Drops oldest if queue is full."""
+    def bind_loop(self, loop: asyncio.AbstractEventLoop) -> None:
+        self._loop = loop
+
+    def _deliver(self, payload: str) -> None:
+        with self._lock:
+            queues = list(self._subscribers)
+        for q in queues:
+            if q.full():
+                with contextlib.suppress(asyncio.QueueEmpty):
+                    q.get_nowait()
+            q.put_nowait(payload)
+
+    def publish(self, event_type: str, data: dict[str, Any] | None = None) -> None:
+        payload = json.dumps({"type": event_type, "at": now_iso(), "data": data or {}})
+        loop = self._loop
+        if loop is None or loop.is_closed():
+            return
         try:
-            self._queue.put_nowait(event.to_json())
-        except asyncio.QueueFull:
-            # Drop oldest item and retry
-            try:
-                self._queue.get_nowait()
-                self._queue.put_nowait(event.to_json())
-            except (asyncio.QueueEmpty, asyncio.QueueFull):
-                pass
+            running = asyncio.get_running_loop()
+        except RuntimeError:
+            running = None
+        if running is loop:
+            self._deliver(payload)
+        else:
+            loop.call_soon_threadsafe(self._deliver, payload)
 
-    async def emit(
-        self,
-        event_type: EventType,
-        job_id: str | None = None,
-        current: int = 0,
-        total: int = 0,
-        message: str = "",
-        data: dict | None = None,
-    ) -> None:
-        """Convenience method to create and publish an event."""
-        await self.publish(ProgressEvent(
-            type=event_type,
-            job_id=job_id,
-            current=current,
-            total=total,
-            message=message,
-            data=data,
-        ))
+    @property
+    def subscriber_count(self) -> int:
+        return len(self._subscribers)
 
-    async def websocket_handler(self, websocket: WebSocket) -> None:
-        """
-        Handle the WebSocket connection from the Flutter UI.
-        Streams events from the queue to the client.
-        """
+    async def serve(self, websocket: WebSocket) -> None:
         await websocket.accept()
-        self._connected = True
-        log.info("websocket_connected")
-
-        # Send ping immediately to confirm connection
-        await websocket.send_text(json.dumps({"type": "connected", "timestamp": datetime.utcnow().isoformat() + "Z"}))
-
+        queue: asyncio.Queue[str] = asyncio.Queue(maxsize=QUEUE_SIZE)
+        with self._lock:
+            self._subscribers.add(queue)
         try:
+            await websocket.send_text(json.dumps({"type": "connected", "at": now_iso(), "data": {}}))
             while True:
-                # Wait for either a new event or a ping from client
                 try:
-                    message = await asyncio.wait_for(
-                        self._queue.get(), timeout=25.0
-                    )
-                    await websocket.send_text(message)
+                    payload = await asyncio.wait_for(queue.get(), timeout=KEEPALIVE_SECONDS)
                 except TimeoutError:
-                    # Send keepalive ping
-                    await websocket.send_text(json.dumps({"type": "ping"}))
-
+                    payload = json.dumps({"type": "ping", "at": now_iso(), "data": {}})
+                await websocket.send_text(payload)
         except WebSocketDisconnect:
-            log.info("websocket_disconnected")
-        except Exception as e:
-            log.error("websocket_error", exc=str(e))
+            pass
+        except Exception as exc:  # noqa: BLE001 - a broken socket must not kill the engine
+            log.warning("websocket_closed", error=type(exc).__name__)
         finally:
-            self._connected = False
-
-
-# Global event bus instance (one per engine process)
-event_bus = EventBus()
+            with self._lock:
+                self._subscribers.discard(queue)

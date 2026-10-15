@@ -6,18 +6,18 @@ Colonne « Déclaré » = ancien `PROGRESS.md` (HEAD a985077). Colonne « Mesur�
 
 | Exigence | Module | Prio | Libellé | Déclaré | Mesuré initial | Implémentation | Tests | Statut actuel |
 |---|---|---|---|---|---|---|---|---|
-| EF-01.01 | M01 Comptes | M | Créer un compte local avec nom, courriel, mot de passe et confirmation | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.02 | M01 Comptes | M | Exiger un mot de passe d'au moins 12 caractères avec indicateur de robustesse et contrôle contre les mots de passe compromis connus (liste locale) | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.03 | M01 Comptes | M | Hacher les mots de passe avec Argon2id | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.04 | M01 Comptes | M | Se connecter, se déconnecter, verrouiller automatiquement après une inactivité paramétrable | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.05 | M01 Comptes | M | Limiter les tentatives (5 échecs = temporisation progressive) | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.06 | M01 Comptes | M | Générer une phrase de récupération de 12 mots à la création pour récupérer un compte local hors ligne | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.07 | M01 Comptes | M | Changer le mot de passe et régénérer la clé de chiffrement locale | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.08 | M01 Comptes | S | Gérer plusieurs profils utilisateurs isolés sur un même poste | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
+| EF-01.01 | M01 Comptes | M | Créer un compte local avec nom, courriel, mot de passe et confirmation | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | engine: services/auth_service.py register · POST /auth/register | tests/test_auth_api.py::test_register_* | MOTEUR OK (UI phase 2) |
+| EF-01.02 | M01 Comptes | M | Exiger un mot de passe d'au moins 12 caractères avec indicateur de robustesse et contrôle contre les mots de passe compromis connus (liste locale) | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | security/passwords.py (≥12, zxcvbn≥3, 10k mots compromis) | test_password_policy_*, test_register_validation | MOTEUR OK (UI phase 2) |
+| EF-01.03 | M01 Comptes | M | Hacher les mots de passe avec Argon2id | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | security/crypto.py Argon2id 64 Mio/3 it. | test_hash_and_kdf_use_distinct_salts, test_production_kdf_defaults_match_spec | OPÉRATIONNEL (moteur) |
+| EF-01.04 | M01 Comptes | M | Se connecter, se déconnecter, verrouiller automatiquement après une inactivité paramétrable | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | POST /auth/login, /logout, /lock, /unlock, auto-verrouillage services/state.py | test_lock_*, test_auto_lock_after_inactivity | MOTEUR OK (UI phase 2) |
+| EF-01.05 | M01 Comptes | M | Limiter les tentatives (5 échecs = temporisation progressive) | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | lockout_minutes(): 5e échec→1 min, doublement, max 60 | test_progressive_lockout_after_five_failures | OPÉRATIONNEL (moteur) |
+| EF-01.06 | M01 Comptes | M | Générer une phrase de récupération de 12 mots à la création pour récupérer un compte local hors ligne | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | security/recovery.py BIP-39 FR/EN 12 mots (128 bits) | test_recovery_phrase_*, test_recover_with_phrase_sets_new_password | MOTEUR OK (UI phase 2) |
+| EF-01.07 | M01 Comptes | M | Changer le mot de passe et régénérer la clé de chiffrement locale | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | PUT /auth/password : ré-enveloppe la clé (arch §9.1-3) | test_change_password_rewraps_key_without_losing_data | MOTEUR OK (UI phase 2) |
+| EF-01.08 | M01 Comptes | S | Gérer plusieurs profils utilisateurs isolés sur un même poste | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | Une base SQLCipher par profil + profiles.json | test_multiple_isolated_profiles | MOTEUR OK (UI phase 2) |
 | EF-01.09 | M01 Comptes | S | Créer ou lier un compte en ligne sur le service de synchronisation (courriel vérifié, réinitialisation par courriel) | MISSING | ABSENT | | | ABSENT |
 | EF-01.10 | M01 Comptes | S | Activer une double authentification TOTP pour le compte en ligne | MISSING | ABSENT | | | ABSENT |
-| EF-01.11 | M01 Comptes | M | Supprimer définitivement son compte et toutes ses données locales et distantes | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-01.12 | M01 Comptes | M | Afficher clairement le mode actif : local seul ou synchronisé | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
+| EF-01.11 | M01 Comptes | M | Supprimer définitivement son compte et toutes ses données locales et distantes | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | POST /auth/account/delete (local) ; distant → phase 6 | test_delete_account_removes_all_local_data | PARTIEL (local OK, distant phase 6) |
+| EF-01.12 | M01 Comptes | M | Afficher clairement le mode actif : local seul ou synchronisé | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | users.account_mode exposé par /auth/me | test_register_returns_session_and_recovery_phrase | MOTEUR OK (UI phase 2) |
 | EF-02.01 | M02 Profil | M | Assistant en 7 étapes : informations générales, formation, expérience, compétences, objectifs, préférences projet/financement, récapitulatif | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
 | EF-02.02 | M02 Profil | M | Informations générales : nom, pays, ville, langue, statut, localisations souhaitées, mobilité, mode télétravail/hybride/présentiel | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
 | EF-02.03 | M02 Profil | M | Formation : niveau, domaine, établissement, année d'obtention, certifications, distinctions | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
@@ -171,14 +171,14 @@ Colonne « Déclaré » = ancien `PROGRESS.md` (HEAD a985077). Colonne « Mesur�
 | EF-18.01 | M18 Paramètres | M | Thèmes clair, sombre et système | MISSING | ABSENT | | | ABSENT |
 | EF-18.02 | M18 Paramètres | M | Langue de l'interface français ou anglais, extensible par fichiers de traduction | MISSING | ABSENT | | | ABSENT |
 | EF-18.03 | M18 Paramètres | M | Formats régionaux : dates, nombres, devise par défaut (XAF) | MISSING | ABSENT | | | ABSENT |
-| EF-18.04 | M18 Paramètres | M | Chiffrer la base locale (SQLCipher) avec clé dérivée du mot de passe | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | | | NON OPÉRATIONNEL |
-| EF-18.05 | M18 Paramètres | M | Sauvegarde manuelle et automatique planifiée, chiffrée, avec rotation | MISSING | ABSENT | | | ABSENT |
-| EF-18.06 | M18 Paramètres | M | Restauration depuis une sauvegarde avec contrôle d'intégrité | MISSING | ABSENT | | | ABSENT |
+| EF-18.04 | M18 Paramètres | M | Chiffrer la base locale (SQLCipher) avec clé dérivée du mot de passe | COMPLETE | NON OPÉRATIONNEL (moteur ne démarre pas) | persistence/database.py SQLCipher 4.12 clé brute 256 bits | test_database_file_is_encrypted_and_wrong_key_rejected | OPÉRATIONNEL (moteur) |
+| EF-18.05 | M18 Paramètres | M | Sauvegarde manuelle et automatique planifiée, chiffrée, avec rotation | MISSING | ABSENT | services/backup_service.py chiffrée, quotidienne+manuelle, rétention 7 | test_manual_backup_*, test_retention_*, test_scheduled_backup_runs_once_per_day | MOTEUR OK (UI phase 3) |
+| EF-18.06 | M18 Paramètres | M | Restauration depuis une sauvegarde avec contrôle d'intégrité | MISSING | ABSENT | restore vérifié + pre_restore + rollback ; import nouveau poste | test_restore_*, test_import_profile_from_backup_on_new_machine | MOTEUR OK (UI phase 3) |
 | EF-18.07 | M18 Paramètres | M | Tableau de bord confidentialité : données stockées, envois vers des tiers, consentements | MISSING | ABSENT | | | ABSENT |
 | EF-18.08 | M18 Paramètres | M | Effacer sélectivement historique, documents, opportunités ou tout le profil | MISSING | ABSENT | | | ABSENT |
 | EF-18.09 | M18 Paramètres | M | Politique de confidentialité et conditions d'utilisation consultables hors ligne | MISSING | ABSENT | | | ABSENT |
 | EF-18.10 | M18 Paramètres | S | Configuration réseau : proxy, limite de bande passante, mode économie de données | MISSING | ABSENT | | | ABSENT |
 | EF-18.11 | M18 Paramètres | M | Vérifier les mises à jour et installer les versions signées | MISSING | ABSENT | | | ABSENT |
-| EF-18.12 | M18 Paramètres | S | Consulter et exporter les journaux techniques expurgés pour le support | MISSING | ABSENT | | | ABSENT |
+| EF-18.12 | M18 Paramètres | S | Consulter et exporter les journaux techniques expurgés pour le support | MISSING | ABSENT | GET /maintenance/logs (journaux ré-expurgés) | test_maintenance_endpoints, test_log_file_is_redacted | MOTEUR OK (UI phase 3) |
 | EF-18.13 | M18 Paramètres | S | Raccourcis clavier configurables et palette de commandes | MISSING | ABSENT | | | ABSENT |
 | EF-18.14 | M18 Paramètres | S | Assistant de premier lancement et visite guidée | MISSING | ABSENT | | | ABSENT |

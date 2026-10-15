@@ -1,112 +1,117 @@
-"""
-FastAPI application factory for the OpportuNex engine.
-All routes require the session token in the Authorization header.
-"""
+"""FastAPI application factory."""
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
+import asyncio
+import contextlib
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, WebSocket
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from api.dependencies import SessionTokenMiddleware
-from api.routers import (
-    ai_router,
-    application_router,
-    auth_router,
-    cv_import_router,
-    dashboard_router,
-    export_router,
-    maintenance_router,
-    monitor_router,
-    opportunity_router,
-    organization_router,
-    privacy_router,
-    profile_router,
-    ref_router,
-    saved_router,
-    search_router,
-    source_router,
-    sync_router,
-    system_router,
-    workspace_router,
-)
+from api.events import EventBus
+from api.routers import auth, maintenance, system
+from api.security import EngineGuard
+from core.config import Settings
+from core.errors import AppError
+from core.version import ENGINE_VERSION
+from security.redaction import redact
+from services.jobs import JobManager
+from services.maintenance_service import MaintenanceService
+from services.state import EngineState
 
 log = structlog.get_logger(__name__)
 
+PREFIX = "/api/v1"
+AUTO_LOCK_TICK_SECONDS = 30.0
+BACKUP_CHECK_SECONDS = 600.0
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Application lifespan: startup → yield → shutdown."""
-    log.info("api_startup")
-    yield
-    log.info("api_shutdown")
+PROBLEM = "application/problem+json"
 
 
-def create_app(session_token: str) -> FastAPI:
-    """Create and configure the FastAPI application."""
+def _problem_response(status: int, body: dict[str, object]) -> JSONResponse:
+    return JSONResponse(status_code=status, content=body, media_type=PROBLEM)
+
+
+def create_app(settings: Settings, engine_token: str) -> FastAPI:
+    events = EventBus()
+    state = EngineState(settings, events)
+    state.jobs = JobManager(state)
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        events.bind_loop(asyncio.get_running_loop())
+
+        async def auto_lock_loop() -> None:
+            while True:
+                await asyncio.sleep(AUTO_LOCK_TICK_SECONDS)
+                await asyncio.to_thread(state.auto_lock_tick)
+
+        async def scheduled_backup_loop() -> None:
+            maintenance_svc = MaintenanceService(state)
+            while True:
+                await asyncio.sleep(BACKUP_CHECK_SECONDS)
+                active = state.active
+                if active is None:
+                    continue
+                try:
+                    await asyncio.to_thread(maintenance_svc.run_scheduled_backup_if_due, active)
+                except Exception as exc:  # noqa: BLE001 - retried at next tick
+                    log.warning("scheduled_backup_failed", error=type(exc).__name__)
+
+        tickers = [asyncio.create_task(auto_lock_loop()), asyncio.create_task(scheduled_backup_loop())]
+        log.info("engine_api_started", version=ENGINE_VERSION)
+        try:
+            yield
+        finally:
+            for ticker in tickers:
+                ticker.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await ticker
+            state.close_active(reason="shutdown", remember_lock=False)
+            log.info("engine_api_stopped")
 
     app = FastAPI(
-        title="OpportuNex Engine API",
-        description="Local REST API for the OpportuNex desktop application.",
-        version="0.1.0",
-        docs_url="/api/docs",          # Only accessible on 127.0.0.1
-        redoc_url="/api/redoc",
-        openapi_url="/api/openapi.json",
+        title="Opportunex Engine API",
+        version=ENGINE_VERSION,
+        docs_url=f"{PREFIX}/docs",
+        redoc_url=None,
+        openapi_url=f"{PREFIX}/openapi.json",
         lifespan=lifespan,
     )
+    app.state.engine = state
+    app.add_middleware(EngineGuard, engine_token=engine_token)
 
-    # ── Security: block all non-localhost origins ───────────────────────────
-    # The engine only accepts requests from the Flutter app (same machine).
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[],        # No cross-origin allowed
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    @app.exception_handler(AppError)
+    async def _app_error(request: Request, exc: AppError) -> JSONResponse:
+        return _problem_response(exc.status, exc.to_problem(request.url.path))
 
-    # ── Session token middleware ────────────────────────────────────────────
-    app.add_middleware(SessionTokenMiddleware, session_token=session_token)
+    @app.exception_handler(RequestValidationError)
+    async def _validation(request: Request, exc: RequestValidationError) -> JSONResponse:
+        errors = [{"loc": [str(p) for p in e.get("loc", ())], "type": e.get("type"),
+                   "msg": e.get("msg")} for e in exc.errors()]
+        return _problem_response(422, {
+            "type": "https://opportunex.app/problems/validation_failed", "title": "Validation failed",
+            "status": 422, "code": "validation_failed", "instance": request.url.path,
+            "errors": errors})
 
-    # ── API v1 routers ──────────────────────────────────────────────────────
-    prefix = "/api/v1"
-
-    app.include_router(system_router,       prefix=prefix, tags=["System"])
-    app.include_router(auth_router,         prefix=prefix, tags=["Auth"])
-    app.include_router(profile_router,      prefix=prefix, tags=["Profile"])
-    app.include_router(cv_import_router,    prefix=prefix, tags=["CV Import"])
-    app.include_router(ref_router,          prefix=prefix, tags=["Reference Data"])
-    app.include_router(search_router,       prefix=prefix, tags=["Search"])
-    app.include_router(opportunity_router,  prefix=prefix, tags=["Opportunities"])
-    app.include_router(source_router,       prefix=prefix, tags=["Sources"])
-    app.include_router(saved_router,        prefix=prefix, tags=["Saved & Applications"])
-    app.include_router(application_router,  prefix=prefix, tags=["Applications"])
-    app.include_router(monitor_router,      prefix=prefix, tags=["Monitors"])
-    app.include_router(workspace_router,    prefix=prefix, tags=["Workspaces"])
-    app.include_router(dashboard_router,    prefix=prefix, tags=["Dashboard"])
-    app.include_router(ai_router,           prefix=prefix, tags=["AI"])
-    app.include_router(export_router,       prefix=prefix, tags=["Exports"])
-    app.include_router(privacy_router,      prefix=prefix, tags=["Privacy"])
-    app.include_router(organization_router, prefix=prefix, tags=["Organizations"])
-    app.include_router(sync_router,         prefix=prefix, tags=["Sync"])
-    app.include_router(maintenance_router,  prefix=prefix, tags=["Maintenance"])
-
-    # ── Global exception handler ─────────────────────────────────────────────
     @app.exception_handler(Exception)
-    async def _unhandled(request: Request, exc: Exception) -> Response:
-        log.error("unhandled_exception", path=request.url.path, exc=str(exc))
-        return JSONResponse(
-            status_code=500,
-            content={
-                "type": "about:blank",
-                "title": "Internal Server Error",
-                "status": 500,
-                "code": "INTERNAL_ERROR",
-            },
-        )
+    async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
+        log.error("unhandled_error", path=request.url.path, error=type(exc).__name__,
+                  message=redact(str(exc))[:300])
+        return _problem_response(500, {
+            "type": "https://opportunex.app/problems/internal_error", "title": "Internal error",
+            "status": 500, "code": "internal_error", "instance": request.url.path})
+
+    app.include_router(system.router, prefix=PREFIX)
+    app.include_router(auth.router, prefix=PREFIX)
+    app.include_router(maintenance.router, prefix=PREFIX)
+
+    @app.websocket(f"{PREFIX}/events")
+    async def events_ws(websocket: WebSocket) -> None:
+        await events.serve(websocket)
 
     return app

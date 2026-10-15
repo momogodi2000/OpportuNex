@@ -81,11 +81,47 @@
 
 ## B. Work done
 
-*(Filled in at the end of each phase.)*
+### Phase 0 — Repository hygiene (commit `0700a6f`)
+- Root `.gitignore`. Untracked, but kept on disk: `build/windows-dist` (165 files), 137 `__pycache__` folders, `engine/.coverage`, the `.env` files and the 4 empty logs.
+- Decision register updated with the identity (ETS Monthe Network / Momo Godi Yvan) and the rule-vs-spec rulings C-01..C-05. Traceability matrix created for the 176 requirements.
+
+### Phase 1 — Engine boot, schema, encryption, sessions, backups
+Almost all of the previous engine code was built on an ORM that no longer matched the schema, and it could not start. That code was **moved with `git mv` to `engine/_legacy/`** (nothing deleted), and a new core was written:
+
+| Area | File(s) | What it fixes |
+| --- | --- | --- |
+| Validated configuration, D-27 data folder | `engine/core/config.py` | Data now lives in `%APPDATA%\PIO`; `.env` was never read before; resources work from a PyInstaller bundle |
+| RFC 9457 errors with stable codes | `engine/core/errors.py`, `api/app.py` | SQL parameters no longer leak into the logs |
+| Monotonic UUID v7 | `engine/core/ids.py` | ADR-004 |
+| Redacted JSON logs with rotation | `engine/core/logging.py`, `security/redaction.py` | E-mails, tokens, keys and phone numbers are masked; ISO dates are kept |
+| Schema is `pio_schema.sql` (bundled copy, tested identical) + Alembic | `persistence/database.py`, `persistence/migrations/` | B-07: tables are **reflected from the live database**, so ORM and schema can no longer drift. Revision `0002_product_identity` is reversible. A database from a newer version is refused. Integrity is checked on open |
+| Real SQLCipher 4.12, one database per profile | `persistence/database.py`, `services/auth_service.py` | B-08: the file cannot be read without the key (tested) |
+| Key management per arch §9.1 | `security/crypto.py`, `persistence/registry.py` | A 256-bit data key, wrapped by both the password and the recovery phrase (separate salts). The registry never stores the e-mail in clear |
+| BIP-39 recovery phrase, FR/EN, 2048-word lists | `security/recovery.py` | Replaces the 100-word list and the static salt |
+| Password policy | `security/passwords.py` | At least 12 characters, zxcvbn score ≥ 3, checked against 10,012 known-compromised passwords (SecLists, MIT) |
+| Bearer sessions and auto-lock | `services/state.py`, `api/deps.py` | B-09: `X-User-Id` removed. The key is wiped from memory on lock |
+| Progressive lockout | `services/auth_service.py::lockout_minutes` | 1 min after the 5th failure, then doubling, capped at 60 min |
+| Transport guard for HTTP and WebSocket | `api/security.py` | B-02: `/health` is public. The engine token is required, including on WebSockets. Requests with an `Origin` header or a non-loopback `Host` are rejected |
+| `/api/v1/events` channel mounted | `api/events.py` | B-03 |
+| Startup | `engine/main.py` | B-05: token read from stdin with a timeout; `PORT:` printed as soon as the socket listens; single-instance lock (D-26); clean shutdown; `--self-test` mode |
+| Persistent background jobs | `services/jobs.py` | Progress, cancellation, resume after interruption (`paused`) |
+| Backup and restore | `services/backup_service.py`, `services/maintenance_service.py` | Consolidates the existing service: encrypted `.opxbak` archive with a SHA-256 manifest; daily and manual backups; keep 7 (ruling C-02); pre-migration and pre-restore backups; verified restore with rollback; import onto a new machine |
+| Dependencies | `engine/requirements*.txt`, `pyproject.toml` | B-06: added email-validator, python-multipart, sqlcipher3-wheels and reportlab; pinned selectolax<1.0; fixed the build backend |
+| Dev launcher | `launch-dev.ps1` | No hard-coded token; `-Setup`, `-Checks` and `-EngineOnly` options |
+
+Also found: the old "60+ sources" catalogue contained **about 46 fake entries** (`www.source16.africa` … `source61.africa`). It will be rebuilt from verified sources in phase 3.
 
 ## C. Test results
 
-*(Filled in at the end of each phase.)*
+| Date | Command (in `engine/`) | Result |
+| --- | --- | --- |
+| 2026-10-15 | `.venv\Scripts\python -m pytest -q --cov` | **51 passed, 0 failed**, 90 % coverage (1,855 statements) |
+| 2026-10-15 | `.venv\Scripts\python -m ruff check .` | Clean |
+| 2026-10-15 | `.venv\Scripts\python -m mypy .` | Clean (35 files) |
+| 2026-10-15 | `.venv\Scripts\python main.py --self-test` | `SELF-TEST OK engine=1.0.0 schema=0002_product_identity` |
+| 2026-10-15 | Real subprocess launch (token on stdin) | `PORT:` after 1.1 s; `/health` ready after 3.9 s (first cold start); a second instance is refused (exit code 3); clean shutdown |
+
+Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.51.1).
 
 ## D. Deliverables
 
