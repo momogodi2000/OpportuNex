@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:opportunex/core/engine/engine_supervisor.dart';
 import 'package:opportunex/core/router/app_router.dart';
 import 'package:opportunex/features/auth/auth_models.dart';
+import 'package:opportunex/features/shell/desktop_integration.dart';
 import 'package:opportunex/features/shell/nav_items.dart';
 
 const _ready = EngineStatus(phase: EngineRunState.ready, port: 1234, token: 't');
@@ -48,5 +49,26 @@ void main() {
     const withPhrase = SignedIn(_user, recoveryPhrase: 'a b c');
     expect(redirectFor(engine: _ready, auth: withPhrase, location: '/settings'), '/register');
     expect(redirectFor(engine: _ready, auth: withPhrase, location: '/register'), isNull);
+  });
+
+  test('onboarding opens right after registration and may be left', () {
+    final fresh = SignedIn(_user.copyWith(onboardingCompleted: false));
+    expect(redirectFor(engine: _ready, auth: fresh, location: '/register'), '/onboarding');
+    expect(redirectFor(engine: _ready, auth: const SignedIn(_user), location: '/register'), homePath);
+    // Later sign-ins are not forced back into the wizard (resumable from the profile page).
+    expect(redirectFor(engine: _ready, auth: fresh, location: '/login'), homePath);
+    expect(redirectFor(engine: _ready, auth: fresh, location: '/onboarding'), isNull);
+    // "Later" leads to the dashboard and the CV import stays reachable from the wizard.
+    expect(redirectFor(engine: _ready, auth: fresh, location: '/dashboard'), isNull);
+    expect(redirectFor(engine: _ready, auth: fresh, location: '/profile/cv'), isNull);
+    expect(homePath, '/dashboard');
+  });
+
+  test('deep links from notifications target the most specific page', () {
+    expect(deepLinkFor({'saved_id': 's', 'opportunity_id': 'o'}), '/saved/s');
+    expect(deepLinkFor({'run_id': 'r'}), '/search?run=r');
+    expect(deepLinkFor({'opportunity_id': 'o'}), '/opportunities/o');
+    expect(deepLinkFor({'source_id': 'x'}), '/sources');
+    expect(deepLinkFor(null), isNull);
   });
 }

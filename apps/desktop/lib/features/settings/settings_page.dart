@@ -17,6 +17,7 @@ import '../auth/auth_controller.dart';
 import '../auth/auth_models.dart';
 import 'about_section.dart';
 import 'maintenance_repository.dart';
+import 'settings_extra.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key, this.initialTab = 0});
@@ -26,8 +27,8 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     return DefaultTabController(
-      length: 4,
-      initialIndex: initialTab.clamp(0, 3),
+      length: 6,
+      initialIndex: initialTab.clamp(0, 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -42,6 +43,8 @@ class SettingsPage extends ConsumerWidget {
               tabAlignment: TabAlignment.start,
               tabs: [
                 Tab(text: l.settingsAccount),
+                Tab(text: l.settingsPreferences),
+                Tab(text: l.settingsPrivacy),
                 Tab(text: l.settingsBackups),
                 Tab(text: l.settingsMaintenance),
                 Tab(text: l.settingsAbout),
@@ -52,6 +55,8 @@ class SettingsPage extends ConsumerWidget {
           const Expanded(
             child: TabBarView(children: [
               _AccountTab(),
+              PreferencesTab(),
+              PrivacyTab(),
               _BackupsTab(),
               _MaintenanceTab(),
               AboutSection(),

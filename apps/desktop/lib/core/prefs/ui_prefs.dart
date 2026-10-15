@@ -8,24 +8,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// until the user picks one; the last used profile pre-selects the sign-in screen.
 @immutable
 class UiPrefs {
-  const UiPrefs({this.localeCode, this.themeMode = ThemeMode.system, this.lastProfileId, this.sidebarCollapsed = false});
+  const UiPrefs({
+    this.localeCode,
+    this.themeMode = ThemeMode.system,
+    this.lastProfileId,
+    this.sidebarCollapsed = false,
+    this.closeToTray = true,
+  });
 
   final String? localeCode;
   final ThemeMode themeMode;
   final String? lastProfileId;
   final bool sidebarCollapsed;
 
+  /// Closing the window hides it to the system tray so monitors and reminders keep running (EF-13.06).
+  final bool closeToTray;
+
   Locale get locale {
     final code = localeCode ?? PlatformDispatcher.instance.locale.languageCode;
     return Locale(code == 'en' ? 'en' : 'fr');
   }
 
-  UiPrefs copyWith({String? localeCode, ThemeMode? themeMode, String? lastProfileId, bool? sidebarCollapsed}) =>
+  UiPrefs copyWith({String? localeCode, ThemeMode? themeMode, String? lastProfileId, bool? sidebarCollapsed, bool? closeToTray}) =>
       UiPrefs(
         localeCode: localeCode ?? this.localeCode,
         themeMode: themeMode ?? this.themeMode,
         lastProfileId: lastProfileId ?? this.lastProfileId,
         sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
+        closeToTray: closeToTray ?? this.closeToTray,
       );
 }
 
@@ -58,6 +68,7 @@ class UiPrefsController extends Notifier<UiPrefs> {
         themeMode: themeModeFromName(prefs.getString('theme')),
         lastProfileId: prefs.getString('last_profile'),
         sidebarCollapsed: prefs.getBool('sidebar_collapsed') ?? false,
+        closeToTray: prefs.getBool('close_to_tray') ?? true,
       );
     } on Object {
       // Preferences are a convenience; defaults are fine if the store is unavailable.
@@ -77,6 +88,11 @@ class UiPrefsController extends Notifier<UiPrefs> {
   Future<void> setLastProfile(String id) async {
     state = state.copyWith(lastProfileId: id);
     await _prefs?.setString('last_profile', id);
+  }
+
+  Future<void> setCloseToTray(bool value) async {
+    state = state.copyWith(closeToTray: value);
+    await _prefs?.setBool('close_to_tray', value);
   }
 
   Future<void> toggleSidebar() async {

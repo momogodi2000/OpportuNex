@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from sqlalchemy import desc, insert, select, update
+from sqlalchemy import desc, select, update
 
 from collection.adapters import RawItem, extract_detail, structured_fields
 from collection.http import FetchError, PoliteClient
@@ -259,6 +259,9 @@ class OpportunityService:
             )
 
     def _notify_change(self, opp_id: str, title: str, changed: list[str]) -> None:
+        """EF-13.03: tell the user when a tracked opportunity changes, honouring notification preferences."""
+        from services.monitor_service import NotificationService
+
         T = self.T
         with self.active.db.tx() as conn:
             saved = conn.execute(
@@ -268,17 +271,10 @@ class OpportunityService:
             ).first()
             if saved is None:
                 return
-            from core.ids import uuid7
-
-            conn.execute(
-                insert(T.notification_records).values(
-                    id=uuid7(),
-                    user_id=self.uid,
-                    kind="opportunity_changed",
-                    title=title[:200],
-                    body=", ".join(changed),
-                    payload=json.dumps({"opportunity_id": opp_id}),
-                    channel="native",
-                )
+            NotificationService(self.active, self.state).notify(
+                conn,
+                "opportunity_changed",
+                title,
+                ", ".join(changed),
+                {"opportunity_id": opp_id, "saved_id": saved[0]},
             )
-        self.state.events.publish("notification", {"kind": "opportunity_changed", "opportunity_id": opp_id})

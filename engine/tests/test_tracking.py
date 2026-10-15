@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from tests.conftest import EngineClient, collect
-from tests.fixtures.site import FixtureSite
+from tests.fixtures.site import DEADLINE_SCHOLARSHIP, DETAIL_1, FixtureSite
 
 
 def _master(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -49,6 +49,28 @@ def test_recheck_marks_verified(client: EngineClient, site: FixtureSite) -> None
     r = client.post(f"/opportunities/{opp['id']}/recheck").json()
     assert r["status"] in ("verified", "modified")
     assert "verified" in client.get(f"/opportunities/{opp['id']}").json()["badges"] or r["status"] == "modified"
+
+
+def test_change_on_tracked_opportunity_notifies_per_preferences(client: EngineClient, site: FixtureSite) -> None:
+    opp = _master(collect(client, site))
+    saved = client.post("/saved", json={"opportunity_id": opp["id"]}).json()
+
+    site.overrides["/opp/1.html"] = DETAIL_1.replace(DEADLINE_SCHOLARSHIP, "2099-12-31").replace(
+        "30 novembre 2099", "31 décembre 2099"
+    )
+    assert client.post(f"/opportunities/{opp['id']}/recheck").json()["status"] == "modified"
+    notes = [n for n in client.get("/notifications").json()["items"] if n["kind"] == "opportunity_changed"]
+    # Regression: the notice used to bypass preferences and carry no deep link to the saved item.
+    assert len(notes) == 1 and notes[0]["title"]
+    assert notes[0]["payload"]["saved_id"] == saved["id"]
+
+    assert client.put("/notifications/preferences/opportunity_changed", json={"enabled": False}).status_code == 204
+    site.overrides["/opp/1.html"] = DETAIL_1.replace(DEADLINE_SCHOLARSHIP, "2099-10-31").replace(
+        "30 novembre 2099", "31 octobre 2099"
+    )
+    assert client.post(f"/opportunities/{opp['id']}/recheck").json()["status"] == "modified"
+    notes = [n for n in client.get("/notifications").json()["items"] if n["kind"] == "opportunity_changed"]
+    assert len(notes) == 1
 
 
 def test_save_creates_application_checklist_and_reminders(client: EngineClient, site: FixtureSite) -> None:

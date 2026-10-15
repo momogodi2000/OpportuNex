@@ -1,3 +1,6 @@
+// The fake process owns its stream controllers for the whole test run.
+// ignore_for_file: close_sinks
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';

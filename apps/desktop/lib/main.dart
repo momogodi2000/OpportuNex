@@ -10,8 +10,8 @@ import 'package:path/path.dart' as p;
 import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
-import 'core/engine/engine_supervisor.dart';
 import 'core/platform/app_paths.dart';
+import 'features/shell/desktop_integration.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,29 +33,9 @@ Future<void> main() async {
       await windowManager.focus();
     },
   );
-  windowManager.addListener(_CloseHandler(container));
+  await DesktopIntegration(container).start();
 
   runApp(UncontrolledProviderScope(container: container, child: const OpportunexApp()));
-}
-
-/// Stop the engine cleanly (WAL checkpoint, job state persisted) before the window closes.
-class _CloseHandler extends WindowListener {
-  _CloseHandler(this.container);
-  final ProviderContainer container;
-  bool _closing = false;
-
-  @override
-  Future<void> onWindowClose() async {
-    if (_closing) return;
-    _closing = true;
-    try {
-      await container.read(engineSupervisorProvider.notifier).stop().timeout(const Duration(seconds: 6));
-    } on Object {
-      // Closing must never hang.
-    }
-    await windowManager.setPreventClose(false);
-    await windowManager.destroy();
-  }
 }
 
 /// UI log file, open for the whole process lifetime (flushed by the OS on exit).

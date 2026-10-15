@@ -210,5 +210,904 @@
   "legalPrivacy": "Privacy",
   "importProfileBody": "Choose an Opportunex backup file (.opxbak) and enter the password of the backed-up profile.",
   "importChooseFile": "Choose a backup…",
-  "importAction": "Import and sign in"
+  "importAction": "Import and sign in",
+  "badgeAiGenerated": "AI-generated",
+  "badgeDeadlineSoon": "Deadline soon",
+  "badgeDeadlineUnknown": "Deadline unknown",
+  "badgeEligibilityUncertain": "Eligibility uncertain",
+  "badgeExpired": "Expired",
+  "badgeModified": "Modified",
+  "badgeNew": "New",
+  "badgeVerified": "Verified",
+  "scoreLabel": "Relevance {score} out of 100",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "catAcceleration": "Incubation & acceleration",
+  "catCall": "Calls for applications",
+  "catCompetition": "Competitions & awards",
+  "catEmployment": "Employment",
+  "catEntrepreneurship": "Entrepreneurship",
+  "catFreelance": "Freelance missions",
+  "catGrant": "Grants & funding",
+  "catInternship": "Internships",
+  "catOther": "Other opportunities",
+  "catPartnership": "Partnerships",
+  "catResearch": "Research",
+  "catScholarship": "Scholarships",
+  "catTender": "Tenders",
+  "catTraining": "Training",
+  "catVolunteering": "Volunteering",
+  "critDeadline": "Deadline",
+  "critEducation": "Education",
+  "critExperience": "Experience",
+  "critLanguage": "Languages",
+  "critLocation": "Location",
+  "critNotEvaluated": "Not evaluated for lack of information",
+  "critObjectives": "Goals",
+  "critSkills": "Skills",
+  "daysLeft": "{days, plural, =0{last day} =1{1 day left} other{{days} days left}}",
+  "@daysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "deadlineUnknownShort": "Deadline not specified",
+  "eligLikely": "Likely eligible (based on published criteria)",
+  "eligNot": "Not eligible: the deadline has passed",
+  "eligUncertain": "Eligibility to check",
+  "eligUnlikely": "Unlikely to be eligible",
+  "exportAction": "Export",
+  "exportDone": "Export saved",
+  "filterAdd": "Add",
+  "filterAddKeyword": "Add a keyword",
+  "filterAmountMin": "Minimum amount",
+  "filterAnyBadge": "All flags",
+  "filterAnyDate": "Any date",
+  "filterAnyScore": "Any relevance",
+  "filterBadge": "Flag",
+  "filterCategories": "Categories",
+  "filterCountries": "Countries",
+  "filterDeadlineBefore": "Deadline before",
+  "filterIncludeExpired": "Include expired",
+  "filterKeywords": "Keywords",
+  "filterMinScore": "Minimum relevance",
+  "filterWorkMode": "Work mode",
+  "filtersSubtitle": "This is how Opportunex understood your request. Correct it freely before starting the search.",
+  "filtersTitle": "Search criteria",
+  "gapEducation": "Required education: {value}",
+  "@gapEducation": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapExperience": "Required experience: {value} year(s)",
+  "@gapExperience": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLanguage": "Required language: {value}",
+  "@gapLanguage": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLocation": "Location: {value}",
+  "@gapLocation": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapSkills": "Skills missing from your profile: {value}",
+  "@gapSkills": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "historyClear": "Clear history",
+  "historyClearConfirm": "Unsaved searches will be deleted. Saved searches are kept.",
+  "historyEmpty": "No searches yet.",
+  "historyHint": "Save a search to rerun it later or turn it into a monitor.",
+  "historyOpen": "View results",
+  "historyRerun": "Run again",
+  "historySave": "Save search",
+  "historyUnsave": "Stop saving",
+  "loadMore": "Show more",
+  "oppAddWorkspace": "Add to a workspace",
+  "oppAmount": "Amount",
+  "oppApplicationUrl": "Application link",
+  "oppContact": "Public contact",
+  "oppDeadline": "Deadline",
+  "oppDismiss": "Dismiss",
+  "oppDocumentsRequired": "Documents required",
+  "oppEligibility": "Eligibility",
+  "oppFeedbackThanks": "Thanks, your recommendations will be adjusted",
+  "oppFinancial": "Financial benefits",
+  "oppFullText": "Full listing text",
+  "oppGaps": "Gaps and points to check",
+  "oppLastChecked": "Last checked",
+  "oppLocation": "Location",
+  "oppMethod": "Analysis method",
+  "oppMethodRules": "Deterministic rules (no AI)",
+  "oppMore": "More actions",
+  "oppNoCriteria": "The listing does not publish precise eligibility criteria: check with the publisher.",
+  "oppNoGaps": "No gap detected with your profile.",
+  "oppNotRelevant": "Not relevant",
+  "oppOfficialLink": "Official link",
+  "oppOpenTracking": "View tracking",
+  "oppOriginalPublisher": "Original publisher",
+  "oppOverview": "Overview",
+  "oppProcedure": "Procedure",
+  "oppPublished": "Published on",
+  "oppPublisher": "Publisher & sources",
+  "oppQualifications": "Required qualifications",
+  "oppRecheck": "Re-check on the official site",
+  "oppRechecked": "Check complete",
+  "oppRelevance": "Relevance for you",
+  "oppRelevant": "Relevant",
+  "oppRepost": "Repost",
+  "oppSave": "Save",
+  "oppSaved": "Saved",
+  "oppSavedToast": "Opportunity saved",
+  "oppStatus": "Status",
+  "oppStrengths": "Your strengths",
+  "oppSubmissionNotice": "Opportunex never submits applications: apply through the publisher's official channel.",
+  "oppSummary": "Summary",
+  "oppToVerify": "To check yourself",
+  "oppVerbatimNote": "Clauses reproduced word for word from the listing.",
+  "oppVerification": "Verification",
+  "provExplicit": "Explicit",
+  "provGenerated": "Generated",
+  "provInferred": "Inferred",
+  "reqEducation": "Education",
+  "reqExperience": "Experience",
+  "reqLanguages": "Languages",
+  "reqSkills": "Skills",
+  "resultsCount": "{count, plural, =0{No results} =1{1 result} other{{count} results}}",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsEmptyBody": "Broaden your criteria or add sources in the Sources section.",
+  "resultsEmptyTitle": "No matching opportunity",
+  "runCancelled": "cancelled",
+  "runCompleted": "complete",
+  "runFailed": "failed",
+  "runPartial": "partly complete",
+  "runProgress": "Searching: {done} of {total} source(s)",
+  "@runProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "runResume": "Resume",
+  "runStatus": "Search {status}",
+  "@runStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "runUnavailableBody": "These sources could not be read automatically or do not allow it. Check them directly:",
+  "runUnavailableTitle": "Sources to check manually",
+  "searchEmptyBody": "Describe what you are looking for in French or English, for example \"master's scholarship in France\" or \"IT internship in Douala\".",
+  "searchEmptyTitle": "What are you looking for?",
+  "searchHelper": "Natural-language search, in French or English",
+  "searchHint": "E.g. master's scholarship in public health for 2027",
+  "searchInterpret": "Analyse",
+  "searchLaunch": "Start search",
+  "searchSuggestions": "Suggestions",
+  "searchTabHistory": "History",
+  "searchTabNew": "Search",
+  "sortAmount": "Amount",
+  "sortDeadline": "Deadline",
+  "sortPublished": "Publication",
+  "sortRecent": "Recently added",
+  "sortRelevance": "Relevance",
+  "sourcesCount": "{count} sources",
+  "@sourcesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workHybrid": "Hybrid",
+  "workOnsite": "On site",
+  "workRemote": "Remote",
+  "wsAdded": "Added to the workspace",
+  "wsNoneYet": "Create a workspace first in the Workspaces section.",
+  "calDeadline": "Official deadline",
+  "calEmpty": "No deadlines this month.",
+  "calExportIcs": "Export calendar (.ics)",
+  "calNext": "Next month",
+  "calPersonalDeadline": "Personal deadline",
+  "calPrev": "Previous month",
+  "cvAccept": "Accept",
+  "cvApplied": "{count, plural, =0{No item added to the profile} =1{1 item added to the profile} other{{count} items added to the profile}}",
+  "@cvApplied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cvApply": "Add to profile",
+  "cvConfidence": "Extraction confidence: {pct}%",
+  "@cvConfidence": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "cvDiscard": "Discard import",
+  "cvIdentity": "Identity",
+  "cvImport": "Import a CV",
+  "cvKeepFile": "Keep the CV file",
+  "cvKeepFileHelp": "The file is encrypted in your local vault. Otherwise it is deleted after parsing.",
+  "cvNothingFound": "Nothing could be extracted",
+  "cvNothingFoundBody": "The document may be scanned (image) or protected. You can fill in your profile manually.",
+  "cvPick": "Choose a file",
+  "cvPickBody": "PDF, DOCX or TXT, up to 10 MB. Parsing happens on this computer, nothing is sent online.",
+  "cvPickTitle": "Import your CV",
+  "cvReject": "Reject",
+  "cvReviewHelp": "Check each detected item: accept, correct or reject it. Only accepted items will be added.",
+  "cvSubtitle": "Pre-fill your profile from an existing CV",
+  "dashActivity": "Recent activity",
+  "dashApplications": "Applications by status",
+  "dashDeadlines": "Upcoming deadlines",
+  "dashDiscovered": "Discovered",
+  "dashFirstStepsBody": "A few steps to get relevant results.",
+  "dashFirstStepsTitle": "Getting started",
+  "dashFollowUp": "Follow-up suggested: {title}",
+  "@dashFollowUp": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dashHello": "Hello {name}",
+  "@dashHello": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashInProgress": "In preparation",
+  "dashManage": "Manage",
+  "dashNew": "New",
+  "dashNewSearch": "New search",
+  "dashNoActivity": "No activity yet.",
+  "dashNoApplications": "No tracked applications.",
+  "dashNoDeadlines": "No deadlines in the next 30 days.",
+  "dashNoRecommendations": "Run a search to get recommendations.",
+  "dashNoStats": "Statistics will appear after your first applications.",
+  "dashRecommendations": "Recommendations",
+  "dashRecommendationsHelp": "Open opportunities ranked best for your profile (indicative score).",
+  "dashRelevant": "Relevant",
+  "dashSaved": "Saved",
+  "dashSourceFailing": "{count, plural, =1{1 consecutive failure} other{{count} consecutive failures}}",
+  "@dashSourceFailing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashSources": "Source health",
+  "dashSourcesSummary": "{active} active, {healthy} healthy, {total} in total",
+  "@dashSourcesSummary": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "healthy": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStatAccepted": "Accepted: {count}",
+  "@dashStatAccepted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStatDelay": "Average response time: {days} days",
+  "@dashStatDelay": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatRate": "Acceptance rate: {rate}",
+  "@dashStatRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatSubmitted": "Submitted: {count}",
+  "@dashStatSubmitted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStats": "Personal statistics",
+  "dashStepCv": "Import a CV",
+  "dashStepMonitor": "Create a monitor",
+  "dashStepProfile": "Complete the profile",
+  "dashStepSearch": "Run a search",
+  "dashSubmitted": "Submitted",
+  "dashSubmittedOn": "Submitted on {date}",
+  "@dashSubmittedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dashSubtitle": "Overview of your opportunities and applications",
+  "dashWithin": "{days} days: {count}",
+  "@dashWithin": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dayFri": "Friday",
+  "dayMon": "Monday",
+  "daySat": "Saturday",
+  "daySun": "Sunday",
+  "dayThu": "Thursday",
+  "dayTue": "Tuesday",
+  "dayWed": "Wednesday",
+  "docCoverLetter": "Cover letter",
+  "docCvSuggestions": "CV tailoring suggestions",
+  "docEmail": "Application e-mail",
+  "docGrant": "Grant application",
+  "docInterview": "Interview preparation",
+  "docProjectSummary": "Project summary",
+  "docScholarship": "Scholarship application letter",
+  "edBac": "High-school diploma",
+  "edBac2": "Associate degree (BTS, DUT, HND)",
+  "edBachelor": "Bachelor's degree",
+  "edDoctorate": "Doctorate",
+  "edMaster": "Master's degree",
+  "edNone": "No diploma",
+  "edPostdoc": "Postdoctoral",
+  "edPrimary": "Primary school",
+  "edSecondary": "Secondary school",
+  "edVocational": "Vocational training",
+  "eraseAction": "Erase selection",
+  "eraseConfirm": "The selected data will be permanently deleted from this computer. Type ERASE to confirm.",
+  "eraseDocuments": "Documents attached to applications",
+  "eraseDone": "Data erased",
+  "eraseHelp": "Choose exactly what you want to delete. Your account and applications are kept.",
+  "eraseHistory": "Unsaved search history",
+  "eraseLogs": "Technical logs",
+  "eraseNotifications": "Notifications",
+  "eraseOpportunities": "Unsaved opportunities",
+  "eraseProfile": "Profile details (education, experience, skills…)",
+  "eraseTitle": "Selective erasure",
+  "etConsulting": "Consulting",
+  "etFreelance": "Freelance",
+  "etFullTime": "Full time",
+  "etInternship": "Internship",
+  "etPartTime": "Part time",
+  "etVolunteer": "Volunteering",
+  "evCall": "Call",
+  "evFollowUp": "Follow-up",
+  "evInterview": "Interview",
+  "evMeeting": "Meeting",
+  "evOther": "Other",
+  "evTest": "Test",
+  "genCreate": "Create a draft",
+  "genEmpty": "No draft for this opportunity.",
+  "genIntegrityTitle": "Check: items not found in your validated profile",
+  "genNotice": "Draft generated from your validated profile. Review and adapt it before sending anything.",
+  "genSaveVersion": "Save a version",
+  "genSubtitle": "Editable drafts with version history",
+  "genTitle": "Generated documents",
+  "monCreate": "New monitor",
+  "monDaily": "Every day at {time}",
+  "@monDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monDailyLabel": "Daily",
+  "monEmptyBody": "A monitor reruns a search on a schedule and tells you what is new.",
+  "monEmptyTitle": "No monitors",
+  "monFrequencyNote": "The actual frequency respects each source's limits (usually at most once a day).",
+  "monLastRun": "Last run: {date} · {count} new",
+  "@monLastRun": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monMinScore": "Minimum score to be notified: {score}",
+  "@monMinScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "monName": "Monitor name",
+  "monNextRun": "Next run: {date}",
+  "@monNextRun": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "monOnlyWhileOpen": "Monitors only run while Opportunex is open (including minimised to the system tray).",
+  "monQuery": "Search to monitor",
+  "monRunNow": "Run now",
+  "monScheduleSummary": "{schedule} · minimum score {score}",
+  "@monScheduleSummary": {
+    "placeholders": {
+      "schedule": {
+        "type": "String"
+      },
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "monStarted": "Monitor started",
+  "monTabMonitors": "Monitors",
+  "monTabNotifications": "Notifications",
+  "monWeekly": "Every week: {when}",
+  "@monWeekly": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "monWeeklyLabel": "Weekly",
+  "nkChanged": "Tracked opportunity changed",
+  "nkDeadline": "Deadline reminders",
+  "nkMonitor": "Monitor failure",
+  "nkNew": "New opportunities",
+  "nkSource": "Source unavailable",
+  "notifEmpty": "No notifications",
+  "notifMarkAllRead": "Mark all as read",
+  "onbDone": "Profile saved. Welcome!",
+  "onbFinish": "Finish",
+  "onbLater": "Later",
+  "onbOptionalNote": "Every step is optional and can be changed at any time from your profile.",
+  "onbResume": "Resume setup",
+  "onbSkip": "Skip",
+  "onbStep1": "General information and links",
+  "onbStep2": "Education",
+  "onbStep3": "Experience",
+  "onbStep4": "Skills and languages",
+  "onbStep5": "Objectives",
+  "onbStep6": "Project or organisation",
+  "onbStep7": "Summary",
+  "onbStepOf": "Step {step} of {total} — {title}",
+  "@onbStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onbTitle": "Set up your profile",
+  "orgAcademic": "Academic institution",
+  "orgAssociation": "Association",
+  "orgBudget": "Annual budget",
+  "orgCooperative": "Cooperative",
+  "orgHelp": "Fill this in if you look for opportunities on behalf of an organisation.",
+  "orgName": "Organisation name",
+  "orgNgo": "NGO",
+  "orgNone": "No organisation provided.",
+  "orgPublic": "Public body",
+  "orgRegistration": "Registration number",
+  "orgSector": "Sector",
+  "orgSme": "SME",
+  "orgStartup": "Start-up",
+  "orgTitle": "Organisation",
+  "orgType": "Organisation type",
+  "pfAchievements": "Achievements",
+  "pfAdd": "Add",
+  "pfAddLanguage": "Add a language",
+  "pfAddLink": "Add a link",
+  "pfAddSkill": "Add a skill",
+  "pfAnyMode": "No preference",
+  "pfBeneficiaries": "Beneficiaries",
+  "pfBio": "About me",
+  "pfCertName": "Certification name",
+  "pfCertifications": "Certifications",
+  "pfCity": "City",
+  "pfCompleteness": "Profile {pct}% complete",
+  "@pfCompleteness": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "pfCountry": "Country",
+  "pfCredentialUrl": "Verification link",
+  "pfCurrency": "Currency",
+  "pfCurrentJob": "Current position",
+  "pfCustomObjective": "Other objective…",
+  "pfDegree": "Degree",
+  "pfEducation": "Education",
+  "pfEducationLevel": "Highest education level",
+  "pfEmployer": "Employer",
+  "pfEmploymentType": "Employment type",
+  "pfEnd": "End",
+  "pfExperience": "Experience",
+  "pfExperienceYears": "Years of experience",
+  "pfExpiresOn": "Expires on",
+  "pfField": "Field of study",
+  "pfFullName": "Full name",
+  "pfFundingHelp": "Whole amount in the chosen currency (in cents for EUR and USD).",
+  "pfFundingMax": "Maximum funding sought",
+  "pfFundingMin": "Minimum funding sought",
+  "pfGeneral": "General information",
+  "pfGrade": "Grade",
+  "pfImproveHint": "For more relevant results, complete:",
+  "pfInstitution": "Institution",
+  "pfIssuer": "Issuer",
+  "pfJobTitle": "Job title",
+  "pfLanguages": "Languages",
+  "pfLegalStatus": "Legal status",
+  "pfLinkKind": "Link type",
+  "pfLinks": "Links",
+  "pfLinksLocations": "Links and locations",
+  "pfMissingEducation": "your education",
+  "pfMissingExperience": "your experience",
+  "pfMissingIdentity": "your name and country",
+  "pfMissingLanguages": "your languages",
+  "pfMissingObjectives": "your objectives",
+  "pfMissingPreferences": "your location preferences",
+  "pfMissingSkills": "your skills",
+  "pfMissingStatus": "your professional status",
+  "pfMissions": "Main responsibilities",
+  "pfNative": "Native language",
+  "pfNothingYet": "Nothing yet.",
+  "pfObjectives": "Objectives",
+  "pfObjectivesHelp": "What you are looking for: they guide searches and ranking.",
+  "pfObtainedOn": "Obtained on",
+  "pfOccupation": "Current occupation",
+  "pfOngoing": "Ongoing",
+  "pfPhone": "Phone",
+  "pfPhoneHelp": "Only used in the document drafts you generate.",
+  "pfPortfolio": "Portfolio",
+  "pfPreferredLocations": "Preferred locations",
+  "pfProjectDescription": "Description",
+  "pfProjectTitle": "Project name",
+  "pfProjects": "Projects",
+  "pfRegionCentralAfrica": "All of Central Africa (CEMAC)",
+  "pfRelocate": "Willing to relocate",
+  "pfSkillPrimaryToggle": "Mark as primary skill",
+  "pfSkills": "Skills",
+  "pfSkillsLanguages": "Skills and languages",
+  "pfStage": "Project stage",
+  "pfStart": "Start",
+  "pfStatus": "Professional status",
+  "pfSubtitle": "This information stays on this computer and is used to rank opportunities.",
+  "pfSummary": "Profile summary",
+  "pfSummaryApprove": "Approve this summary",
+  "pfSummaryApproved": "Summary approved",
+  "pfSummaryGenerate": "Compose from profile",
+  "pfSummaryHelp": "Summary composed only from your information. Edit it, then approve it.",
+  "pfTimeline": "Planned duration (months)",
+  "pfWebsite": "Website",
+  "prefBandwidth": "Maximum data per search: {mb} MB",
+  "@prefBandwidth": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "prefDataSaver": "Data saver",
+  "prefDataSaverHelp": "Does not download detail pages or attachments during searches.",
+  "prefNetwork": "Network",
+  "prefNotifications": "Notifications",
+  "prefProxy": "Proxy (optional)",
+  "prefReminders": "Reminders before deadlines",
+  "prefRemindersHelp": "Days before the deadline, separated by commas (e.g. 14, 7, 3, 1).",
+  "prefWeights": "Score weighting",
+  "prefWeightsHelp": "Adjust how much each criterion counts in the relevance score.",
+  "prioHigh": "High",
+  "prioLow": "Low",
+  "prioMedium": "Medium",
+  "privConsentAi": "Processing by an AI service",
+  "privConsentSync": "Synchronisation",
+  "privConsents": "Consents",
+  "privDisclosures": "Data sent to third parties",
+  "privExportAll": "Export all my data",
+  "privImportJson": "Import a JSON export",
+  "privImported": "{count, plural, =0{Import complete} =1{Import complete: 1 tracked opportunity} other{Import complete: {count} tracked opportunities}}",
+  "@privImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privNoDisclosures": "No personal data has been sent to a third party.",
+  "privNoTelemetry": "No telemetry: Opportunex sends no usage statistics.",
+  "privOpportunities": "Cached opportunities",
+  "privPortability": "Portability",
+  "privPortabilityHelp": "Readable ZIP archive (JSON + files) of all your data, or re-import of a JSON export.",
+  "privRevoke": "Withdraw",
+  "privRevokedOn": "withdrawn on {date}",
+  "@privRevokedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "privSearches": "Searches",
+  "privStored": "Stored data",
+  "privStoredHelp": "Everything is encrypted in this profile's local database.",
+  "psEmployed": "Employed",
+  "psEntrepreneur": "Entrepreneur",
+  "psFreelancer": "Freelancer",
+  "psJobSeeker": "Job seeker",
+  "psOther": "Other",
+  "psResearcher": "Researcher",
+  "psRetired": "Retired",
+  "psSelfEmployed": "Self-employed",
+  "psStudent": "Student",
+  "psUnemployed": "Unemployed",
+  "srcActive": "Active",
+  "srcAdd": "Add a source",
+  "srcAddHelp": "Enter the address of a public page. Opportunex detects an RSS/Atom feed and respects robots.txt.",
+  "srcAdded": "{count, plural, =0{Source added (no item detected yet)} =1{Source added: 1 item detected} other{Source added: {count} items detected}}",
+  "@srcAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "srcAll": "All",
+  "srcCount": "{shown} of {total}",
+  "@srcCount": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "srcCustom": "Added by me",
+  "srcDetect": "Detect and add",
+  "srcFailing": "Failing",
+  "srcLastError": "Error: {error}",
+  "@srcLastError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "srcLastSuccess": "Last success: {date}",
+  "@srcLastSuccess": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "srcLinkOnly": "Official link only",
+  "srcLinks": "Official links",
+  "srcName": "Name (optional)",
+  "srcOppCount": "{count, plural, =1{1 opportunity} other{{count} opportunities}}",
+  "@srcOppCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "srcPolicy": "Opportunex only queries public sources, respects robots.txt and terms of use, and spaces out its requests. Portals without a feed are offered as an official link.",
+  "srcReliability": "Reliability {pct}%",
+  "@srcReliability": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "srcSubtitle": "Catalogue of public sources queried during searches",
+  "stAccepted": "Accepted",
+  "stArchived": "Archived",
+  "stDiscovered": "Discovered",
+  "stExpired": "Expired",
+  "stInterview": "Interview",
+  "stPreparing": "Preparing",
+  "stReady": "Ready to submit",
+  "stRejected": "Rejected",
+  "stSubmitted": "Submitted",
+  "stToReview": "To review",
+  "stWithdrawn": "Withdrawn",
+  "stgEarly": "Early stage",
+  "stgEstablished": "Established",
+  "stgGrowth": "Growth",
+  "stgIdea": "Idea",
+  "stgPrototype": "Prototype",
+  "stgScale": "Scaling",
+  "trackAddEvent": "Add an event",
+  "trackAddItem": "Add an item",
+  "trackAddNote": "Add a note",
+  "trackAddTag": "Add a tag",
+  "trackAllPriorities": "All priorities",
+  "trackAllStatuses": "All statuses",
+  "trackAllTags": "All tags",
+  "trackArchive": "Archive",
+  "trackArchived": "Archived",
+  "trackAttach": "Attach a file",
+  "trackBoard": "Board",
+  "trackCalendar": "Calendar",
+  "trackChecklist": "Checklist",
+  "trackChecklistEmpty": "No items. Documents required by the listing appear here when known.",
+  "trackChecklistProgress": "{done} of {total} done",
+  "@trackChecklistProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "trackDocumentLabel": "Document label",
+  "trackDocuments": "Attached documents",
+  "trackDocumentsHelp": "Files are encrypted in your local vault.",
+  "trackDownload": "Save a copy",
+  "trackDropHere": "Drop here",
+  "trackEmptyBody": "Save opportunities from search results to track them here.",
+  "trackEmptyTitle": "No tracked opportunities",
+  "trackEventContact": "Contact",
+  "trackEventLocation": "Location",
+  "trackEventTitle": "Title",
+  "trackEventType": "Type",
+  "trackEventWhen": "Date and time",
+  "trackEvents": "Events and contacts",
+  "trackFromListing": "Required by the listing",
+  "trackHistory": "History",
+  "trackIneligible": "Not eligible",
+  "trackIneligibleReason": "Reason (optional)",
+  "trackInterest": "Interest",
+  "trackInterested": "Interested",
+  "trackList": "List",
+  "trackNoDocuments": "No attached documents.",
+  "trackNoEvents": "No events.",
+  "trackNoPersonalDeadline": "No personal deadline",
+  "trackNoteHint": "Write a note…",
+  "trackNotes": "Notes",
+  "trackOpenSheet": "Open the sheet",
+  "trackPersonalDeadline": "Personal deadline",
+  "trackPriority": "Priority",
+  "trackReminders": "Scheduled reminders",
+  "trackSearchHint": "Filter by title or organisation",
+  "trackSettings": "Tracking",
+  "trackStatus": "Status",
+  "trackStatusChanged": "Status updated: {status}",
+  "@trackStatusChanged": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSubmittedOn": "Submission date",
+  "trackTag": "Tag",
+  "trackUnarchive": "Unarchive",
+  "trackUndecided": "Undecided",
+  "trackUnsave": "Stop tracking",
+  "trackUnsaveConfirm": "This application's notes, documents and history will be deleted.",
+  "wsCompare": "Compare ({count})",
+  "@wsCompare": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wsCounts": "{queries} searches · {saved} tracked · {opportunities} opportunities",
+  "@wsCounts": {
+    "placeholders": {
+      "queries": {
+        "type": "int"
+      },
+      "saved": {
+        "type": "int"
+      },
+      "opportunities": {
+        "type": "int"
+      }
+    }
+  },
+  "wsCreate": "New workspace",
+  "wsEmptyBody": "A workspace groups searches, opportunities and notes around a project.",
+  "wsEmptyTitle": "No workspaces",
+  "wsName": "Workspace name",
+  "wsNoOpportunities": "No opportunities in this workspace.",
+  "wsNoQueries": "No searches saved in this workspace.",
+  "wsNoTemplate": "Blank",
+  "wsOpportunities": "Opportunities",
+  "wsQueries": "Searches",
+  "wsRemove": "Remove from workspace",
+  "wsSearchHere": "Search in this workspace",
+  "wsSubtitle": "Organise your searches by project",
+  "wsTemplate": "Template",
+  "settingsPreferences": "Preferences",
+  "settingsPrivacy": "Privacy",
+  "genSaved": "Version saved",
+  "prefCloseToTray": "Keep running in the notification area when closed",
+  "prefCloseToTrayHelp": "Monitors and reminders only run while the app is open; closing the window then minimises it next to the clock.",
+  "trayOpen": "Open Opportunex",
+  "trayQuit": "Quit",
+  "trayStillRunning": "Opportunex keeps running in the notification area to run your monitors. Right-click the icon to quit."
 }

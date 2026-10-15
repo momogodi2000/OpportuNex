@@ -72,6 +72,12 @@ class ApiClient {
         (d) => Uint8List.fromList(d as List<int>),
       );
 
+  /// POST returning a file (exports, archives).
+  Future<Uint8List> postBytes(String path, {Object? body}) => _call(
+        () => _dio.post<List<int>>(path, data: body, options: _opts(Options(responseType: ResponseType.bytes))),
+        (d) => Uint8List.fromList(d as List<int>),
+      );
+
   Future<Json> upload(String path, {required String fileName, required List<int> bytes, Map<String, String>? fields}) =>
       _call(
         () => _dio.post<dynamic>(path,
@@ -103,6 +109,13 @@ final apiClientProvider = Provider<ApiClient?>((ref) {
 });
 
 /// Convenience for feature repositories: throws when the engine is not available.
+/// Widget-side counterpart of [requireApi] for event handlers: reads (never watches) the client.
+ApiClient readApi(WidgetRef ref) {
+  final api = ref.read(apiClientProvider);
+  if (api == null) throw ApiException.offline('engine not ready');
+  return api;
+}
+
 ApiClient requireApi(Ref ref) {
   final api = ref.watch(apiClientProvider);
   if (api == null) throw ApiException.offline('engine not ready');

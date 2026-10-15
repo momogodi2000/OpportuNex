@@ -79,7 +79,23 @@ class _Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         host = (self.headers.get("Host") or "127.0.0.1").split(":")[0]
         path = self.path.split("?")[0]
-        if path == "/robots.txt":
+        self.server.seen.append((path, dict(self.headers.items())))  # type: ignore[attr-defined]
+        override = self.server.overrides.get(path)  # type: ignore[attr-defined]
+        if override is not None:
+            self._send(override)
+        elif path == "/etag.xml":
+            if self.headers.get("If-None-Match") == '"v1"':
+                self.send_response(304)
+                self.end_headers()
+            else:
+                data = FEED.replace("{host}", "127.0.0.1").encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/rss+xml")
+                self.send_header("ETag", '"v1"')
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+        elif path == "/robots.txt":
             self._send("User-agent: *\nDisallow: /private/\n", "text/plain")
         elif path == "/" and host == "127.0.0.1":
             self._send(INDEX)
@@ -105,6 +121,12 @@ class FixtureSite:
     def __init__(self) -> None:
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
         self.port = self.server.server_address[1]
+        # Tests replace a page body here to simulate a publisher editing it.
+        self.overrides: dict[str, str] = {}
+        self.server.overrides = self.overrides  # type: ignore[attr-defined]
+        # (path, request headers) of every GET, to assert on politeness headers.
+        self.seen: list[tuple[str, dict[str, str]]] = []
+        self.server.seen = self.seen  # type: ignore[attr-defined]
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
 
     def __enter__(self) -> FixtureSite:

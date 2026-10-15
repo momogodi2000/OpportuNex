@@ -54,7 +54,7 @@ void main() {
     fail('timed out waiting for $finder');
   }
 
-  testWidgets('register, recovery phrase, settings, lock/unlock, backup', (tester) async {
+  testWidgets('register, onboarding, dashboard, sources, privacy, lock/unlock, backup', (tester) async {
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1.0;
     await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const OpportunexApp()));
@@ -79,16 +79,35 @@ void main() {
     await tester.tap(find.byType(CheckboxListTile));
     await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, 'Continuer'));
+
+    // Guided onboarding opens once; "Later" leaves it for the dashboard.
+    await waitFor(tester, find.text('Configurer votre profil'));
+    await tester.tap(find.text('Plus tard'));
+    await waitFor(tester, find.text('Premiers pas'));
+    expect(find.text('Bonjour Awa'), findsOneWidget);
+
+    // Source catalogue served by the engine (real catalogue, nothing fetched).
+    await tester.tap(find.byIcon(Icons.hub_outlined));
+    await waitFor(tester, find.text('Ajouter une source'));
+    await waitFor(tester, find.byIcon(Icons.open_in_new));
+
+    // Settings: account, then the privacy dashboard reads the encrypted profile.
+    await tester.tap(find.byIcon(Icons.settings_outlined));
     await waitFor(tester, find.text('Compte et sécurité'));
     expect(find.text('awa@example.com'), findsOneWidget);
+    await tester.tap(find.widgetWithText(Tab, 'Confidentialité'));
+    await waitFor(tester, find.text('Données stockées'));
+    await waitFor(tester, find.textContaining('Aucune télémétrie'));
 
-    // Lock with Ctrl+L, then unlock with the password.
+    // Lock with Ctrl+L, then unlock with the password: back on the dashboard.
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
     await tester.sendKeyEvent(LogicalKeyboardKey.keyL);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     await waitFor(tester, find.text('Profil verrouillé'));
     await tester.enterText(find.byType(TextFormField).first, password);
     await tester.tap(find.text('Déverrouiller'));
+    await waitFor(tester, find.text('Premiers pas'));
+    await tester.tap(find.byIcon(Icons.settings_outlined));
     await waitFor(tester, find.text('Compte et sécurité'));
 
     // Create a real encrypted backup from the Backups tab.

@@ -129,6 +129,57 @@ The old Flutter `lib/` and `test/` were moved with `git mv` to `apps/desktop/_le
 | Fonts and icons | `assets/fonts/Inter-*.ttf` + OFL, `packaging/branding/make_icons.py` | The "Inter" files were **6-byte placeholders**, replaced with Inter 4.1. The `.ico` and in-app icon were the whole brand sheet shrunk down; the real app tile is now cropped reproducibly (Windows `.ico` 16–256, Linux hicolor 16–512) |
 | Platform metadata | `windows/runner/Runner.rc`, `main.cpp`, `linux/CMakeLists.txt`, `my_application.cc`, macOS config | ETS Monthe Network / Opportunex / AGPL instead of "com.protegeqv … All rights reserved" |
 
+### Phase 3 — Functional modules end to end (engine commit `689a030`, desktop commit after it)
+**Engine.** Each module of the specification runs on the real encrypted database:
+- **Profile (M02).** 7-step onboarding data, organisation profile, completeness indicator, and a summary composed only from validated data.
+- **CV import (M03).** PDF/DOCX/TXT, type checked by content, parsed in a separate process, macro-enabled DOCX refused, item-by-item review.
+- **Search and collection (M04/M05/M09).**
+  - Rule-based FR/EN interpreter; background jobs with per-source progress, cancel and resume.
+  - `PoliteClient`: SSRF guard with DNS pinning, robots.txt, ≥ 2 s per domain, ETag cache, size and redirect caps.
+  - Declarative adapters `rss`, `json_api` and `html_list`; JSON-LD detail pages.
+  - Normalisation of dates, XAF minor units, ISO countries and languages; verbatim clauses.
+  - Deduplication by URL, id, fingerprint and simhash/rapidfuzz, keeping the original publisher; FTS5 local search.
+- **Sources (M06).** The fake catalogue was replaced by **74 real sources**:
+  - 20 feeds/APIs verified live by `tools/verify_sources.py --apply`;
+  - 54 official portals without a feed, shipped disabled as official links.
+- **Matching (M08).** Deterministic weighted scorer with breakdown, strengths, gaps and points to verify. Eligibility is never asserted.
+- **Opportunity sheet (M10).** 13 sections with provenance, recheck, and checklist from requirements. Template drafts use the validated profile only; any invented item is flagged.
+- **Tracking (M12).** 11 statuses with history, notes, tags, priorities, events, encrypted attachments, board, calendar and `.ics`.
+- **Dashboard (M11)**, **monitors and reminders (M13)**, **workspaces (M15)** and **exports CSV/XLSX/PDF/JSON plus personal archive and import (M16)**.
+- **Privacy dashboard, selective erasure and network settings (M18).**
+
+Bugs fixed with regression tests along the way:
+- Dynamic routes returned 422 because of postponed annotations.
+- `database is locked` under concurrent writes → `BEGIN IMMEDIATE` + per-database lock.
+- A crashed job left its run "running".
+- A rerun queried every enabled source.
+- Eligibility clauses under headings were missed.
+- Non-ASCII `Content-Disposition` names crashed.
+- The opportunity sheet crashed for saved items (missing `.mappings()`).
+
+**Desktop (this phase).**
+
+| Area | File(s) | What it adds |
+| --- | --- | --- |
+| Navigation | `lib/core/router/app_router.dart`, `features/shell/nav_items.dart` | Dashboard (new home), search, saved items, monitors, workspaces, sources, profile and settings. Onboarding opens once after registration; it can be left and resumed from the profile |
+| Dashboard | `features/dashboard/` | Real counters, deadlines at 7/14/30 days, applications by status, follow-ups, recommendations, source health, first-steps card |
+| Search and sheet | `features/search/`, `features/opportunity/` | Free query → editable filters → background run with live progress, history, exports; 13-section sheet with score breakdown |
+| Profile, onboarding, CV | `features/profile/` | All profile sections through a shared form spec, 7-step wizard, CV review screen |
+| Tracking | `features/tracking/` | List / Kanban (drag and drop) / calendar, application page (status, events, checklist, encrypted documents, notes), document drafts with versions and integrity warnings |
+| Monitors and notifications | `features/monitors/`, `features/shell/desktop_integration.dart` | Monitor CRUD and run now, notification centre with deep links, native toasts (`local_notifier`), tray icon with close-to-tray (default on, can be turned off) so monitors keep running |
+| Workspaces | `features/workspaces/` | Templates, queries, opportunities, notes, comparison of 2–4 opportunities |
+| Sources | `features/sources/` | Catalogue with filters, reliability, last success/error, official links, add custom source, enable/disable |
+| Settings | `features/settings/settings_extra.dart` | Preferences (notification kinds, reminder offsets, score weights, proxy / data saver / bandwidth, close-to-tray), Privacy (stored data, disclosures, consents with withdrawal, full export, JSON import, selective erasure) |
+| i18n | `lib/l10n/*.arb`, `tool/l10n_phase3a.json`, `tool/l10n_phase3b.json` | Every new string localised in French and English (0 missing keys) |
+
+**Fixed during this phase:**
+- The "opportunity changed" notification bypassed the notification preferences and carried no title or link → it now goes through `NotificationService.notify`, with a regression test.
+- The onboarding step titles did not match their pages.
+- The objectives editor mutated its own state list in place.
+- "Later" in onboarding silently marked onboarding as complete.
+
+Tests added: `tests/test_collection_units.py` covers the JSON API and HTML list adapters, invalid adapter specs, the explicit User-Agent, conditional requests (ETag/304) and the reliability score. These were previously untested.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -142,6 +193,24 @@ The old Flutter `lib/` and `test/` were moved with `git mv` to `apps/desktop/_le
 | 2026-10-15 | `flutter analyze` (apps/desktop) | No issues |
 | 2026-10-15 | `flutter test` | **20 passed** (redirect rules, locator, supervisor handshake/failures, problem parsing, auth widgets) |
 | 2026-10-15 | `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (14 s)**: real Windows build + real engine — register → recovery phrase → settings → Ctrl+L lock → unlock → encrypted backup created on disk |
+
+Phase 3 (same machine):
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-10-15 | `engine: pytest -q --cov` | **97 passed, 0 failed**, 88 % coverage (5,893 statements) |
+| 2026-10-15 | `engine: ruff check . · mypy .` | Clean · Clean (76 files) |
+| 2026-10-15 | `desktop: flutter analyze` | No issues |
+| 2026-10-15 | `desktop: flutter test` | **22 passed** (adds onboarding landing and notification deep-link rules) |
+| 2026-10-15 | `desktop: flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (17 s)**: register → recovery phrase → onboarding → "Later" → dashboard (first steps) → sources catalogue → settings → privacy dashboard → Ctrl+L lock → unlock → encrypted backup on disk |
+
+Traceability after phase 3 (`TRACEABILITY.md`, 176 requirements):
+- 13 operational end to end.
+- 16 operational engine-internal features.
+- 82 with the engine tested and the screen delivered but not walked by the E2E test.
+- 8 implemented without an automated test.
+- 19 partial.
+- 38 absent: 15 AI (phase 4), 14 sync/organisations (phase 6), and 9 others listed in the matrix.
 
 Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.51.1), Flutter 3.41.2.
 

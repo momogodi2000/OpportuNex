@@ -143,8 +143,8 @@ void main() {
 
   testWidgets('recovery phrase is displayed once and must be acknowledged', (tester) async {
     const phrase = 'un deux trois quatre cinq six sept huit neuf dix onze douze';
-    await _pump(tester, const RegisterPage(), SignedIn(
-      const AppUser(
+    await _pump(tester, const RegisterPage(), const SignedIn(
+      AppUser(
         id: 'u', email: 'a@b.c', displayName: 'A', accountMode: 'local', locale: 'fr', theme: 'system',
         autoLockMinutes: 15, onboardingCompleted: false,
       ),
