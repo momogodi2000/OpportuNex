@@ -12,6 +12,8 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/feedback.dart';
 import '../../core/widgets/layout.dart';
 import '../../l10n/app_localizations.dart';
+import '../ai/ai_consent.dart';
+import '../ai/ai_repository.dart';
 import 'status_labels.dart';
 import 'tracking_repository.dart';
 
@@ -38,7 +40,31 @@ class GeneratedDocuments extends ConsumerWidget {
         icon: const Icon(Icons.post_add),
         onSelected: (t) async {
           try {
-            final doc = await ref.read(trackingRepositoryProvider).generate(savedId, t, lang);
+            final repo = ref.read(trackingRepositoryProvider);
+            var useAi = false;
+            if (await ref.read(aiAvailableProvider.future) && context.mounted) {
+              final choice = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => SimpleDialog(title: Text(docTypeLabel(l, t)), children: [
+                  SimpleDialogOption(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: ListTile(leading: const Icon(Icons.description_outlined), title: Text(l.genFromTemplate),
+                        subtitle: Text(l.genFromTemplateHelp)),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: ListTile(leading: const Icon(Icons.auto_awesome), title: Text(l.genWithAi),
+                        subtitle: Text(l.genWithAiHelp)),
+                  ),
+                ]),
+              );
+              if (choice == null) return;
+              useAi = choice;
+            }
+            if (!context.mounted) return;
+            final doc = await withAiConsent(context, ref, () => repo.generate(savedId, t, lang, useAi: useAi),
+                withoutAi: () => repo.generate(savedId, t, lang));
+            if (doc == null) return;
             ref.invalidate(generatedListProvider(savedId));
             if (context.mounted) {
               await showDialog<void>(context: context, builder: (_) => _Editor(docId: doc.string('id')));

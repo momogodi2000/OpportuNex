@@ -57,6 +57,16 @@ def _join(items: list[str], lang: str) -> str:
     return ", ".join(items[:-1]) + (" et " if lang == "fr" else " and ") + items[-1]
 
 
+def header(doc_type: str, profile: dict[str, Any], lang: str) -> str:
+    """Sender block for letters, filled locally so the AI never receives name or contact details."""
+    if doc_type not in ("cover_letter", "scholarship_statement", "application_email"):
+        return ""
+    g = profile["general"]
+    city = ", ".join(x for x in [g.get("city"), g.get("country_code")] if x)
+    lines = [x for x in (g.get("full_name"), city) if x]
+    return ("\n".join(lines) + "\n\n" if lines else "") + f"{_today(lang)}\n\n"
+
+
 def build(doc_type: str, profile: dict[str, Any], opp: dict[str, Any], lang: str) -> tuple[str, str]:
     """Return (title, markdown content)."""
     fr = lang == "fr"

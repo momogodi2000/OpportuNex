@@ -1109,5 +1109,151 @@
   "prefCloseToTrayHelp": "Monitors and reminders only run while the app is open; closing the window then minimises it next to the clock.",
   "trayOpen": "Open Opportunex",
   "trayQuit": "Quit",
-  "trayStillRunning": "Opportunex keeps running in the notification area to run your monitors. Right-click the icon to quit."
+  "trayStillRunning": "Opportunex keeps running in the notification area to run your monitors. Right-click the icon to quit.",
+  "aiAddProvider": "Add a provider",
+  "aiAllow": "Allow",
+  "aiAnalyze": "Analyse with AI",
+  "aiAnalyzed": "Analysis done: {applied} verified fields added, {unverifiable} unverifiable",
+  "@aiAnalyzed": {
+    "placeholders": {
+      "applied": {
+        "type": "int"
+      },
+      "unverifiable": {
+        "type": "int"
+      }
+    }
+  },
+  "aiBaseUrl": "Service address (optional)",
+  "aiBaseUrlHelp": "HTTPS is required, except for a server on this computer.",
+  "aiBaseUrlRequired": "Service address",
+  "aiConsentGiven": "consent given",
+  "aiConsentIntro": "For this action, Opportunex must send data to {provider}, an online service:",
+  "@aiConsentIntro": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiConsentNever": "Your name, contact details, links and identifiers are never sent. Every send is listed in the privacy dashboard.",
+  "aiConsentRevoke": "You can withdraw this consent at any time in Settings > Privacy.",
+  "aiConsentTitle": "Send data to {provider}?",
+  "@aiConsentTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDeleteConfirm": "The provider and its key (removed from the system keychain) will be deleted.",
+  "aiDisplayName": "Display name",
+  "aiEnable": "Turn on AI features",
+  "aiEnableHelp": "Off by default. Every feature works without AI; AI only helps to structure, summarise, translate and draft.",
+  "aiErrAuth": "The provider rejected the API key.",
+  "aiErrNetwork": "Service unreachable. Check the connection and address.",
+  "aiErrOther": "Provider error ({code}).",
+  "@aiErrOther": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "aiErrRateLimited": "The provider's quota is reached. Try again later.",
+  "aiErrTimeout": "The provider did not answer in time.",
+  "aiFieldAmount": "Amount",
+  "aiFieldApplicationUrl": "Application link",
+  "aiFieldAudience": "Target audience",
+  "aiFieldCategory": "Category",
+  "aiFieldCountry": "Country",
+  "aiFieldCurrency": "Currency",
+  "aiFieldOrganization": "Organisation",
+  "aiFields": "Information extracted by AI",
+  "aiKey": "API key",
+  "aiKeyHelp": "Kept in the system's secure keychain, never in the database or the logs.",
+  "aiKeyMissing": "key missing",
+  "aiKeyReplace": "New API key (leave empty to keep the current one)",
+  "aiKind": "Provider",
+  "aiKindLmStudio": "LM Studio (on this computer)",
+  "aiKindOllama": "Ollama (on this computer)",
+  "aiKindOpenAi": "OpenAI-compatible (custom address)",
+  "aiLocal": "on this computer",
+  "aiLocalHelp": "Model running on this computer: no data leaves the machine and no consent is needed.",
+  "aiModel": "Model",
+  "aiModelHelp": "Exact model name; \"Test\" lists the available models.",
+  "aiModelNotListed": "The model \"{model}\" is not in the list: pick one below.",
+  "@aiModelNotListed": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiModelsAvailable": "{count, plural, =0{No model listed} =1{1 model available} other{{count} models available}}",
+  "@aiModelsAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiMoveDown": "Move down the fallback order",
+  "aiMoveUp": "Move up the fallback order",
+  "aiNoProvider": "No provider configured.",
+  "aiProviderAdded": "Provider added. Use \"Test\" to check the connection.",
+  "aiProviders": "Providers and fallback order",
+  "aiProvidersHelp": "Providers are tried in this order; as a last resort the application uses its rules without AI.",
+  "aiPurposeContent": "The text needed for the task (query or public announcement)",
+  "aiPurposeCv": "Your CV text, without name, e-mail, phone or links",
+  "aiPurposeProfile": "Your anonymised profile (education, experience, skills, languages)",
+  "aiRemote": "online service",
+  "aiRemoteHelp": "Online service: you will be asked for consent before the first send, and every send is logged.",
+  "aiRouting": "Model per task",
+  "aiRoutingAuto": "Automatic (fallback order)",
+  "aiRoutingHelp": "Pick a specific provider for some tasks.",
+  "aiRule1": "Extracted values are checked against the announcement text; otherwise they are marked \"Unverifiable\".",
+  "aiRule2": "The relevance score is still computed without AI, in an explainable way.",
+  "aiRule3": "Drafts only use your validated profile; any invented addition is flagged.",
+  "aiRule4": "Local models (Ollama, LM Studio) keep all data on this computer.",
+  "aiSummary": "AI-generated summary",
+  "aiTaskCv": "CV parsing",
+  "aiTaskDrafting": "Document drafting",
+  "aiTaskExtraction": "Announcement analysis",
+  "aiTaskQuery": "Search interpretation",
+  "aiTaskTranslation": "Translation",
+  "aiTest": "Test",
+  "aiTestFailed": "test failed",
+  "aiTestOk": "tested on {date}",
+  "@aiTestOk": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiTestSuccess": "Connection successful",
+  "aiTitle": "Artificial intelligence",
+  "aiTranslate": "Translate",
+  "aiUnavailable": "AI could not process the request; the information obtained without AI is still shown.",
+  "aiUsage": "Usage",
+  "aiUsageCache": "Cache",
+  "aiUsageCalls": "Calls",
+  "aiUsageDay": "Day",
+  "aiUsageEmpty": "No calls yet.",
+  "aiUsageErrors": "Errors",
+  "aiUsageHelp": "Last 30 days, per provider. Tokens are those reported by the provider.",
+  "aiUsageProvider": "Provider",
+  "aiUsageRules": "Fallback without AI",
+  "aiUsageTokens": "Tokens",
+  "aiWithout": "Continue without AI",
+  "commonRefresh": "Refresh",
+  "cvUseAi": "Analyse with AI",
+  "cvUseAiHelp": "The CV text is sent without name, e-mail, phone or links; every item still needs your validation.",
+  "genFromTemplate": "Built-in template",
+  "genFromTemplateHelp": "Written locally from your profile.",
+  "genWithAi": "Draft with AI",
+  "genWithAiHelp": "From your anonymised profile; additions not in the profile are flagged.",
+  "provUnverifiable": "Unverifiable",
+  "settingsAi": "AI"
 }

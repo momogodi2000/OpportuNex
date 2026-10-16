@@ -48,12 +48,20 @@ class DocumentService:
             )
         return opp
 
-    def generate(self, saved_id: str, doc_type: str, lang: str) -> dict[str, Any]:
+    def generate(
+        self, saved_id: str, doc_type: str, lang: str, ai_draft: tuple[str, str] | None = None
+    ) -> dict[str, Any]:
+        """Template draft, or an AI body (``ai_draft`` = body, provider id) under a locally built header."""
         if doc_type not in generator.DOC_TYPES or doc_type == "checklist":
             raise ValidationFailed("unknown document type", code="doc_type_invalid")
         opp = self._saved_opp(saved_id)
         profile = ProfileService(self.active).get()
         title, content = generator.build(doc_type, profile, opp, lang)
+        provider_id = None
+        if ai_draft:
+            body, provider_id = ai_draft
+            content = generator.header(doc_type, profile, lang) + body.strip() + "\n"
+        # EF-10.10: the integrity check runs on AI text exactly as on template text.
         flags = generator.integrity_flags(content, profile)
         T = self.T
         doc_id = uuid7()
@@ -76,6 +84,7 @@ class DocumentService:
                     version=1,
                     content=content,
                     origin="ai",
+                    ai_provider_id=provider_id,
                     integrity_flags=json.dumps(flags) if flags else None,
                 )
             )

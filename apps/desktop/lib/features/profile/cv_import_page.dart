@@ -14,6 +14,8 @@ import '../../core/widgets/feedback.dart';
 import '../../core/widgets/layout.dart';
 import '../../core/widgets/states.dart';
 import '../../l10n/app_localizations.dart';
+import '../ai/ai_consent.dart';
+import '../ai/ai_repository.dart';
 import 'profile_repository.dart';
 
 /// CV import (M03): upload → isolated parsing → validate each item → apply (EF-03.01..05).
@@ -27,6 +29,7 @@ class CvImportPage extends ConsumerStatefulWidget {
 class _CvImportPageState extends ConsumerState<CvImportPage> {
   Json? _import;
   bool _keepFile = false;
+  bool _useAi = false;
   bool _busy = false;
 
   ProfileRepository get _repo => ref.read(profileRepositoryProvider);
@@ -37,8 +40,12 @@ class _CvImportPageState extends ConsumerState<CvImportPage> {
     if (path == null) return;
     setState(() => _busy = true);
     try {
-      final imp = await _repo.uploadCv(p.basename(path), await File(path).readAsBytes(), _keepFile);
-      setState(() => _import = imp);
+      final name = p.basename(path);
+      final bytes = await File(path).readAsBytes();
+      if (!mounted) return;
+      final imp = await withAiConsent(context, ref, () => _repo.uploadCv(name, bytes, _keepFile, useAi: _useAi),
+          withoutAi: () => _repo.uploadCv(name, bytes, _keepFile));
+      if (imp != null) setState(() => _import = imp);
     } on Object catch (e) {
       if (mounted) showError(context, e);
     } finally {
@@ -97,6 +104,14 @@ class _CvImportPageState extends ConsumerState<CvImportPage> {
                           : const Icon(Icons.folder_open),
                       label: Text(l.cvPick),
                     )),
+                if (ref.watch(aiAvailableProvider).valueOrNull ?? false)
+                  SwitchListTile(
+                    value: _useAi,
+                    onChanged: (v) => setState(() => _useAi = v),
+                    secondary: const Icon(Icons.auto_awesome),
+                    title: Text(l.cvUseAi),
+                    subtitle: Text(l.cvUseAiHelp),
+                  ),
                 SwitchListTile(
                   value: _keepFile,
                   onChanged: (v) => setState(() => _keepFile = v),

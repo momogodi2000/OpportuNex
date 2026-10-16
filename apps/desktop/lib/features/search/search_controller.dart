@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/api_client.dart' show Json;
+import '../../core/api/api_exception.dart';
 import '../../core/api/engine_events.dart';
 import '../../core/api/json.dart';
 import 'search_repository.dart';
@@ -25,6 +26,8 @@ class SearchState {
     this.badge,
     this.error,
     this.loadingMore = false,
+    this.aiUsed = false,
+    this.consent,
   });
 
   final SearchStage stage;
@@ -39,6 +42,12 @@ class SearchState {
   final String? badge;
   final Object? error;
   final bool loadingMore;
+
+  /// The filters came from the AI interpreter (shown as a label, EF-07.02).
+  final bool aiUsed;
+
+  /// Pending consent request from the engine (EF-14.09); the page asks the user.
+  final Json? consent;
 
   String? get runId => run?.obj('run').str('id');
   String get runStatus => run?.obj('run').string('status') ?? '';
@@ -61,6 +70,9 @@ class SearchState {
     Object? error,
     bool clearError = false,
     bool? loadingMore,
+    bool? aiUsed,
+    Json? consent,
+    bool clearConsent = false,
   }) =>
       SearchState(
         stage: stage ?? this.stage,
@@ -75,6 +87,8 @@ class SearchState {
         badge: clearBadge ? null : (badge ?? this.badge),
         error: clearError ? null : (error ?? this.error),
         loadingMore: loadingMore ?? this.loadingMore,
+        aiUsed: aiUsed ?? this.aiUsed,
+        consent: clearConsent ? null : (consent ?? this.consent),
       );
 }
 
@@ -97,17 +111,23 @@ class SearchController extends Notifier<SearchState> {
     return const SearchState();
   }
 
-  Future<void> interpret(String text) async {
+  Future<void> interpret(String text, {bool useAi = true}) async {
     final query = text.trim();
     if (query.isEmpty) return;
-    state = state.copyWith(stage: SearchStage.interpreting, text: query, clearError: true);
+    state = state.copyWith(stage: SearchStage.interpreting, text: query, clearError: true, clearConsent: true);
     try {
-      final filters = await _repo.interpret(query);
-      state = state.copyWith(stage: SearchStage.editing, filters: filters);
+      final r = await _repo.interpret(query, useAi: useAi);
+      state = state.copyWith(stage: SearchStage.editing, filters: r.obj('filters'), aiUsed: r.str('interpreter') == 'ai');
+    } on ApiException catch (e) {
+      state = e.code == 'ai_consent_required'
+          ? state.copyWith(stage: SearchStage.idle, consent: e.extra)
+          : state.copyWith(stage: SearchStage.idle, error: e);
     } on Object catch (e) {
       state = state.copyWith(stage: SearchStage.idle, error: e);
     }
   }
+
+  void clearConsent() => state = state.copyWith(clearConsent: true);
 
   void updateFilters(Json filters) => state = state.copyWith(filters: filters);
 

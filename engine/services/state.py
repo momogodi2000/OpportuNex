@@ -12,6 +12,7 @@ import time
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from ai.secrets import SecretStore, make_store
 from api.events import EventBus
 from core.config import DataPaths, Settings
 from core.errors import Unauthorized
@@ -73,6 +74,9 @@ class EngineState:
         self.locked: LockedSession | None = None
         self.lock = threading.RLock()
         self.jobs: JobManager | None = None
+        self.secrets: SecretStore = make_store(settings.secret_store)
+        # provider id → monotonic time until which it is suspended after HTTP 429 (EF-14.06)
+        self.ai_suspended: dict[str, float] = {}
 
     # ------------------------------------------------------------- sessions
     def require(self, bearer: str | None) -> ActiveProfile:

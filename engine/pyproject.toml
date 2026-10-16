@@ -18,7 +18,10 @@ dependencies = { file = ["requirements.txt"] }
 optional-dependencies.dev = { file = ["requirements-dev.txt"] }
 
 [tool.setuptools.packages.find]
-include = ["api*", "core*", "persistence*", "security*", "services*", "collection*", "domain*"]
+include = [
+    "api*", "core*", "persistence*", "security*", "services*", "collection*", "domain*",
+    "search*", "documents*", "matching*", "ai*",
+]
 
 [tool.ruff]
 target-version = "py312"
@@ -60,7 +63,10 @@ asyncio_mode = "auto"
 filterwarnings = ["ignore::DeprecationWarning:fastapi.testclient", "ignore:Using `httpx`"]
 
 [tool.coverage.run]
-source = ["api", "core", "persistence", "security", "services", "collection", "domain"]
+source = [
+    "api", "core", "persistence", "security", "services", "collection",
+    "search", "documents", "matching", "ai",
+]
 omit = ["persistence/migrations/*", "_legacy/*", "tests/*"]
 
 [tool.coverage.report]

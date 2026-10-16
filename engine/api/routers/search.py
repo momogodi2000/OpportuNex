@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from api.deps import Active, StateDep
 from core.errors import ValidationFailed
+from services.ai_tasks import interpret_query
 from services.jobs import JobManager
 from services.search_service import SORTS, SearchService
 from services.state import EngineState
@@ -19,6 +20,8 @@ router = APIRouter(prefix="/search", tags=["Search"])
 
 class InterpretIn(BaseModel):
     text: str = Field(min_length=1, max_length=500)
+    # False keeps the rule-based interpreter even when AI is configured (e.g. consent declined).
+    use_ai: bool = True
 
 
 class Filters(BaseModel):
@@ -55,8 +58,11 @@ def _jobs(state: EngineState) -> JobManager:
 
 
 @router.post("/interpret")
-def interpret(body: InterpretIn, active: Active, state: StateDep) -> dict[str, Any]:
-    return SearchService(active, state).interpret(body.text)
+async def interpret(body: InterpretIn, active: Active, state: StateDep) -> dict[str, Any]:
+    rules = await asyncio.to_thread(SearchService(active, state).interpret, body.text)
+    if not body.use_ai:
+        return rules
+    return await interpret_query(active, state, body.text, rules["filters"])
 
 
 async def _start(

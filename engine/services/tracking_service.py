@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import Connection, and_, delete, desc, func, insert, or_, select, update
@@ -743,7 +743,7 @@ class TrackingService:
     def ics(self) -> str:
         """EF-12.10: iCalendar export of deadlines and events."""
         items = self.calendar("1970-01-01", "2999-12-31")
-        stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
         def esc(t: str) -> str:
             return t.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")

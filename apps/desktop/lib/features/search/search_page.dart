@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/api/api_client.dart' show Json;
 import '../../core/api/json.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
@@ -14,6 +16,7 @@ import '../../core/widgets/feedback.dart';
 import '../../core/widgets/opportunity_widgets.dart';
 import '../../core/widgets/states.dart';
 import '../../l10n/app_localizations.dart';
+import '../ai/ai_consent.dart';
 import 'filters_panel.dart';
 import 'search_controller.dart';
 import 'search_history_view.dart';
@@ -48,8 +51,23 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     super.dispose();
   }
 
+  Future<void> _onConsent(Json request) async {
+    final ctrl = ref.read(searchControllerProvider.notifier);
+    final text = ref.read(searchControllerProvider).text;
+    ctrl.clearConsent();
+    try {
+      final granted = await askAiConsent(context, ref, request);
+      await ctrl.interpret(text, useAi: granted);
+    } on Object catch (e) {
+      if (mounted) showError(context, e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen(searchControllerProvider.select((s) => s.consent), (_, next) {
+      if (next != null) unawaited(_onConsent(next));
+    });
     final l = AppLocalizations.of(context);
     final s = ref.watch(searchControllerProvider);
     final ctrl = ref.read(searchControllerProvider.notifier);
@@ -80,6 +98,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               const SizedBox(height: Space.lg),
               if (s.stage == SearchStage.idle) const _Suggestions(),
               if (s.filters != null && (s.stage == SearchStage.editing || s.stage == SearchStage.interpreting)) ...[
+                if (s.aiUsed) ...[
+                  const Align(alignment: Alignment.centerLeft, child: StatusBadge(kind: 'ai_generated')),
+                  const SizedBox(height: Space.sm),
+                ],
                 FiltersPanel(filters: s.filters!, onChanged: ctrl.updateFilters),
                 const SizedBox(height: Space.lg),
                 Align(

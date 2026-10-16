@@ -14,6 +14,7 @@ import sys
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -43,6 +44,8 @@ class Settings(BaseSettings):
     # Allow outbound requests to private/loopback addresses. Only the test suite's
     # local fixture server sets this; it must never be enabled in production.
     allow_private_network: bool = False
+    # Where AI API keys are kept: the OS keychain in production; "memory" only for the test-suite.
+    secret_store: Literal["keyring", "memory"] = "keyring"  # noqa: S105 - a backend name, not a secret
 
     @field_validator("log_level")
     @classmethod

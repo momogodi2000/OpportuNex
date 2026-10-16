@@ -1109,5 +1109,151 @@
   "prefCloseToTrayHelp": "Les veilles et les rappels ne fonctionnent que lorsque l'application est ouverte ; fermer la fenêtre la réduit alors à côté de l'horloge.",
   "trayOpen": "Ouvrir Opportunex",
   "trayQuit": "Quitter",
-  "trayStillRunning": "Opportunex continue dans la zone de notification pour exécuter vos veilles. Clic droit sur l'icône pour quitter."
+  "trayStillRunning": "Opportunex continue dans la zone de notification pour exécuter vos veilles. Clic droit sur l'icône pour quitter.",
+  "aiAddProvider": "Ajouter un fournisseur",
+  "aiAllow": "Autoriser",
+  "aiAnalyze": "Analyser avec l'IA",
+  "aiAnalyzed": "Analyse terminée : {applied} champs vérifiés ajoutés, {unverifiable} non vérifiables",
+  "@aiAnalyzed": {
+    "placeholders": {
+      "applied": {
+        "type": "int"
+      },
+      "unverifiable": {
+        "type": "int"
+      }
+    }
+  },
+  "aiBaseUrl": "Adresse du service (facultatif)",
+  "aiBaseUrlHelp": "HTTPS obligatoire, sauf pour un serveur sur cet ordinateur.",
+  "aiBaseUrlRequired": "Adresse du service",
+  "aiConsentGiven": "consentement donné",
+  "aiConsentIntro": "Pour cette action, Opportunex doit envoyer des données à {provider}, un service en ligne :",
+  "@aiConsentIntro": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiConsentNever": "Votre nom, vos coordonnées, vos liens et vos identifiants ne sont jamais envoyés. Chaque envoi est inscrit dans le tableau de bord de confidentialité.",
+  "aiConsentRevoke": "Vous pourrez retirer ce consentement à tout moment dans Paramètres > Confidentialité.",
+  "aiConsentTitle": "Envoyer des données à {provider} ?",
+  "@aiConsentTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDeleteConfirm": "Le fournisseur et sa clé (retirée du trousseau du système) seront supprimés.",
+  "aiDisplayName": "Nom affiché",
+  "aiEnable": "Activer les fonctions d'IA",
+  "aiEnableHelp": "Désactivées par défaut. Toutes les fonctions marchent sans IA ; l'IA ne fait qu'aider à structurer, résumer, traduire et rédiger.",
+  "aiErrAuth": "Clé d'API refusée par le fournisseur.",
+  "aiErrNetwork": "Service injoignable. Vérifiez la connexion et l'adresse.",
+  "aiErrOther": "Erreur du fournisseur ({code}).",
+  "@aiErrOther": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "aiErrRateLimited": "Quota atteint chez le fournisseur. Réessayez plus tard.",
+  "aiErrTimeout": "Le fournisseur n'a pas répondu à temps.",
+  "aiFieldAmount": "Montant",
+  "aiFieldApplicationUrl": "Lien de candidature",
+  "aiFieldAudience": "Public visé",
+  "aiFieldCategory": "Catégorie",
+  "aiFieldCountry": "Pays",
+  "aiFieldCurrency": "Devise",
+  "aiFieldOrganization": "Organisme",
+  "aiFields": "Informations extraites par l'IA",
+  "aiKey": "Clé d'API",
+  "aiKeyHelp": "Conservée dans le trousseau sécurisé du système, jamais dans la base ni dans les journaux.",
+  "aiKeyMissing": "clé manquante",
+  "aiKeyReplace": "Nouvelle clé d'API (laisser vide pour garder l'actuelle)",
+  "aiKind": "Fournisseur",
+  "aiKindLmStudio": "LM Studio (sur cet ordinateur)",
+  "aiKindOllama": "Ollama (sur cet ordinateur)",
+  "aiKindOpenAi": "Compatible OpenAI (adresse personnalisée)",
+  "aiLocal": "sur cet ordinateur",
+  "aiLocalHelp": "Modèle exécuté sur cet ordinateur : aucune donnée ne quitte la machine, aucun consentement n'est demandé.",
+  "aiModel": "Modèle",
+  "aiModelHelp": "Nom exact du modèle ; « Tester » liste les modèles disponibles.",
+  "aiModelNotListed": "Le modèle « {model} » n'apparaît pas dans la liste : choisissez-en un ci-dessous.",
+  "@aiModelNotListed": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiModelsAvailable": "{count, plural, =0{Aucun modèle listé} =1{1 modèle disponible} other{{count} modèles disponibles}}",
+  "@aiModelsAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiMoveDown": "Descendre dans l'ordre de repli",
+  "aiMoveUp": "Monter dans l'ordre de repli",
+  "aiNoProvider": "Aucun fournisseur configuré.",
+  "aiProviderAdded": "Fournisseur ajouté. Utilisez « Tester » pour vérifier la connexion.",
+  "aiProviders": "Fournisseurs et ordre de repli",
+  "aiProvidersHelp": "Les fournisseurs sont essayés dans cet ordre ; en dernier recours, l'application utilise ses règles sans IA.",
+  "aiPurposeContent": "Le texte nécessaire à la tâche (requête ou annonce publique)",
+  "aiPurposeCv": "Le texte de votre CV, sans nom, courriel, téléphone ni liens",
+  "aiPurposeProfile": "Votre profil anonymisé (formations, expériences, compétences, langues)",
+  "aiRemote": "service en ligne",
+  "aiRemoteHelp": "Service en ligne : un consentement vous sera demandé avant le premier envoi, et chaque envoi sera journalisé.",
+  "aiRouting": "Modèle par tâche",
+  "aiRoutingAuto": "Automatique (ordre de repli)",
+  "aiRoutingHelp": "Choisissez un fournisseur précis pour certaines tâches.",
+  "aiRule1": "Les valeurs extraites sont vérifiées dans le texte de l'annonce ; sinon elles sont marquées « Non vérifiable ».",
+  "aiRule2": "Le score de pertinence reste calculé sans IA, de façon explicable.",
+  "aiRule3": "Les brouillons n'utilisent que votre profil validé ; tout ajout inventé est signalé.",
+  "aiRule4": "Les modèles locaux (Ollama, LM Studio) ne font sortir aucune donnée de l'ordinateur.",
+  "aiSummary": "Résumé généré par l'IA",
+  "aiTaskCv": "Analyse de CV",
+  "aiTaskDrafting": "Rédaction de documents",
+  "aiTaskExtraction": "Analyse des annonces",
+  "aiTaskQuery": "Interprétation des recherches",
+  "aiTaskTranslation": "Traduction",
+  "aiTest": "Tester",
+  "aiTestFailed": "échec du test",
+  "aiTestOk": "testé le {date}",
+  "@aiTestOk": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiTestSuccess": "Connexion réussie",
+  "aiTitle": "Intelligence artificielle",
+  "aiTranslate": "Traduire",
+  "aiUnavailable": "L'IA n'a pas pu traiter la demande ; les informations sans IA restent affichées.",
+  "aiUsage": "Consommation",
+  "aiUsageCache": "Cache",
+  "aiUsageCalls": "Appels",
+  "aiUsageDay": "Jour",
+  "aiUsageEmpty": "Aucun appel pour l'instant.",
+  "aiUsageErrors": "Erreurs",
+  "aiUsageHelp": "30 derniers jours, par fournisseur. Les jetons sont ceux déclarés par le fournisseur.",
+  "aiUsageProvider": "Fournisseur",
+  "aiUsageRules": "Repli sans IA",
+  "aiUsageTokens": "Jetons",
+  "aiWithout": "Continuer sans IA",
+  "commonRefresh": "Actualiser",
+  "cvUseAi": "Analyser avec l'IA",
+  "cvUseAiHelp": "Le texte du CV est envoyé sans nom, courriel, téléphone ni liens ; chaque élément reste à valider.",
+  "genFromTemplate": "Modèle intégré",
+  "genFromTemplateHelp": "Rédigé localement à partir de votre profil.",
+  "genWithAi": "Rédiger avec l'IA",
+  "genWithAiHelp": "À partir de votre profil anonymisé ; les ajouts non présents dans le profil sont signalés.",
+  "provUnverifiable": "Non vérifiable",
+  "settingsAi": "IA"
 }

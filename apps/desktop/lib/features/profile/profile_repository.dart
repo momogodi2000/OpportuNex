@@ -28,8 +28,8 @@ class ProfileRepository {
   Future<List<Json>> skills(String q) async => items(await _api.getJson('/ref/skills', query: {'q': q, 'limit': 12}));
 
   Future<List<Json>> cvImports() async => items(await _api.getJson('/cv-imports'));
-  Future<Json> uploadCv(String name, List<int> bytes, bool keep) =>
-      _api.upload('/cv-imports', fileName: name, bytes: bytes, fields: {'keep_file': '$keep'});
+  Future<Json> uploadCv(String name, List<int> bytes, bool keep, {bool useAi = false}) =>
+      _api.upload('/cv-imports', fileName: name, bytes: bytes, fields: {'keep_file': '$keep', 'use_ai': '$useAi'});
   Future<Json> cvImport(String id) => _api.getJson('/cv-imports/$id');
   Future<Json> decide(String id, int itemId, String decision, {Json? payload}) =>
       _api.putJson('/cv-imports/$id/items/$itemId', body: {'decision': decision, 'payload': ?payload});

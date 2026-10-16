@@ -374,6 +374,10 @@ class AuthService:
         if not verify_secret(password, record.auth_hash, self._params_of(record)):
             raise Unauthorized("password is wrong", code="invalid_credentials")
         user_id = active.user_id
+        # AI keys live in the OS keychain, outside the profile folder: remove them first (EF-01.11).
+        from services.ai_service import AIService
+
+        AIService(active, self.state).forget_all_keys()
         self.state.close_active(reason="deleted", remember_lock=False)
         paths = self.state.paths
         shutil.rmtree(paths.profile_dir(user_id), ignore_errors=True)

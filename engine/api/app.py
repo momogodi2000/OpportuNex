@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 
 from api.events import EventBus
 from api.routers import (
+    ai,
     auth,
     cv_import,
     insights,
@@ -176,6 +177,7 @@ def create_app(settings: Settings, engine_token: str) -> FastAPI:
     app.include_router(opportunities.router, prefix=PREFIX)
     app.include_router(tracking.router, prefix=PREFIX)
     app.include_router(insights.router, prefix=PREFIX)
+    app.include_router(ai.router, prefix=PREFIX)
 
     @app.websocket(f"{PREFIX}/events")
     async def events_ws(websocket: WebSocket) -> None:

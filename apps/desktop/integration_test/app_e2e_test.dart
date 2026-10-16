@@ -99,6 +99,13 @@ void main() {
     await waitFor(tester, find.text('Données stockées'));
     await waitFor(tester, find.textContaining('Aucune télémétrie'));
 
+    // AI is off by default (D-15) and no provider exists until the user adds one.
+    await tester.tap(find.widgetWithText(Tab, 'IA'));
+    await waitFor(tester, find.text("Activer les fonctions d'IA"));
+    await waitFor(tester, find.text('Aucun fournisseur configuré.'));
+    final aiSwitch = tester.widget<SwitchListTile>(find.widgetWithText(SwitchListTile, "Activer les fonctions d'IA"));
+    expect(aiSwitch.value, isFalse);
+
     // Lock with Ctrl+L, then unlock with the password: back on the dashboard.
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
     await tester.sendKeyEvent(LogicalKeyboardKey.keyL);

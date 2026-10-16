@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, File, Form, Query, Response, UploadFile
 from pydantic import BaseModel, Field
 
-from api.deps import Active
+from api.deps import Active, StateDep
 from api.http_utils import attachment
+from services import ai_tasks
 from services.document_service import DocumentService
+from services.profile_service import ProfileService
 from services.tracking_service import MAX_ATTACHMENT, TrackingService
 
 router = APIRouter(tags=["Tracking"])
@@ -99,6 +102,8 @@ class GenerateIn(BaseModel):
         "interview_prep",
     ]
     language: Literal["fr", "en"] = "fr"
+    # True asks the configured AI for the body (anonymised profile); the template is the fallback.
+    use_ai: bool = False
 
 
 class VersionIn(BaseModel):
@@ -283,8 +288,15 @@ def list_generated(saved_id: str, active: Active) -> dict[str, Any]:
 
 
 @router.post("/saved/{saved_id}/generated", status_code=201)
-def generate(saved_id: str, body: GenerateIn, active: Active) -> dict[str, Any]:
-    return DocumentService(active).generate(saved_id, body.doc_type, body.language)
+async def generate(saved_id: str, body: GenerateIn, active: Active, state: StateDep) -> dict[str, Any]:
+    svc = DocumentService(active)
+    draft = None
+    if body.use_ai:
+        opp = await asyncio.to_thread(svc._saved_opp, saved_id)
+        profile = await asyncio.to_thread(ProfileService(active).get)
+        draft = await ai_tasks.draft_body(active, state, body.doc_type, profile, opp, body.language)
+    doc = await asyncio.to_thread(svc.generate, saved_id, body.doc_type, body.language, draft)
+    return doc | {"ai_used": draft is not None}
 
 
 @router.get("/generated/{doc_id}")

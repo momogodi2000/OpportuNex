@@ -9,7 +9,9 @@ class SearchRepository {
   SearchRepository(this._api);
   final ApiClient _api;
 
-  Future<Json> interpret(String text) async => (await _api.postJson('/search/interpret', body: {'text': text})).obj('filters');
+  /// Filters plus `interpreter` (`rules` or `ai`); the engine answers 409 `ai_consent_required` when needed.
+  Future<Json> interpret(String text, {bool useAi = true}) =>
+      _api.postJson('/search/interpret', body: {'text': text, 'use_ai': useAi});
   Future<List<String>> suggestions() async => (await _api.getJson('/search/suggestions')).strings('items');
   Future<Json> start(String text, Json filters, {String? workspaceId}) => _api.postJson('/search/runs',
       body: {'text': text, 'filters': filters, 'workspace_id': ?workspaceId});

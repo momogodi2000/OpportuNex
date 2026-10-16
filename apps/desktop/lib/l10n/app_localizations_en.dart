@@ -2462,4 +2462,332 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get trayStillRunning =>
       'Opportunex keeps running in the notification area to run your monitors. Right-click the icon to quit.';
+
+  @override
+  String get aiAddProvider => 'Add a provider';
+
+  @override
+  String get aiAllow => 'Allow';
+
+  @override
+  String get aiAnalyze => 'Analyse with AI';
+
+  @override
+  String aiAnalyzed(int applied, int unverifiable) {
+    return 'Analysis done: $applied verified fields added, $unverifiable unverifiable';
+  }
+
+  @override
+  String get aiBaseUrl => 'Service address (optional)';
+
+  @override
+  String get aiBaseUrlHelp =>
+      'HTTPS is required, except for a server on this computer.';
+
+  @override
+  String get aiBaseUrlRequired => 'Service address';
+
+  @override
+  String get aiConsentGiven => 'consent given';
+
+  @override
+  String aiConsentIntro(String provider) {
+    return 'For this action, Opportunex must send data to $provider, an online service:';
+  }
+
+  @override
+  String get aiConsentNever =>
+      'Your name, contact details, links and identifiers are never sent. Every send is listed in the privacy dashboard.';
+
+  @override
+  String get aiConsentRevoke =>
+      'You can withdraw this consent at any time in Settings > Privacy.';
+
+  @override
+  String aiConsentTitle(String provider) {
+    return 'Send data to $provider?';
+  }
+
+  @override
+  String get aiDeleteConfirm =>
+      'The provider and its key (removed from the system keychain) will be deleted.';
+
+  @override
+  String get aiDisplayName => 'Display name';
+
+  @override
+  String get aiEnable => 'Turn on AI features';
+
+  @override
+  String get aiEnableHelp =>
+      'Off by default. Every feature works without AI; AI only helps to structure, summarise, translate and draft.';
+
+  @override
+  String get aiErrAuth => 'The provider rejected the API key.';
+
+  @override
+  String get aiErrNetwork =>
+      'Service unreachable. Check the connection and address.';
+
+  @override
+  String aiErrOther(String code) {
+    return 'Provider error ($code).';
+  }
+
+  @override
+  String get aiErrRateLimited =>
+      'The provider\'s quota is reached. Try again later.';
+
+  @override
+  String get aiErrTimeout => 'The provider did not answer in time.';
+
+  @override
+  String get aiFieldAmount => 'Amount';
+
+  @override
+  String get aiFieldApplicationUrl => 'Application link';
+
+  @override
+  String get aiFieldAudience => 'Target audience';
+
+  @override
+  String get aiFieldCategory => 'Category';
+
+  @override
+  String get aiFieldCountry => 'Country';
+
+  @override
+  String get aiFieldCurrency => 'Currency';
+
+  @override
+  String get aiFieldOrganization => 'Organisation';
+
+  @override
+  String get aiFields => 'Information extracted by AI';
+
+  @override
+  String get aiKey => 'API key';
+
+  @override
+  String get aiKeyHelp =>
+      'Kept in the system\'s secure keychain, never in the database or the logs.';
+
+  @override
+  String get aiKeyMissing => 'key missing';
+
+  @override
+  String get aiKeyReplace =>
+      'New API key (leave empty to keep the current one)';
+
+  @override
+  String get aiKind => 'Provider';
+
+  @override
+  String get aiKindLmStudio => 'LM Studio (on this computer)';
+
+  @override
+  String get aiKindOllama => 'Ollama (on this computer)';
+
+  @override
+  String get aiKindOpenAi => 'OpenAI-compatible (custom address)';
+
+  @override
+  String get aiLocal => 'on this computer';
+
+  @override
+  String get aiLocalHelp =>
+      'Model running on this computer: no data leaves the machine and no consent is needed.';
+
+  @override
+  String get aiModel => 'Model';
+
+  @override
+  String get aiModelHelp =>
+      'Exact model name; \"Test\" lists the available models.';
+
+  @override
+  String aiModelNotListed(String model) {
+    return 'The model \"$model\" is not in the list: pick one below.';
+  }
+
+  @override
+  String aiModelsAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count models available',
+      one: '1 model available',
+      zero: 'No model listed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiMoveDown => 'Move down the fallback order';
+
+  @override
+  String get aiMoveUp => 'Move up the fallback order';
+
+  @override
+  String get aiNoProvider => 'No provider configured.';
+
+  @override
+  String get aiProviderAdded =>
+      'Provider added. Use \"Test\" to check the connection.';
+
+  @override
+  String get aiProviders => 'Providers and fallback order';
+
+  @override
+  String get aiProvidersHelp =>
+      'Providers are tried in this order; as a last resort the application uses its rules without AI.';
+
+  @override
+  String get aiPurposeContent =>
+      'The text needed for the task (query or public announcement)';
+
+  @override
+  String get aiPurposeCv =>
+      'Your CV text, without name, e-mail, phone or links';
+
+  @override
+  String get aiPurposeProfile =>
+      'Your anonymised profile (education, experience, skills, languages)';
+
+  @override
+  String get aiRemote => 'online service';
+
+  @override
+  String get aiRemoteHelp =>
+      'Online service: you will be asked for consent before the first send, and every send is logged.';
+
+  @override
+  String get aiRouting => 'Model per task';
+
+  @override
+  String get aiRoutingAuto => 'Automatic (fallback order)';
+
+  @override
+  String get aiRoutingHelp => 'Pick a specific provider for some tasks.';
+
+  @override
+  String get aiRule1 =>
+      'Extracted values are checked against the announcement text; otherwise they are marked \"Unverifiable\".';
+
+  @override
+  String get aiRule2 =>
+      'The relevance score is still computed without AI, in an explainable way.';
+
+  @override
+  String get aiRule3 =>
+      'Drafts only use your validated profile; any invented addition is flagged.';
+
+  @override
+  String get aiRule4 =>
+      'Local models (Ollama, LM Studio) keep all data on this computer.';
+
+  @override
+  String get aiSummary => 'AI-generated summary';
+
+  @override
+  String get aiTaskCv => 'CV parsing';
+
+  @override
+  String get aiTaskDrafting => 'Document drafting';
+
+  @override
+  String get aiTaskExtraction => 'Announcement analysis';
+
+  @override
+  String get aiTaskQuery => 'Search interpretation';
+
+  @override
+  String get aiTaskTranslation => 'Translation';
+
+  @override
+  String get aiTest => 'Test';
+
+  @override
+  String get aiTestFailed => 'test failed';
+
+  @override
+  String aiTestOk(String date) {
+    return 'tested on $date';
+  }
+
+  @override
+  String get aiTestSuccess => 'Connection successful';
+
+  @override
+  String get aiTitle => 'Artificial intelligence';
+
+  @override
+  String get aiTranslate => 'Translate';
+
+  @override
+  String get aiUnavailable =>
+      'AI could not process the request; the information obtained without AI is still shown.';
+
+  @override
+  String get aiUsage => 'Usage';
+
+  @override
+  String get aiUsageCache => 'Cache';
+
+  @override
+  String get aiUsageCalls => 'Calls';
+
+  @override
+  String get aiUsageDay => 'Day';
+
+  @override
+  String get aiUsageEmpty => 'No calls yet.';
+
+  @override
+  String get aiUsageErrors => 'Errors';
+
+  @override
+  String get aiUsageHelp =>
+      'Last 30 days, per provider. Tokens are those reported by the provider.';
+
+  @override
+  String get aiUsageProvider => 'Provider';
+
+  @override
+  String get aiUsageRules => 'Fallback without AI';
+
+  @override
+  String get aiUsageTokens => 'Tokens';
+
+  @override
+  String get aiWithout => 'Continue without AI';
+
+  @override
+  String get commonRefresh => 'Refresh';
+
+  @override
+  String get cvUseAi => 'Analyse with AI';
+
+  @override
+  String get cvUseAiHelp =>
+      'The CV text is sent without name, e-mail, phone or links; every item still needs your validation.';
+
+  @override
+  String get genFromTemplate => 'Built-in template';
+
+  @override
+  String get genFromTemplateHelp => 'Written locally from your profile.';
+
+  @override
+  String get genWithAi => 'Draft with AI';
+
+  @override
+  String get genWithAiHelp =>
+      'From your anonymised profile; additions not in the profile are flagged.';
+
+  @override
+  String get provUnverifiable => 'Unverifiable';
+
+  @override
+  String get settingsAi => 'AI';
 }

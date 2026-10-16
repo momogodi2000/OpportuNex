@@ -2475,4 +2475,334 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get trayStillRunning =>
       'Opportunex continue dans la zone de notification pour exécuter vos veilles. Clic droit sur l\'icône pour quitter.';
+
+  @override
+  String get aiAddProvider => 'Ajouter un fournisseur';
+
+  @override
+  String get aiAllow => 'Autoriser';
+
+  @override
+  String get aiAnalyze => 'Analyser avec l\'IA';
+
+  @override
+  String aiAnalyzed(int applied, int unverifiable) {
+    return 'Analyse terminée : $applied champs vérifiés ajoutés, $unverifiable non vérifiables';
+  }
+
+  @override
+  String get aiBaseUrl => 'Adresse du service (facultatif)';
+
+  @override
+  String get aiBaseUrlHelp =>
+      'HTTPS obligatoire, sauf pour un serveur sur cet ordinateur.';
+
+  @override
+  String get aiBaseUrlRequired => 'Adresse du service';
+
+  @override
+  String get aiConsentGiven => 'consentement donné';
+
+  @override
+  String aiConsentIntro(String provider) {
+    return 'Pour cette action, Opportunex doit envoyer des données à $provider, un service en ligne :';
+  }
+
+  @override
+  String get aiConsentNever =>
+      'Votre nom, vos coordonnées, vos liens et vos identifiants ne sont jamais envoyés. Chaque envoi est inscrit dans le tableau de bord de confidentialité.';
+
+  @override
+  String get aiConsentRevoke =>
+      'Vous pourrez retirer ce consentement à tout moment dans Paramètres > Confidentialité.';
+
+  @override
+  String aiConsentTitle(String provider) {
+    return 'Envoyer des données à $provider ?';
+  }
+
+  @override
+  String get aiDeleteConfirm =>
+      'Le fournisseur et sa clé (retirée du trousseau du système) seront supprimés.';
+
+  @override
+  String get aiDisplayName => 'Nom affiché';
+
+  @override
+  String get aiEnable => 'Activer les fonctions d\'IA';
+
+  @override
+  String get aiEnableHelp =>
+      'Désactivées par défaut. Toutes les fonctions marchent sans IA ; l\'IA ne fait qu\'aider à structurer, résumer, traduire et rédiger.';
+
+  @override
+  String get aiErrAuth => 'Clé d\'API refusée par le fournisseur.';
+
+  @override
+  String get aiErrNetwork =>
+      'Service injoignable. Vérifiez la connexion et l\'adresse.';
+
+  @override
+  String aiErrOther(String code) {
+    return 'Erreur du fournisseur ($code).';
+  }
+
+  @override
+  String get aiErrRateLimited =>
+      'Quota atteint chez le fournisseur. Réessayez plus tard.';
+
+  @override
+  String get aiErrTimeout => 'Le fournisseur n\'a pas répondu à temps.';
+
+  @override
+  String get aiFieldAmount => 'Montant';
+
+  @override
+  String get aiFieldApplicationUrl => 'Lien de candidature';
+
+  @override
+  String get aiFieldAudience => 'Public visé';
+
+  @override
+  String get aiFieldCategory => 'Catégorie';
+
+  @override
+  String get aiFieldCountry => 'Pays';
+
+  @override
+  String get aiFieldCurrency => 'Devise';
+
+  @override
+  String get aiFieldOrganization => 'Organisme';
+
+  @override
+  String get aiFields => 'Informations extraites par l\'IA';
+
+  @override
+  String get aiKey => 'Clé d\'API';
+
+  @override
+  String get aiKeyHelp =>
+      'Conservée dans le trousseau sécurisé du système, jamais dans la base ni dans les journaux.';
+
+  @override
+  String get aiKeyMissing => 'clé manquante';
+
+  @override
+  String get aiKeyReplace =>
+      'Nouvelle clé d\'API (laisser vide pour garder l\'actuelle)';
+
+  @override
+  String get aiKind => 'Fournisseur';
+
+  @override
+  String get aiKindLmStudio => 'LM Studio (sur cet ordinateur)';
+
+  @override
+  String get aiKindOllama => 'Ollama (sur cet ordinateur)';
+
+  @override
+  String get aiKindOpenAi => 'Compatible OpenAI (adresse personnalisée)';
+
+  @override
+  String get aiLocal => 'sur cet ordinateur';
+
+  @override
+  String get aiLocalHelp =>
+      'Modèle exécuté sur cet ordinateur : aucune donnée ne quitte la machine, aucun consentement n\'est demandé.';
+
+  @override
+  String get aiModel => 'Modèle';
+
+  @override
+  String get aiModelHelp =>
+      'Nom exact du modèle ; « Tester » liste les modèles disponibles.';
+
+  @override
+  String aiModelNotListed(String model) {
+    return 'Le modèle « $model » n\'apparaît pas dans la liste : choisissez-en un ci-dessous.';
+  }
+
+  @override
+  String aiModelsAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count modèles disponibles',
+      one: '1 modèle disponible',
+      zero: 'Aucun modèle listé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiMoveDown => 'Descendre dans l\'ordre de repli';
+
+  @override
+  String get aiMoveUp => 'Monter dans l\'ordre de repli';
+
+  @override
+  String get aiNoProvider => 'Aucun fournisseur configuré.';
+
+  @override
+  String get aiProviderAdded =>
+      'Fournisseur ajouté. Utilisez « Tester » pour vérifier la connexion.';
+
+  @override
+  String get aiProviders => 'Fournisseurs et ordre de repli';
+
+  @override
+  String get aiProvidersHelp =>
+      'Les fournisseurs sont essayés dans cet ordre ; en dernier recours, l\'application utilise ses règles sans IA.';
+
+  @override
+  String get aiPurposeContent =>
+      'Le texte nécessaire à la tâche (requête ou annonce publique)';
+
+  @override
+  String get aiPurposeCv =>
+      'Le texte de votre CV, sans nom, courriel, téléphone ni liens';
+
+  @override
+  String get aiPurposeProfile =>
+      'Votre profil anonymisé (formations, expériences, compétences, langues)';
+
+  @override
+  String get aiRemote => 'service en ligne';
+
+  @override
+  String get aiRemoteHelp =>
+      'Service en ligne : un consentement vous sera demandé avant le premier envoi, et chaque envoi sera journalisé.';
+
+  @override
+  String get aiRouting => 'Modèle par tâche';
+
+  @override
+  String get aiRoutingAuto => 'Automatique (ordre de repli)';
+
+  @override
+  String get aiRoutingHelp =>
+      'Choisissez un fournisseur précis pour certaines tâches.';
+
+  @override
+  String get aiRule1 =>
+      'Les valeurs extraites sont vérifiées dans le texte de l\'annonce ; sinon elles sont marquées « Non vérifiable ».';
+
+  @override
+  String get aiRule2 =>
+      'Le score de pertinence reste calculé sans IA, de façon explicable.';
+
+  @override
+  String get aiRule3 =>
+      'Les brouillons n\'utilisent que votre profil validé ; tout ajout inventé est signalé.';
+
+  @override
+  String get aiRule4 =>
+      'Les modèles locaux (Ollama, LM Studio) ne font sortir aucune donnée de l\'ordinateur.';
+
+  @override
+  String get aiSummary => 'Résumé généré par l\'IA';
+
+  @override
+  String get aiTaskCv => 'Analyse de CV';
+
+  @override
+  String get aiTaskDrafting => 'Rédaction de documents';
+
+  @override
+  String get aiTaskExtraction => 'Analyse des annonces';
+
+  @override
+  String get aiTaskQuery => 'Interprétation des recherches';
+
+  @override
+  String get aiTaskTranslation => 'Traduction';
+
+  @override
+  String get aiTest => 'Tester';
+
+  @override
+  String get aiTestFailed => 'échec du test';
+
+  @override
+  String aiTestOk(String date) {
+    return 'testé le $date';
+  }
+
+  @override
+  String get aiTestSuccess => 'Connexion réussie';
+
+  @override
+  String get aiTitle => 'Intelligence artificielle';
+
+  @override
+  String get aiTranslate => 'Traduire';
+
+  @override
+  String get aiUnavailable =>
+      'L\'IA n\'a pas pu traiter la demande ; les informations sans IA restent affichées.';
+
+  @override
+  String get aiUsage => 'Consommation';
+
+  @override
+  String get aiUsageCache => 'Cache';
+
+  @override
+  String get aiUsageCalls => 'Appels';
+
+  @override
+  String get aiUsageDay => 'Jour';
+
+  @override
+  String get aiUsageEmpty => 'Aucun appel pour l\'instant.';
+
+  @override
+  String get aiUsageErrors => 'Erreurs';
+
+  @override
+  String get aiUsageHelp =>
+      '30 derniers jours, par fournisseur. Les jetons sont ceux déclarés par le fournisseur.';
+
+  @override
+  String get aiUsageProvider => 'Fournisseur';
+
+  @override
+  String get aiUsageRules => 'Repli sans IA';
+
+  @override
+  String get aiUsageTokens => 'Jetons';
+
+  @override
+  String get aiWithout => 'Continuer sans IA';
+
+  @override
+  String get commonRefresh => 'Actualiser';
+
+  @override
+  String get cvUseAi => 'Analyser avec l\'IA';
+
+  @override
+  String get cvUseAiHelp =>
+      'Le texte du CV est envoyé sans nom, courriel, téléphone ni liens ; chaque élément reste à valider.';
+
+  @override
+  String get genFromTemplate => 'Modèle intégré';
+
+  @override
+  String get genFromTemplateHelp =>
+      'Rédigé localement à partir de votre profil.';
+
+  @override
+  String get genWithAi => 'Rédiger avec l\'IA';
+
+  @override
+  String get genWithAiHelp =>
+      'À partir de votre profil anonymisé ; les ajouts non présents dans le profil sont signalés.';
+
+  @override
+  String get provUnverifiable => 'Non vérifiable';
+
+  @override
+  String get settingsAi => 'IA';
 }

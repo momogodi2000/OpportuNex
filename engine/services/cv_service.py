@@ -32,6 +32,10 @@ class CvService:
         return {alias: name for alias, name in rows}
 
     def upload(self, file_name: str, data: bytes, keep_file: bool) -> dict[str, Any]:
+        return self.upload_with_text(file_name, data, keep_file)[0]
+
+    def upload_with_text(self, file_name: str, data: bytes, keep_file: bool) -> tuple[dict[str, Any], str]:
+        """Deterministic parse; the extracted text is returned (never stored) for an optional AI pass."""
         mime = cv_parser.detect_mime(file_name, data)
         import_id = uuid7()
         vault_path = self.active.vault.put(data) if keep_file else None
@@ -83,6 +87,26 @@ class CvService:
                     )
                 )
             conn.execute(update(T.cv_imports).where(T.cv_imports.c.id == import_id).values(status="review"))
+        return self.get(import_id), text
+
+    def replace_with_ai(self, import_id: str, items: list[tuple[str, dict[str, Any], float]]) -> dict[str, Any]:
+        """AI items replace the rule-based ones, except identity and links (removed from the AI input)."""
+        T = self.T
+        with self.active.db.tx() as conn:
+            self._import_row(conn, import_id)
+            conn.execute(
+                delete(T.cv_extracted_items).where(
+                    T.cv_extracted_items.c.cv_import_id == import_id,
+                    T.cv_extracted_items.c.item_type.notin_(("identity", "link")),
+                )
+            )
+            for kind, payload, confidence in items:
+                conn.execute(
+                    insert(T.cv_extracted_items).values(
+                        cv_import_id=import_id, item_type=kind, payload=json.dumps(payload), confidence=confidence
+                    )
+                )
+            conn.execute(update(T.cv_imports).where(T.cv_imports.c.id == import_id).values(parser="ai"))
         return self.get(import_id)
 
     def _import_row(self, conn: Connection, import_id: str) -> dict[str, Any]:

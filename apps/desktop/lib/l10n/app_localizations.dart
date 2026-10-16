@@ -4567,6 +4567,570 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Opportunex continue dans la zone de notification pour exécuter vos veilles. Clic droit sur l\'icône pour quitter.'**
   String get trayStillRunning;
+
+  /// No description provided for @aiAddProvider.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un fournisseur'**
+  String get aiAddProvider;
+
+  /// No description provided for @aiAllow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autoriser'**
+  String get aiAllow;
+
+  /// No description provided for @aiAnalyze.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyser avec l\'IA'**
+  String get aiAnalyze;
+
+  /// No description provided for @aiAnalyzed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse terminée : {applied} champs vérifiés ajoutés, {unverifiable} non vérifiables'**
+  String aiAnalyzed(int applied, int unverifiable);
+
+  /// No description provided for @aiBaseUrl.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse du service (facultatif)'**
+  String get aiBaseUrl;
+
+  /// No description provided for @aiBaseUrlHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'HTTPS obligatoire, sauf pour un serveur sur cet ordinateur.'**
+  String get aiBaseUrlHelp;
+
+  /// No description provided for @aiBaseUrlRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse du service'**
+  String get aiBaseUrlRequired;
+
+  /// No description provided for @aiConsentGiven.
+  ///
+  /// In fr, this message translates to:
+  /// **'consentement donné'**
+  String get aiConsentGiven;
+
+  /// No description provided for @aiConsentIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour cette action, Opportunex doit envoyer des données à {provider}, un service en ligne :'**
+  String aiConsentIntro(String provider);
+
+  /// No description provided for @aiConsentNever.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre nom, vos coordonnées, vos liens et vos identifiants ne sont jamais envoyés. Chaque envoi est inscrit dans le tableau de bord de confidentialité.'**
+  String get aiConsentNever;
+
+  /// No description provided for @aiConsentRevoke.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pourrez retirer ce consentement à tout moment dans Paramètres > Confidentialité.'**
+  String get aiConsentRevoke;
+
+  /// No description provided for @aiConsentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer des données à {provider} ?'**
+  String aiConsentTitle(String provider);
+
+  /// No description provided for @aiDeleteConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le fournisseur et sa clé (retirée du trousseau du système) seront supprimés.'**
+  String get aiDeleteConfirm;
+
+  /// No description provided for @aiDisplayName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom affiché'**
+  String get aiDisplayName;
+
+  /// No description provided for @aiEnable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer les fonctions d\'IA'**
+  String get aiEnable;
+
+  /// No description provided for @aiEnableHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactivées par défaut. Toutes les fonctions marchent sans IA ; l\'IA ne fait qu\'aider à structurer, résumer, traduire et rédiger.'**
+  String get aiEnableHelp;
+
+  /// No description provided for @aiErrAuth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé d\'API refusée par le fournisseur.'**
+  String get aiErrAuth;
+
+  /// No description provided for @aiErrNetwork.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service injoignable. Vérifiez la connexion et l\'adresse.'**
+  String get aiErrNetwork;
+
+  /// No description provided for @aiErrOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur du fournisseur ({code}).'**
+  String aiErrOther(String code);
+
+  /// No description provided for @aiErrRateLimited.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quota atteint chez le fournisseur. Réessayez plus tard.'**
+  String get aiErrRateLimited;
+
+  /// No description provided for @aiErrTimeout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le fournisseur n\'a pas répondu à temps.'**
+  String get aiErrTimeout;
+
+  /// No description provided for @aiFieldAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant'**
+  String get aiFieldAmount;
+
+  /// No description provided for @aiFieldApplicationUrl.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lien de candidature'**
+  String get aiFieldApplicationUrl;
+
+  /// No description provided for @aiFieldAudience.
+  ///
+  /// In fr, this message translates to:
+  /// **'Public visé'**
+  String get aiFieldAudience;
+
+  /// No description provided for @aiFieldCategory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catégorie'**
+  String get aiFieldCategory;
+
+  /// No description provided for @aiFieldCountry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pays'**
+  String get aiFieldCountry;
+
+  /// No description provided for @aiFieldCurrency.
+  ///
+  /// In fr, this message translates to:
+  /// **'Devise'**
+  String get aiFieldCurrency;
+
+  /// No description provided for @aiFieldOrganization.
+  ///
+  /// In fr, this message translates to:
+  /// **'Organisme'**
+  String get aiFieldOrganization;
+
+  /// No description provided for @aiFields.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations extraites par l\'IA'**
+  String get aiFields;
+
+  /// No description provided for @aiKey.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé d\'API'**
+  String get aiKey;
+
+  /// No description provided for @aiKeyHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conservée dans le trousseau sécurisé du système, jamais dans la base ni dans les journaux.'**
+  String get aiKeyHelp;
+
+  /// No description provided for @aiKeyMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'clé manquante'**
+  String get aiKeyMissing;
+
+  /// No description provided for @aiKeyReplace.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle clé d\'API (laisser vide pour garder l\'actuelle)'**
+  String get aiKeyReplace;
+
+  /// No description provided for @aiKind.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fournisseur'**
+  String get aiKind;
+
+  /// No description provided for @aiKindLmStudio.
+  ///
+  /// In fr, this message translates to:
+  /// **'LM Studio (sur cet ordinateur)'**
+  String get aiKindLmStudio;
+
+  /// No description provided for @aiKindOllama.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ollama (sur cet ordinateur)'**
+  String get aiKindOllama;
+
+  /// No description provided for @aiKindOpenAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compatible OpenAI (adresse personnalisée)'**
+  String get aiKindOpenAi;
+
+  /// No description provided for @aiLocal.
+  ///
+  /// In fr, this message translates to:
+  /// **'sur cet ordinateur'**
+  String get aiLocal;
+
+  /// No description provided for @aiLocalHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle exécuté sur cet ordinateur : aucune donnée ne quitte la machine, aucun consentement n\'est demandé.'**
+  String get aiLocalHelp;
+
+  /// No description provided for @aiModel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle'**
+  String get aiModel;
+
+  /// No description provided for @aiModelHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom exact du modèle ; « Tester » liste les modèles disponibles.'**
+  String get aiModelHelp;
+
+  /// No description provided for @aiModelNotListed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le modèle « {model} » n\'apparaît pas dans la liste : choisissez-en un ci-dessous.'**
+  String aiModelNotListed(String model);
+
+  /// No description provided for @aiModelsAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aucun modèle listé} =1{1 modèle disponible} other{{count} modèles disponibles}}'**
+  String aiModelsAvailable(int count);
+
+  /// No description provided for @aiMoveDown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Descendre dans l\'ordre de repli'**
+  String get aiMoveDown;
+
+  /// No description provided for @aiMoveUp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Monter dans l\'ordre de repli'**
+  String get aiMoveUp;
+
+  /// No description provided for @aiNoProvider.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun fournisseur configuré.'**
+  String get aiNoProvider;
+
+  /// No description provided for @aiProviderAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fournisseur ajouté. Utilisez « Tester » pour vérifier la connexion.'**
+  String get aiProviderAdded;
+
+  /// No description provided for @aiProviders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fournisseurs et ordre de repli'**
+  String get aiProviders;
+
+  /// No description provided for @aiProvidersHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les fournisseurs sont essayés dans cet ordre ; en dernier recours, l\'application utilise ses règles sans IA.'**
+  String get aiProvidersHelp;
+
+  /// No description provided for @aiPurposeContent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le texte nécessaire à la tâche (requête ou annonce publique)'**
+  String get aiPurposeContent;
+
+  /// No description provided for @aiPurposeCv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le texte de votre CV, sans nom, courriel, téléphone ni liens'**
+  String get aiPurposeCv;
+
+  /// No description provided for @aiPurposeProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre profil anonymisé (formations, expériences, compétences, langues)'**
+  String get aiPurposeProfile;
+
+  /// No description provided for @aiRemote.
+  ///
+  /// In fr, this message translates to:
+  /// **'service en ligne'**
+  String get aiRemote;
+
+  /// No description provided for @aiRemoteHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service en ligne : un consentement vous sera demandé avant le premier envoi, et chaque envoi sera journalisé.'**
+  String get aiRemoteHelp;
+
+  /// No description provided for @aiRouting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle par tâche'**
+  String get aiRouting;
+
+  /// No description provided for @aiRoutingAuto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Automatique (ordre de repli)'**
+  String get aiRoutingAuto;
+
+  /// No description provided for @aiRoutingHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un fournisseur précis pour certaines tâches.'**
+  String get aiRoutingHelp;
+
+  /// No description provided for @aiRule1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les valeurs extraites sont vérifiées dans le texte de l\'annonce ; sinon elles sont marquées « Non vérifiable ».'**
+  String get aiRule1;
+
+  /// No description provided for @aiRule2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le score de pertinence reste calculé sans IA, de façon explicable.'**
+  String get aiRule2;
+
+  /// No description provided for @aiRule3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les brouillons n\'utilisent que votre profil validé ; tout ajout inventé est signalé.'**
+  String get aiRule3;
+
+  /// No description provided for @aiRule4.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les modèles locaux (Ollama, LM Studio) ne font sortir aucune donnée de l\'ordinateur.'**
+  String get aiRule4;
+
+  /// No description provided for @aiSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résumé généré par l\'IA'**
+  String get aiSummary;
+
+  /// No description provided for @aiTaskCv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse de CV'**
+  String get aiTaskCv;
+
+  /// No description provided for @aiTaskDrafting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rédaction de documents'**
+  String get aiTaskDrafting;
+
+  /// No description provided for @aiTaskExtraction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse des annonces'**
+  String get aiTaskExtraction;
+
+  /// No description provided for @aiTaskQuery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Interprétation des recherches'**
+  String get aiTaskQuery;
+
+  /// No description provided for @aiTaskTranslation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Traduction'**
+  String get aiTaskTranslation;
+
+  /// No description provided for @aiTest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tester'**
+  String get aiTest;
+
+  /// No description provided for @aiTestFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'échec du test'**
+  String get aiTestFailed;
+
+  /// No description provided for @aiTestOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'testé le {date}'**
+  String aiTestOk(String date);
+
+  /// No description provided for @aiTestSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion réussie'**
+  String get aiTestSuccess;
+
+  /// No description provided for @aiTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intelligence artificielle'**
+  String get aiTitle;
+
+  /// No description provided for @aiTranslate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Traduire'**
+  String get aiTranslate;
+
+  /// No description provided for @aiUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'IA n\'a pas pu traiter la demande ; les informations sans IA restent affichées.'**
+  String get aiUnavailable;
+
+  /// No description provided for @aiUsage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommation'**
+  String get aiUsage;
+
+  /// No description provided for @aiUsageCache.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cache'**
+  String get aiUsageCache;
+
+  /// No description provided for @aiUsageCalls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appels'**
+  String get aiUsageCalls;
+
+  /// No description provided for @aiUsageDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jour'**
+  String get aiUsageDay;
+
+  /// No description provided for @aiUsageEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun appel pour l\'instant.'**
+  String get aiUsageEmpty;
+
+  /// No description provided for @aiUsageErrors.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreurs'**
+  String get aiUsageErrors;
+
+  /// No description provided for @aiUsageHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'30 derniers jours, par fournisseur. Les jetons sont ceux déclarés par le fournisseur.'**
+  String get aiUsageHelp;
+
+  /// No description provided for @aiUsageProvider.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fournisseur'**
+  String get aiUsageProvider;
+
+  /// No description provided for @aiUsageRules.
+  ///
+  /// In fr, this message translates to:
+  /// **'Repli sans IA'**
+  String get aiUsageRules;
+
+  /// No description provided for @aiUsageTokens.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jetons'**
+  String get aiUsageTokens;
+
+  /// No description provided for @aiWithout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer sans IA'**
+  String get aiWithout;
+
+  /// No description provided for @commonRefresh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actualiser'**
+  String get commonRefresh;
+
+  /// No description provided for @cvUseAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyser avec l\'IA'**
+  String get cvUseAi;
+
+  /// No description provided for @cvUseAiHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le texte du CV est envoyé sans nom, courriel, téléphone ni liens ; chaque élément reste à valider.'**
+  String get cvUseAiHelp;
+
+  /// No description provided for @genFromTemplate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle intégré'**
+  String get genFromTemplate;
+
+  /// No description provided for @genFromTemplateHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rédigé localement à partir de votre profil.'**
+  String get genFromTemplateHelp;
+
+  /// No description provided for @genWithAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rédiger avec l\'IA'**
+  String get genWithAi;
+
+  /// No description provided for @genWithAiHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'À partir de votre profil anonymisé ; les ajouts non présents dans le profil sont signalés.'**
+  String get genWithAiHelp;
+
+  /// No description provided for @provUnverifiable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non vérifiable'**
+  String get provUnverifiable;
+
+  /// No description provided for @settingsAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'IA'**
+  String get settingsAi;
 }
 
 class _AppLocalizationsDelegate

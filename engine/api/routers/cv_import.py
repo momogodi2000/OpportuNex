@@ -8,9 +8,11 @@ from typing import Annotated, Any, Literal
 from fastapi import APIRouter, File, Form, UploadFile
 from pydantic import BaseModel
 
-from api.deps import Active
+from api.deps import Active, StateDep
 from documents.cv_parser import MAX_BYTES
+from services import ai_tasks
 from services.cv_service import CvService
+from services.profile_service import ProfileService
 
 router = APIRouter(prefix="/cv-imports", tags=["CV import"])
 
@@ -27,10 +29,24 @@ def list_imports(active: Active) -> dict[str, Any]:
 
 @router.post("", status_code=201)
 async def upload(
-    active: Active, file: Annotated[UploadFile, File()], keep_file: Annotated[bool, Form()] = False
+    active: Active,
+    state: StateDep,
+    file: Annotated[UploadFile, File()],
+    keep_file: Annotated[bool, Form()] = False,
+    use_ai: Annotated[bool, Form()] = False,
 ) -> dict[str, Any]:
     data = await file.read(MAX_BYTES + 1)
-    return await asyncio.to_thread(CvService(active).upload, file.filename or "cv", data, keep_file)
+    svc = CvService(active)
+    # Consent is checked before anything is parsed so the user is asked first (EF-14.09).
+    ai_ready = use_ai and await asyncio.to_thread(ai_tasks.preflight, active, state, "cv_parsing", ai_tasks.CV_PURPOSES)
+    result, text = await asyncio.to_thread(svc.upload_with_text, file.filename or "cv", data, keep_file)
+    if not ai_ready:
+        return result | {"ai_used": False}
+    full_name = await asyncio.to_thread(lambda: ProfileService(active).get()["general"].get("full_name"))
+    items = await ai_tasks.cv_items(active, state, text, full_name)
+    if items is None:
+        return result | {"ai_used": False}
+    return await asyncio.to_thread(svc.replace_with_ai, result["id"], items) | {"ai_used": True}
 
 
 @router.get("/{import_id}")

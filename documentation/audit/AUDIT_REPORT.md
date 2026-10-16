@@ -180,6 +180,29 @@ Bugs fixed with regression tests along the way:
 
 Tests added: `tests/test_collection_units.py` covers the JSON API and HTML list adapters, invalid adapter specs, the explicit User-Agent, conditional requests (ETag/304) and the reliability score. These were previously untested.
 
+### Phase 4 — AI gateway, consent and provenance (M07, M14)
+AI is **optional and off by default** (D-15). Every feature already worked without it in phase 3. The AI layer only structures, summarises, translates and drafts; it never computes the relevance score (arch §7).
+
+| Area | File(s) | What it does |
+| --- | --- | --- |
+| Provider adapters (EF-14.01) | `engine/ai/providers.py` | One adapter per API family: OpenAI-compatible (also Mistral, Groq, OpenRouter, LM Studio), Gemini, Anthropic, Ollama. Temperature 0 and JSON output. No tools are offered to the model. Remote addresses must use HTTPS; plain HTTP is accepted only on loopback. Keys travel in headers, never in URLs |
+| Keys (EF-14.02) | `engine/ai/secrets.py`, `services/ai_service.py` | API keys go to the OS keychain (`keyring`). The database stores only a reference. `SecretStr` keeps keys out of validation errors and logs. Keys are removed when the provider or the account is deleted |
+| Gateway (ADR-008) | `engine/ai/gateway.py` | Routed provider first, then the fallback chain (EF-14.04/05); daily cap and suspension after 429 using `Retry-After` (EF-14.06); cache keyed on task + template version + model + content (EF-14.08); strict schema validation with one corrective retry, then the next provider, then the deterministic path (EF-07.07); every attempt in `ai_usage_logs` (EF-14.07) |
+| Consent (EF-14.09) | gateway + `api/routers/ai.py` + `features/ai/ai_consent.dart` | Consent is per provider and per purpose (`ai_remote_processing`, `profile_to_ai`, `cv_parsing_ai`). The engine answers 409 `ai_consent_required` **before** sending anything, and the desktop shows who receives what. Local models need no consent. Every send is written to `data_disclosures` and shown in the privacy dashboard |
+| Minimisation (EF-14.10) | `engine/ai/anonymize.py` | The anonymised profile carries no name, contact, links or internal ids. Free text is scrubbed of e-mails, phones and URLs. CV text has the user's name removed. Letter headers (name, city) are filled in locally |
+| Injection defence (EF-07.06) | `engine/ai/prompts.py` | Versioned templates with fixed instructions. Untrusted data sits in a delimited block with a random nonce, and look-alike tags are neutralised. Suspected injections are logged in `security_events` |
+| Post-checks (arch §7.2-5, EF-07.02-04) | `engine/ai/checks.py` | A value is `explicit` only if its excerpt is found word for word in the announcement and the value is readable in it (dates in FR/EN forms, amounts by digits). Otherwise it is `inferred` or `unverifiable`. Eligibility clauses that are not verbatim are dropped. Structured data is never overwritten |
+| Features using AI | `services/ai_tasks.py` | Query interpretation (merged into the rules, restricted to reference codes); opportunity analysis and ≤ 5-line summary; translation on demand; CV parsing (items absent from the CV are dropped); document drafting from the anonymised profile, with the integrity check still applied |
+| Desktop | `features/ai/*`, search, opportunity sheet, CV import, generated documents | Settings > AI: master switch, providers (add, test and pick a model, enable, reorder, edit key, delete), routing per task, 30-day usage. Consent dialog. "Analyse with AI" and "Translate" on the sheet. AI fields shown with their provenance and excerpt. "Draft with AI" option and AI switch in CV import, both offered only when AI is on |
+
+Also fixed: `pyproject.toml` packaged only part of the engine (`search`, `documents` and `matching` were missing; `ai` is now added). Coverage now measures those packages too. A `datetime.utcnow()` deprecation was replaced.
+
+Not done in this phase, by design or for lack of a resource:
+- AI analysis runs on demand, not automatically during every search.
+- Embeddings (EF-08.07, Could) are not implemented.
+- The real providers were not called. The adapters are tested against a local server reproducing their wire formats (`tests/fixtures/fake_ai.py`).
+- The OS keychain backend is a thin `keyring` wrapper that the automated tests do not exercise, because they use an in-memory store so they never write to Windows Credential Manager.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -203,6 +226,23 @@ Phase 3 (same machine):
 | 2026-10-15 | `desktop: flutter analyze` | No issues |
 | 2026-10-15 | `desktop: flutter test` | **22 passed** (adds onboarding landing and notification deep-link rules) |
 | 2026-10-15 | `desktop: flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (17 s)**: register → recovery phrase → onboarding → "Later" → dashboard (first steps) → sources catalogue → settings → privacy dashboard → Ctrl+L lock → unlock → encrypted backup on disk |
+
+Phase 4 (same machine, 2026-10-16):
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-10-16 | `engine: pytest -q --cov` | **120 passed, 0 failed, 0 warnings**, 88 % coverage (7,628 statements, now including `ai`, `search`, `documents`, `matching`) |
+| 2026-10-16 | `engine: ruff check . · mypy .` | Clean · Clean (87 files) |
+| 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **24 passed** (adds the consent dialog: allow and retry, continue without AI) |
+| 2026-10-16 | `desktop: flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (17 s)**; also checks that AI is off and that no provider exists on a fresh profile |
+
+Traceability after phase 4 (176 requirements):
+- 13 operational end to end.
+- 20 operational engine-internal features.
+- 97 with the engine tested and the screen delivered but not walked by the E2E test.
+- 8 implemented without an automated test.
+- 15 partial.
+- 23 absent: 14 sync/organisations (phase 6) and 9 others listed in the matrix.
 
 Traceability after phase 3 (`TRACEABILITY.md`, 176 requirements):
 - 13 operational end to end.

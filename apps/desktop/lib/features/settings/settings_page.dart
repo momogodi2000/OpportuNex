@@ -13,6 +13,7 @@ import '../../core/widgets/layout.dart';
 import '../../core/widgets/password_field.dart';
 import '../../core/widgets/states.dart';
 import '../../l10n/app_localizations.dart';
+import '../ai/ai_settings_tab.dart';
 import '../auth/auth_controller.dart';
 import '../auth/auth_models.dart';
 import 'about_section.dart';
@@ -27,8 +28,8 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     return DefaultTabController(
-      length: 6,
-      initialIndex: initialTab.clamp(0, 5),
+      length: 7,
+      initialIndex: initialTab.clamp(0, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -45,6 +46,7 @@ class SettingsPage extends ConsumerWidget {
                 Tab(text: l.settingsAccount),
                 Tab(text: l.settingsPreferences),
                 Tab(text: l.settingsPrivacy),
+                Tab(text: l.settingsAi),
                 Tab(text: l.settingsBackups),
                 Tab(text: l.settingsMaintenance),
                 Tab(text: l.settingsAbout),
@@ -57,6 +59,7 @@ class SettingsPage extends ConsumerWidget {
               _AccountTab(),
               PreferencesTab(),
               PrivacyTab(),
+              AiSettingsTab(),
               _BackupsTab(),
               _MaintenanceTab(),
               AboutSection(),

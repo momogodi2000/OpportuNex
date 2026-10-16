@@ -13,6 +13,8 @@ import '../../core/widgets/layout.dart';
 import '../../core/widgets/opportunity_widgets.dart';
 import '../../core/widgets/states.dart';
 import '../../l10n/app_localizations.dart';
+import '../ai/ai_consent.dart';
+import '../ai/ai_repository.dart';
 
 final opportunityProvider = FutureProvider.autoDispose.family<Json, String>(
     (ref, id) => requireApi(ref).getJson('/opportunities/$id'));
@@ -43,6 +45,10 @@ class _Sheet extends ConsumerWidget {
     final overview = d.obj('overview');
     final relevance = d.objOrNull('relevance');
     final fields = d.obj('fields');
+    final aiOn = ref.watch(aiAvailableProvider).valueOrNull ?? false;
+    final aiFields = fields.entries
+        .where((e) => e.value is Map && (e.value as Map)['extracted_by'] == 'ai' && e.key != 'ai_summary')
+        .toList();
     final savedId = d.str('saved_id');
 
     Future<void> run(Future<void> Function() fn, String done) async {
@@ -85,6 +91,10 @@ class _Sheet extends ConsumerWidget {
                 await run(() => api.postJson('/opportunities/$id/recheck'), l.oppRechecked);
               case 'workspace':
                 await _addToWorkspace(context, ref);
+              case 'ai_analyze':
+                await _analyze(context, ref);
+              case 'ai_translate':
+                await _translate(context, ref);
               default:
                 await run(() => api.postJson('/opportunities/$id/feedback', body: {'feedback': v}), l.oppFeedbackThanks);
                 if (v == 'dismissed' && context.mounted && context.canPop()) context.pop();
@@ -93,6 +103,11 @@ class _Sheet extends ConsumerWidget {
           itemBuilder: (_) => [
             PopupMenuItem(value: 'recheck', child: ListTile(leading: const Icon(Icons.refresh), title: Text(l.oppRecheck))),
             PopupMenuItem(value: 'workspace', child: ListTile(leading: const Icon(Icons.folder_outlined), title: Text(l.oppAddWorkspace))),
+            if (aiOn) ...[
+              const PopupMenuDivider(),
+              PopupMenuItem(value: 'ai_analyze', child: ListTile(leading: const Icon(Icons.auto_awesome), title: Text(l.aiAnalyze))),
+              PopupMenuItem(value: 'ai_translate', child: ListTile(leading: const Icon(Icons.translate), title: Text(l.aiTranslate))),
+            ],
             const PopupMenuDivider(),
             PopupMenuItem(value: 'relevant', child: ListTile(leading: const Icon(Icons.thumb_up_outlined), title: Text(l.oppRelevant))),
             PopupMenuItem(value: 'not_relevant', child: ListTile(leading: const Icon(Icons.thumb_down_outlined), title: Text(l.oppNotRelevant))),
@@ -113,6 +128,10 @@ class _Sheet extends ConsumerWidget {
                 _Field(label: l.oppSummary, value: overview.string('summary'), field: fields.objOrNull('summary')),
                 const SizedBox(height: Space.md),
               ],
+              if (fields.objOrNull('ai_summary') != null) ...[
+                _Field(label: l.aiSummary, value: fields.obj('ai_summary').string('value_text'), field: fields.obj('ai_summary')),
+                const SizedBox(height: Space.md),
+              ],
               _Kv(l.oppLocation, [overview.str('location_text'), overview.str('country_code')].whereType<String>().join(', ')),
               _Kv(l.filterWorkMode, _workMode(l, overview.str('work_mode'))),
               _Kv(l.oppPublished, Fmt.date(context, overview.str('published_on'))),
@@ -126,6 +145,18 @@ class _Sheet extends ConsumerWidget {
             _Section(l.oppDeadline, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _Field(label: l.oppDeadline, value: Fmt.date(context, d.obj('deadline').str('date')), field: fields.objOrNull('deadline_on')),
             ])),
+            if (aiFields.isNotEmpty)
+              _Section(l.aiFields, Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                for (final e in aiFields) ...[
+                  Text(aiFieldLabel(l, e.key), style: context.text.labelLarge),
+                  _Field(
+                    label: aiFieldLabel(l, e.key),
+                    value: (e.value as Json).str('value_text') ?? l.commonNotSpecified,
+                    field: e.value as Json,
+                  ),
+                  const SizedBox(height: Space.sm),
+                ],
+              ])),
             _Section(l.oppEligibility, d.obj('eligibility').strings('clauses').isEmpty
                 ? Text(l.oppNoCriteria)
                 : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -176,6 +207,64 @@ class _Sheet extends ConsumerWidget {
         }),
       ]),
     );
+  }
+
+  String _lang(BuildContext context) => Localizations.localeOf(context).languageCode == 'en' ? 'en' : 'fr';
+
+  /// EF-07.01-05: AI analysis; only values verified against the announcement are applied.
+  Future<void> _analyze(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final api = ref.read(apiClientProvider)!;
+    try {
+      final r = await withAiConsent(context, ref,
+          () => api.postJson('/opportunities/$id/analyze', body: {'language': _lang(context)}));
+      if (r == null || !context.mounted) return;
+      ref.invalidate(opportunityProvider(id));
+      if (r.str('status') == 'analyzed') {
+        showSuccess(context, l.aiAnalyzed(r.strings('applied').length, r.strings('unverifiable').length));
+      } else {
+        showError(context, l.aiUnavailable);
+      }
+    } on Object catch (e) {
+      if (context.mounted) showError(context, e);
+    }
+  }
+
+  /// EF-07.08: translation on demand, labelled as generated and never stored as source data.
+  Future<void> _translate(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final api = ref.read(apiClientProvider)!;
+    final target = _lang(context) == 'fr' && d.obj('overview').str('language_code') == 'fr' ? 'en' : _lang(context);
+    try {
+      final r = await withAiConsent(context, ref,
+          () => api.postJson('/opportunities/$id/translate', body: {'language': target}));
+      if (r == null || !context.mounted) return;
+      if (r.str('status') != 'translated') {
+        showError(context, l.aiUnavailable);
+        return;
+      }
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(r.string('title')),
+          content: SizedBox(
+            width: 640,
+            child: SingleChildScrollView(
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const StatusBadge(kind: 'generated'),
+                const SizedBox(height: Space.md),
+                for (final s in r.strings('summary')) Text('• $s'),
+                const SizedBox(height: Space.md),
+                SelectableText(r.string('description')),
+              ]),
+            ),
+          ),
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l.commonClose))],
+        ),
+      );
+    } on Object catch (e) {
+      if (context.mounted) showError(context, e);
+    }
   }
 
   Future<void> _addToWorkspace(BuildContext context, WidgetRef ref) async {
@@ -443,3 +532,17 @@ class _Verification extends StatelessWidget {
     ]);
   }
 }
+
+String aiFieldLabel(AppLocalizations l, String name) => switch (name) {
+      'organization_name' => l.aiFieldOrganization,
+      'deadline_on' => l.oppDeadline,
+      'amount' => l.aiFieldAmount,
+      'currency' => l.aiFieldCurrency,
+      'country_code' => l.aiFieldCountry,
+      'work_mode' => l.filterWorkMode,
+      'category' => l.aiFieldCategory,
+      'target_audience' => l.aiFieldAudience,
+      'application_url' => l.aiFieldApplicationUrl,
+      'eligibility_raw' => l.oppEligibility,
+      _ => name,
+    };

@@ -45,8 +45,8 @@ class TrackingRepository {
   Future<Uint8List> ics() => _api.getBytes('/applications/calendar.ics');
 
   Future<List<Json>> generated(String savedId) async => items(await _api.getJson('/saved/$savedId/generated'));
-  Future<Json> generate(String savedId, String type, String lang) =>
-      _api.postJson('/saved/$savedId/generated', body: {'doc_type': type, 'language': lang});
+  Future<Json> generate(String savedId, String type, String lang, {bool useAi = false}) =>
+      _api.postJson('/saved/$savedId/generated', body: {'doc_type': type, 'language': lang, 'use_ai': useAi});
   Future<Json> generatedDoc(String id) => _api.getJson('/generated/$id');
   Future<Json> saveVersion(String id, String content) => _api.postJson('/generated/$id/versions', body: {'content': content});
   Future<void> deleteGenerated(String id) => _api.delete('/generated/$id');

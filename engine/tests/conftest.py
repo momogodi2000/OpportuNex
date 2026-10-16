@@ -35,7 +35,7 @@ def data_dir(tmp_path: Path) -> Path:
 @pytest.fixture
 def settings(data_dir: Path) -> Settings:
     # Low Argon2 cost keeps the suite fast; production keeps 64 MiB / 3 iterations.
-    return Settings(data_dir=data_dir, kdf_memory_kib=1024, kdf_iterations=1)
+    return Settings(data_dir=data_dir, kdf_memory_kib=1024, kdf_iterations=1, secret_store="memory")
 
 
 class EngineClient:
@@ -128,7 +128,9 @@ def site() -> Iterator[FixtureSite]:
 
 @pytest.fixture
 def client(tmp_path: Path) -> Iterator[EngineClient]:
-    settings = Settings(data_dir=tmp_path / "PIO", kdf_memory_kib=1024, kdf_iterations=1, allow_private_network=True)
+    settings = Settings(
+        data_dir=tmp_path / "PIO", kdf_memory_kib=1024, kdf_iterations=1, allow_private_network=True, secret_store="memory"
+    )
     token = secrets.token_urlsafe(32)
     with TestClient(create_app(settings, token), base_url="http://127.0.0.1", raise_server_exceptions=False) as tc:
         c = EngineClient(tc, token)

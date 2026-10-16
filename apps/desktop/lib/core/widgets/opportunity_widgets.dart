@@ -30,6 +30,7 @@ class StatusBadge extends StatelessWidget {
       'explicit' => (s.success, s.onSuccess, Icons.format_quote, l.provExplicit),
       'generated' => (s.ai, s.onAi, Icons.auto_awesome, l.provGenerated),
       'not_specified' => (s.neutral, s.onNeutral, Icons.remove, l.commonNotSpecified),
+      'unverifiable' => (s.warning, s.onWarning, Icons.report_gmailerrorred_outlined, l.provUnverifiable),
       _ => (s.neutral, s.onNeutral, Icons.label_outline, kind),
     };
     return Semantics(
