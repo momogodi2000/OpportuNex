@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/api_client.dart' show Json;
 import '../../core/api/json.dart';
 import '../../core/format.dart';
+import '../../core/ref_data.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/layout.dart';
@@ -48,7 +49,7 @@ class FiltersPanel extends ConsumerWidget {
         ])),
         _Row(label: l.filterCountries, child: Wrap(spacing: Space.xs, runSpacing: Space.xs, children: [
           for (final code in selectedCountries)
-            InputChip(label: Text(_countryName(countries, code, lang)),
+            InputChip(label: Text(countryName(countries, code, lang)),
                 onDeleted: () => _set('countries', [...selectedCountries]..remove(code))),
           _AddMenu(
             label: l.filterAdd,
@@ -85,9 +86,16 @@ class FiltersPanel extends ConsumerWidget {
           if (filters.str('deadline_before') != null)
             IconButton(tooltip: l.commonDelete, icon: const Icon(Icons.clear), onPressed: () => _set('deadline_before', null)),
         ])),
-        _Row(label: l.filterIncludeExpired, child: Switch(
-          value: filters.flag('include_expired'),
-          onChanged: (v) => _set('include_expired', v),
+        // Left-aligned with its label, and labelled for screen readers.
+        _Row(label: l.filterIncludeExpired, child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Semantics(
+            label: l.filterIncludeExpired,
+            child: Switch(
+              value: filters.flag('include_expired'),
+              onChanged: (v) => _set('include_expired', v),
+            ),
+          ),
         )),
         if (filters.integer('amount_min') != null)
           _Row(label: l.filterAmountMin, child: InputChip(
@@ -102,8 +110,6 @@ class FiltersPanel extends ConsumerWidget {
   String? _catName(List<Json> cats, String code, String lang) =>
       cats.where((c) => c.str('code') == code).map((c) => c.string(lang == 'en' ? 'name_en' : 'name_fr')).firstOrNull;
 
-  String _countryName(List<Json> countries, String code, String lang) =>
-      countries.where((c) => c.str('code') == code).map((c) => c.string(lang == 'en' ? 'name_en' : 'name_fr')).firstOrNull ?? code;
 }
 
 class _Row extends StatelessWidget {

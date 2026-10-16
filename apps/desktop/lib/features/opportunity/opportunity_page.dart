@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/json.dart';
 import '../../core/format.dart';
+import '../../core/ref_data.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/feedback.dart';
@@ -132,7 +133,10 @@ class _Sheet extends ConsumerWidget {
                 _Field(label: l.aiSummary, value: fields.obj('ai_summary').string('value_text'), field: fields.obj('ai_summary')),
                 const SizedBox(height: Space.md),
               ],
-              _Kv(l.oppLocation, [overview.str('location_text'), overview.str('country_code')].whereType<String>().join(', ')),
+              _Kv(l.oppLocation, [
+                overview.str('location_text'),
+                if (overview.str('country_code') != null) ref.country(context, overview.string('country_code')),
+              ].whereType<String>().join(', ')),
               _Kv(l.filterWorkMode, _workMode(l, overview.str('work_mode'))),
               _Kv(l.oppPublished, Fmt.date(context, overview.str('published_on'))),
               if ((overview.str('description') ?? '').isNotEmpty)
@@ -407,12 +411,12 @@ class _Requirements extends StatelessWidget {
   }
 }
 
-class _Relevance extends StatelessWidget {
+class _Relevance extends ConsumerWidget {
   const _Relevance(this.r);
   final Json r;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final names = {'skills': l.critSkills, 'education': l.critEducation, 'experience': l.critExperience,
         'location': l.critLocation, 'language': l.critLanguage, 'objectives': l.critObjectives, 'deadline': l.critDeadline};
@@ -447,7 +451,7 @@ class _Relevance extends StatelessWidget {
       if (r.strings('strengths').isNotEmpty) ...[
         const SizedBox(height: Space.sm),
         Text(l.oppStrengths, style: context.text.labelLarge),
-        for (final s in r.strings('strengths')) Text('• ${strengthLabel(l, s)}', style: context.text.bodySmall),
+        for (final s in r.strings('strengths')) Text('• ${strengthLabel(l, s, country: (c) => ref.country(context, c))}', style: context.text.bodySmall),
       ],
     ]);
   }
@@ -461,7 +465,7 @@ String _eligibility(AppLocalizations l, String v) => switch (v) {
     };
 
 /// Matching strengths (`kind:value`) in plain words (EF-08.03).
-String strengthLabel(AppLocalizations l, String code) {
+String strengthLabel(AppLocalizations l, String code, {String Function(String code)? country}) {
   final kind = code.split(':').first;
   final value = _humanize(code);
   return switch (kind) {
@@ -469,7 +473,7 @@ String strengthLabel(AppLocalizations l, String code) {
     'education_ok' => l.strEducation(educationLevelLabel(l, value)),
     'experience_ok' => l.strExperience(value),
     'remote' => l.strRemote,
-    'location' => l.strLocation(value),
+    'location' => l.strLocation(country?.call(value) ?? value),
     'languages_ok' => l.strLanguages,
     'objective' => l.strObjective(categoryLabel(l, value)),
     _ => value,

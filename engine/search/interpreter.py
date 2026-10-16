@@ -303,10 +303,14 @@ def interpret(text: str, countries: dict[str, str], today: date | None = None) -
     for term in sorted(consumed, key=len, reverse=True):
         remaining = remaining.replace(f" {term} ", " ")
     words = [w for w in fold_words(remaining).split() if w not in STOPWORDS and len(w) > 2 and not w.isdigit()]
+    # Keywords keep the user's spelling ("données", not "donnees"): they are shown as editable chips and
+    # sent to sources that search server-side; local matching and FTS ignore accents anyway.
+    typed = {fold(w): w.lower() for w in re.findall(r"\w+", text)}
     keywords: list[str] = []
     for w in words:
-        if w not in keywords:
-            keywords.append(w)
+        shown = typed.get(w, w)
+        if shown not in keywords:
+            keywords.append(shown)
         for syn in SYNONYMS.get(w, []):
             if syn not in keywords:
                 keywords.append(syn)

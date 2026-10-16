@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../api/api_client.dart';
 import '../api/json.dart';
 import '../format.dart';
+import '../ref_data.dart';
 import '../theme/app_theme.dart';
 import '../theme/tokens.dart';
 
@@ -155,7 +157,9 @@ class OpportunityCard extends StatelessWidget {
                 Wrap(spacing: Space.md, runSpacing: Space.xs, children: [
                   if (data.str('organization_name') != null) _Meta(Icons.apartment, data.string('organization_name')),
                   _Meta(Icons.category_outlined, categoryLabel(l, data.str('category'))),
-                  if (data.str('country_code') != null) _Meta(Icons.place_outlined, data.string('country_code')),
+                  if (data.str('country_code') != null)
+                    Consumer(builder: (context, ref, _) =>
+                        _Meta(Icons.place_outlined, ref.country(context, data.string('country_code')))),
                   _Meta(Icons.event, daysLeft == null
                       ? l.deadlineUnknownShort
                       : '${Fmt.date(context, data.str('deadline_on'))} · ${l.daysLeft(daysLeft)}'),

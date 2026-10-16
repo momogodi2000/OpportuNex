@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/json.dart';
 
+export '../../core/ref_data.dart' show refCountriesProvider;
+
 class SearchRepository {
   SearchRepository(this._api);
   final ApiClient _api;
@@ -38,8 +40,6 @@ final searchRepositoryProvider = Provider<SearchRepository>((ref) => SearchRepos
 
 final refCategoriesProvider = FutureProvider<List<Json>>((ref) async =>
     items(await requireApi(ref).getJson('/ref/categories')));
-final refCountriesProvider = FutureProvider<List<Json>>((ref) async =>
-    items(await requireApi(ref).getJson('/ref/countries')));
 final refLanguagesProvider = FutureProvider<List<Json>>((ref) async =>
     items(await requireApi(ref).getJson('/ref/languages')));
 final refObjectivesProvider = FutureProvider<List<Json>>((ref) async =>

@@ -27,7 +27,12 @@ Première version complète, reconstruite sur une base auditée (`documentation/
 - Licence GNU AGPL v3 complète, `NOTICE`, `AUTHORS`, `TRADEMARKS.md`, `SECURITY.md`, `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md` et inventaire des 179 composants tiers avec leurs licences (`THIRD_PARTY_NOTICES.md`).
 
+- Guide utilisateur Word (`documentation/user-guide/`), illustré de captures réelles de la version 1.0.0.
+
 ### Corrigé
+- Les mots-clés de recherche gardent leurs accents (« données » au lieu de « donnees »).
+- Les pays s'affichent par leur nom (« Cameroun ») et non par leur code dans les résultats et la fiche.
+- L'option « Inclure les expirées » est alignée sur son libellé et annoncée par les lecteurs d'écran.
 - Le moteur restait actif quand l'application était fermée de force ou plantait, et bloquait le lancement
   suivant (« déjà en cours d'exécution ») : il s'arrête désormais avec l'application (`--parent-pid`).
 

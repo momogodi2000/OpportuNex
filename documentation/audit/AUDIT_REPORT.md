@@ -306,6 +306,32 @@ Found and fixed while doing it:
 - **Orphan engine after a crash.** Testing the installed build showed that when the app is killed or crashes, the engine keeps running. It then holds the single-instance lock, so the next launch fails with "already running". The cause: the UI closes stdin after sending the token, so the engine has no way to notice. The UI now passes `--parent-pid` and the engine shuts down when that process ends (`core/parent_watch.py`, two regression tests, one of them with a real engine process).
 - `ruff format` had never been applied to the engine; it is now, so the CI format check is meaningful.
 
+### Phase 8 — User guide with real screenshots
+**Deliverable.** `documentation/user-guide/Guide_Utilisateur_Opportunex.docx` is a French user guide for version 1.0.0: 53 pages, 19 chapters plus cover, document information, version history and a table of contents computed by Word. It has 41 figures with captions and explanations.
+
+It covers the 24 items requested:
+- installation and removal on Windows, and on Debian/Ubuntu (labelled as not yet verified);
+- first launch, the interface and every module, with step-by-step procedures;
+- data operations, search, filters and export, accounts and roles, files, backup and restore;
+- error messages and start-up troubleshooting, security, FAQ, glossary, support and annexes.
+
+A table at the start labels each feature as available, limited or unavailable, consistent with `TRACEABILITY.md`. Each claim was checked against the code: labels from the ARB files, limits and defaults from the engine.
+
+**Screenshots** (`documentation/user-guide/screenshots/`, all from the real version 1.0.0):
+- **Installer.** The installer pages and the installed application come from the real `dist/windows` installer, captured window by window by `tools/capture_installer.ps1`. It uses UI Automation and Win32 button messages, and PrintWindow, so nothing else on the screen is captured.
+- **Application.** The application screens come from the UI tour integration test, which drives the real app and the real engine. Its sample data is now explicitly fictional ("Université Exemple", "Banque Exemple"). The tour also gained the new-search, command-palette and recovery screens.
+- **Privacy.** Paths showing the Windows user name are pixelated. The annotated main screen is marked as annotated.
+
+`build_guide.py` regenerates the document. `tools/finalize_with_word.ps1` fills the table of contents and can export a PDF.
+
+**Videos: not produced.** ffmpeg is not installed, and installing it needs the owner's approval. `tools/record_video.ps1` records the real application window on a throw-away data folder once ffmpeg is present.
+
+Found and fixed while capturing:
+- **Keyword chips dropped accents.** They showed "donnees" for "données". The interpreter now keeps the typed spelling; matching and full-text search stay accent-insensitive (regression test).
+- **"Include expired" switch.** It floated in the middle of its row and had no accessible label (the tour's accessibility check reported it). It is now aligned with its label and labelled.
+- **Raw country codes.** Result cards, the opportunity sheet and the "strengths" list showed "CM" instead of "Cameroun". There is now a shared `core/ref_data.dart` helper (regression test).
+- **Stale sync state in the tour.** The tour linked sync through the API without refreshing the account, so the sidebar said "Mode local" while synced. It now reloads the account, as the Settings screen does.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -372,6 +398,17 @@ Phase 7 (2026-10-16):
 | 2026-10-16 | Rebuilt installer, app killed twice | Engine exits within 6 s each time; relaunch starts normally (no `already_running`) |
 | 2026-10-16 | Silent uninstall | Exit 0; program folder, shortcut and uninstall registry key removed; user data kept |
 | — | `.deb` build and install test, sync-server image | **Not run**: Docker does not start on this machine |
+
+Phase 8 (2026-10-16):
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-10-16 | `engine: pytest -q --cov` | **130 passed**, 89 % coverage; ruff, ruff format --check and mypy clean |
+| 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **60 passed** |
+| 2026-10-16 | `flutter test integration_test/ui_tour_test.dart -d windows` | **1 passed (5 min 50 s)**: 0 layout problems; the unlabelled switch on the search page is fixed |
+| 2026-10-16 | `tools/capture_installer.ps1` | 7 captures from the real installer and installed app; silent uninstall OK |
+| 2026-10-16 | `build_guide.py` + `tools/finalize_with_word.ps1` (Word 16) | 41 figures, 53 pages, table of contents filled |
+| 2026-10-16 | Packaged app at rest (portable build, welcome screen) | Window 109 MB + engine 133 MB working set; engine exits when the app is killed |
 
 Traceability after phase 6 (176 requirements):
 - 15 operational end to end.

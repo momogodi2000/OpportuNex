@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -12,9 +13,11 @@ import 'package:opportunex/core/api/json.dart';
 import 'package:opportunex/core/engine/engine_supervisor.dart';
 import 'package:opportunex/core/prefs/ui_prefs.dart';
 import 'package:opportunex/core/router/app_router.dart';
+import 'package:opportunex/features/auth/auth_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// UI tour: the real app against the real engine and a local publisher, with realistic data.
+/// UI tour: the real app against the real engine and a local publisher, with realistic but fictional data
+/// (people, institutions and offers are invented: the screenshots are reused in the user guide).
 ///
 /// Saves a PNG of every page (light, dark, minimum window size, English) under `build/ui_tour/`
 /// and records every layout error (overflow, exceptions) per page in `build/ui_tour/report.txt`.
@@ -147,12 +150,15 @@ void main() {
     final api = container.read(apiClientProvider)!;
     late final Map<String, String> ids;
     await tester.runAsync(() async => ids = await _seed(api, site, sync));
+    // The seed linked sync through the API, not the Settings screen: reload the account as that screen does.
+    await tester.runAsync(() => container.read(authControllerProvider.notifier).refresh());
 
     await go('/onboarding', '05_onboarding_filled');
     await go('/dashboard', '06_dashboard');
 
     final pages = <(String, String)>[
       ('/dashboard', 'dashboard'),
+      ('/search?q=bourse de master en données au Cameroun', 'search'),
       ('/search?run=${ids['run']}', 'search_results'),
       ('/opportunities/${ids['opp']}', 'opportunity'),
       ('/saved', 'saved_list'),
@@ -182,6 +188,16 @@ void main() {
       await go(path, 'light_$name');
       await audit('light_$name');
     }
+
+    // Command palette (Ctrl+K) over the dashboard.
+    await go('/dashboard', 'light_dashboard');
+    await tester.tap(find.byType(Scaffold).first, warnIfMissed: false);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyK);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await shot('light_palette');
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await settle();
 
     await container.read(uiPrefsProvider.notifier).setTheme(ThemeMode.dark);
     for (final (path, name) in pages) {
@@ -214,6 +230,8 @@ void main() {
     await tester.runAsync(() => api.postJson('/auth/lock'));
     await waitFor(find.text('Profil verrouillé'));
     await shot('99_locked');
+    await tester.tap(find.text('Mot de passe oublié ?').first, warnIfMissed: false);
+    await shot('99_recover');
 
     FlutterError.onError = previousOnError;
     semantics.dispose();
@@ -244,11 +262,11 @@ Future<Map<String, String>> _seed(ApiClient api, _Publisher site, _SyncServer sy
     'bio': 'Analyste de données passionnée par la statistique appliquée au développement.',
   });
   await api.postJson('/profile/education', body: {
-    'level': 'Master', 'field_of_study': 'Statistique et économie appliquée', 'institution': 'Université de Yaoundé II',
+    'level': 'Master', 'field_of_study': 'Statistique et économie appliquée', 'institution': 'Université Exemple',
     'country_code': 'CM', 'start_date': '2017-09', 'end_date': '2019-07',
   });
   await api.postJson('/profile/experiences', body: {
-    'job_title': 'Analyste de données', 'employer': 'Banque Atlantique', 'employment_type': 'full_time',
+    'job_title': 'Analyste de données', 'employer': 'Banque Exemple', 'employment_type': 'full_time',
     'country_code': 'CM', 'city': 'Douala', 'start_date': '2021-02', 'is_current': true,
     'description': 'Tableaux de bord, modèles de risque, automatisation des rapports.',
   });
@@ -261,7 +279,7 @@ Future<Map<String, String>> _seed(ApiClient api, _Publisher site, _SyncServer sy
   await api.putJson('/profile/objectives', body: {'objective_ids': [1, 4]});
 
   final source = await api.postJson('/sources', body: {
-    'url': site.url('/feed.xml'), 'name': 'Portail régional des opportunités', 'categories': ['scholarship', 'employment', 'tender'],
+    'url': site.url('/feed.xml'), 'name': 'Portail d\'exemple des opportunités', 'categories': ['scholarship', 'employment', 'tender'],
   });
   final run = await api.postJson('/search/runs', body: {
     'text': 'bourse ou emploi en données au Cameroun', 'source_ids': [source.string('id')], 'filters': {'keywords': <String>[]},
@@ -283,7 +301,7 @@ Future<Map<String, String>> _seed(ApiClient api, _Publisher site, _SyncServer sy
   await api.postJson('/applications/$appId/events', body: {
     'event_type': 'interview', 'title': 'Entretien avec le jury', 'scheduled_at': '${_d(9)}T10:00:00Z', 'location': 'Yaoundé',
   });
-  await api.postJson('/saved/$savedId/notes', body: {'body': 'Demander une lettre de recommandation au Pr. Mballa.'});
+  await api.postJson('/saved/$savedId/notes', body: {'body': 'Demander une lettre de recommandation au directeur de mémoire.'});
   for (final r in results.skip(1).take(2)) {
     await api.postJson('/saved', body: {'opportunity_id': r.string('id')});
   }
@@ -301,7 +319,7 @@ Future<Map<String, String>> _seed(ApiClient api, _Publisher site, _SyncServer sy
   await api.postJson('/sync/account/link', body: {
     'server_url': sync.url, 'email': 'awa@example.org', 'password': 'Mot-De-Passe-En-Ligne-2026!', 'device_name': 'Bureau',
   });
-  final org = await api.postJson('/orgs', body: {'name': 'Association Jeunesse Numérique', 'org_type': 'association'});
+  final org = await api.postJson('/orgs', body: {'name': 'Association Exemple Numérique', 'org_type': 'association'});
   final shared = await api.postJson('/workspaces', body: {'name': 'Subventions associatives'});
   await api.postJson('/orgs/share', body: {'kind': 'workspace', 'id': shared.string('id'), 'organization_id': org.string('id')});
   await api.postJson('/orgs/${org.string('id')}/invites', body: {'email': 'bob@example.org', 'role': 'editor'});
@@ -328,8 +346,8 @@ class _Publisher {
   Future<void> close() => _server.close(force: true);
 
   static final _items = [
-    ('Bourse de master en science des données 2027 — Université de Douala',
-        'L\'Université de Douala offre dix bourses complètes de 1 500 000 FCFA par an pour un master en science des '
+    ('Bourse de master en science des données 2027 — Université Exemple',
+        'L\'Université Exemple (établissement fictif) offre dix bourses complètes de 1 500 000 FCFA par an pour un master en science des '
         'données. Conditions d\'éligibilité : être titulaire d\'une licence en mathématiques ou informatique, être '
         'ressortissant d\'un pays de la CEMAC. Pièces à fournir : CV, lettre de motivation, relevés de notes.', 12),
     ('Recrutement : Analyste de données (Python, SQL) — Douala',

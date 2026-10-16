@@ -29,6 +29,18 @@ def test_custom_source_discovery_and_validation(client: EngineClient, site: Fixt
     assert client.delete(f"/sources/{body['id']}").status_code == 204
 
 
+def test_keywords_keep_the_typed_spelling() -> None:
+    """Regression: the chips showed "donnees" for "données"; matching must stay accent-insensitive."""
+    from collection.adapters import RawItem
+    from collection.fetching import keyword_filter
+    from search.interpreter import interpret
+
+    keywords = interpret("bourse de master en Données au Cameroun", {"cameroun": "CM"})["keywords"]
+    assert "données" in keywords and "donnees" not in keywords
+    item = RawItem(title="Bourse en science des donnees", url="https://example.org/1", summary="")
+    assert keyword_filter([item], keywords, {}) == [item]
+
+
 def test_full_search_pipeline(client: EngineClient, site: FixtureSite) -> None:
     source_id = _add_source(client, site.url("/feed.xml"), "Fixture publisher")
     interp = client.post("/search/interpret", json={"text": "bourse de master au Cameroun"}).json()
