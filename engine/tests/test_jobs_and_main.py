@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import io
+import os
+import subprocess
+import sys
+import threading
 import time
 from pathlib import Path
 
@@ -40,6 +44,50 @@ def test_serve_refuses_short_token(monkeypatch: object) -> None:
         assert main.serve() == 2
     finally:
         mp.undo()
+
+
+def _sleeper() -> subprocess.Popen[bytes]:
+    return subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+
+
+def test_watch_parent_fires_when_the_process_ends() -> None:
+    from core.parent_watch import watch_parent
+
+    proc = _sleeper()
+    fired = threading.Event()
+    watch_parent(proc.pid, fired.set)
+    assert not fired.wait(0.5)
+    proc.kill()
+    proc.wait()
+    assert fired.wait(10)
+
+
+def test_engine_stops_when_the_desktop_app_dies(tmp_path: Path) -> None:
+    """Regression: a crashed or force-killed app left the engine running, holding the instance lock."""
+    app = _sleeper()
+    env = {**os.environ, "OPX_DATA_DIR": str(tmp_path), "PYTHONUNBUFFERED": "1"}
+    engine = subprocess.Popen(  # noqa: S603 - fixed argv: this interpreter and main.py
+        [sys.executable, str(Path(main.__file__)), "--parent-pid", str(app.pid)],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        env=env,
+        cwd=Path(main.__file__).parent,
+    )
+    try:
+        assert engine.stdin and engine.stdout
+        engine.stdin.write(b"t" * 40 + b"\n")
+        engine.stdin.close()
+        assert engine.stdout.readline().startswith(b"PORT:")
+        assert engine.poll() is None
+        app.kill()
+        app.wait()
+        assert engine.wait(timeout=20) == 0
+        assert main.SingleInstanceLock(tmp_path / "engine.lock").acquire()
+    finally:
+        for p in (app, engine):
+            if p.poll() is None:
+                p.kill()
 
 
 def test_self_test_mode_passes() -> None:

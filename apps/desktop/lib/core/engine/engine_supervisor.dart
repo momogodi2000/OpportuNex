@@ -88,9 +88,10 @@ class EngineSupervisor extends Notifier<EngineStatus> {
     return const EngineStatus(phase: EngineRunState.stopped);
   }
 
+  // `--parent-pid`: the engine exits by itself if this app crashes or is killed.
   static Future<Process> _defaultSpawn(EngineCommand c) => Process.start(
         c.executable,
-        c.arguments,
+        [...c.arguments, '--parent-pid', '$pid'],
         workingDirectory: c.workingDirectory,
         environment: const {'PYTHONUNBUFFERED': '1', 'PYTHONIOENCODING': 'utf-8'},
       );

@@ -7,6 +7,8 @@ Protocol with the desktop UI:
    the socket is listening (before heavy imports), then serves the API.
 3. Every request must carry ``X-Engine-Token``; ``GET /api/v1/health`` is the only public
    route.
+4. With ``--parent-pid <pid>`` (passed by the UI) the engine shuts down when that process ends, so a
+   crashed or force-killed app never leaves an orphan engine holding the instance lock.
 
 Other modes:
 
@@ -81,7 +83,7 @@ def _bind() -> socket.socket:
     return sock
 
 
-def serve() -> int:
+def serve(parent_pid: int | None = None) -> int:
     token = _read_token(sys.stdin, TOKEN_TIMEOUT_SECONDS) or os.environ.get("OPX_ENGINE_TOKEN", "")
     if len(token) < MIN_TOKEN_LENGTH:
         print("ERROR:missing_token", file=sys.stderr, flush=True)
@@ -109,6 +111,10 @@ def serve() -> int:
     config = uvicorn.Config(app, log_config=None, access_log=False, ws="auto", timeout_graceful_shutdown=5)
     server = uvicorn.Server(config)
     app.state.request_shutdown = lambda: setattr(server, "should_exit", True)
+    if parent_pid:
+        from core.parent_watch import watch_parent
+
+        watch_parent(parent_pid, app.state.request_shutdown)
     server.run(sockets=[sock])
     return 0
 
@@ -154,14 +160,58 @@ def self_test() -> int:
             me = client.get("/api/v1/auth/me", headers=headers | {"Authorization": f"Bearer {session}"})
             _check(me.status_code == 200, f"me {me.status_code}")
             version = client.get("/api/v1/version", headers=headers).json()
-        print(f"SELF-TEST OK engine={version['engine_version']} schema={version['schema_revision']}")
+        libraries = _check_libraries()
+        print(f"SELF-TEST OK engine={version['engine_version']} schema={version['schema_revision']} libs={libraries}")
     return 0
+
+
+def _check_libraries() -> int:
+    """Exercise the lazily imported libraries, so a packaged build that lacks one fails here, not in use."""
+    import io
+
+    from collection.adapters import extract_detail, structured_fields
+    from collection.normalize import detect_language, parse_date
+    from documents import cv_parser, generator
+    from sync import crypto
+
+    html = (
+        '<html><head><script type=\'application/ld+json\'>{"@context":"https://schema.org",'
+        '"@type":"JobPosting","title":"Analyste","validThrough":"2099-12-15"}</script></head>'
+        "<body><article><h1>Analyste de données</h1><p>"
+        + "Poste d'analyste de données basé à Douala. " * 20
+        + "</p></article></body></html>"
+    ).encode()
+    text, obj = extract_detail(html, "https://example.org/offre")  # trafilatura + extruct
+    _check("Douala" in text, f"page text extraction (trafilatura, {len(text)} chars)")
+    _check(obj is not None and bool(structured_fields(obj).get("deadline")), f"structured data (extruct, {obj!r:.80})")
+    _check(str(parse_date("15 décembre 2099")) == "2099-12-15", "dateparser")
+    _check(detect_language("Ceci est une offre d'emploi pour un analyste de données à Douala.") == "fr", "langdetect")
+    pdf = generator.to_pdf("Test", "Lettre de motivation pour un poste d'analyste.")  # reportlab
+    _check(pdf.startswith(b"%PDF"), "reportlab")
+    _check(len(generator.to_docx("Test", "Lettre.")) > 1000, "python-docx")
+    # PDF parsing runs in a child process: this also checks multiprocessing in a frozen build.
+    _check("analyste" in cv_parser.extract_text_isolated("application/pdf", pdf).lower(), "pdf parsing")
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    wb.active.append(["ok"])
+    buf = io.BytesIO()
+    wb.save(buf)
+    _check(buf.getbuffer().nbytes > 1000, "openpyxl")
+    key = crypto.new_key()
+    nonce, ct = crypto.encrypt(key, b"secret", "user|x")
+    _check(crypto.decrypt(key, nonce, ct, "user|x") == b"secret", "libsodium")
+    import keyring
+
+    _check(keyring.get_keyring() is not None, "keyring")
+    return 9
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="opportunex-engine")
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--version", action="store_true")
+    parser.add_argument("--parent-pid", type=int, help="stop when this process (the desktop app) exits")
     args = parser.parse_args(argv)
     if args.version:
         from core.version import ENGINE_VERSION
@@ -170,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.self_test:
         return self_test()
-    return serve()
+    return serve(args.parent_pid)
 
 
 if __name__ == "__main__":

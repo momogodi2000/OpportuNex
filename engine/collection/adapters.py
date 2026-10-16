@@ -16,11 +16,14 @@ from typing import Any
 from urllib.parse import quote_plus, urljoin
 
 import feedparser
+import structlog
 from selectolax.parser import HTMLParser
 
 ALLOWED_KINDS = ("rss", "json_api", "html_list")
 _TAGS = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
+
+log = structlog.get_logger("collection")
 
 
 class AdapterError(Exception):
@@ -261,7 +264,8 @@ def extract_detail(html_bytes: bytes, url: str) -> tuple[str, dict[str, Any] | N
                     break
             if structured:
                 break
-    except Exception:  # noqa: BLE001 - structured data is optional; malformed markup is common
+    except Exception as exc:  # noqa: BLE001 - structured data is optional; malformed markup is common
+        log.debug("structured_data_skipped", error=type(exc).__name__)
         structured = None
     return text[:200_000], structured
 

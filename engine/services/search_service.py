@@ -449,8 +449,10 @@ class SearchService:
     # ------------------------------------------------------------- finalize
     def _matches_filters(self, opp: dict[str, Any], category_code: str | None, f: dict[str, Any]) -> bool:
         cats = f.get("categories") or []
-        if cats and category_code and not any(
-            category_code == c or category_code.split(".")[0] == c.split(".")[0] for c in cats
+        if (
+            cats
+            and category_code
+            and not any(category_code == c or category_code.split(".")[0] == c.split(".")[0] for c in cats)
         ):
             return False
         countries = f.get("countries") or []

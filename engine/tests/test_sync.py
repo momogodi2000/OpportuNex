@@ -335,17 +335,31 @@ def test_applications_documents_searches_and_monitors_follow_the_user(
     saved = a.post("/saved", json={"opportunity_id": opp["id"], "priority": "high"}).json()
     app_id = saved["application"]["id"]
     a.post(f"/applications/{app_id}/status", json={"status": "preparing"})
-    a.post(f"/applications/{app_id}/events", json={"event_type": "interview", "title": "Entretien", "scheduled_at": "2099-11-20T10:00:00Z"})
+    a.post(
+        f"/applications/{app_id}/events",
+        json={"event_type": "interview", "title": "Entretien", "scheduled_at": "2099-11-20T10:00:00Z"},
+    )
     a.post(f"/saved/{saved['id']}/notes", json={"body": "Demander deux lettres."})
     a.put(f"/saved/{saved['id']}/tags", json={"names": ["prioritaire"]})
     doc = a.post(f"/saved/{saved['id']}/generated", json={"doc_type": "cover_letter"}).json()
     a.post(f"/generated/{doc['id']}/versions", json={"content": "Version retouchée de la lettre."})
     source = next(s["id"] for s in a.get("/sources").json()["items"] if s["custom"])
-    run_id = a.post("/search/runs", json={"text": "bourse", "source_ids": [source], "filters": {"keywords": []}}).json()["run_id"]
+    run_id = a.post(
+        "/search/runs", json={"text": "bourse", "source_ids": [source], "filters": {"keywords": []}}
+    ).json()["run_id"]
     query_id = wait_run(a, run_id)["query"]["id"]
     a.put(f"/search/queries/{query_id}/save", json={"name": "Bourses suivies"})
-    a.post("/monitors", json={"name": "Veille bourses", "filters": {"keywords": []}, "schedule_kind": "daily",
-                              "schedule_expr": "08:00", "min_score": 0, "source_ids": [source]})
+    a.post(
+        "/monitors",
+        json={
+            "name": "Veille bourses",
+            "filters": {"keywords": []},
+            "schedule_kind": "daily",
+            "schedule_expr": "08:00",
+            "min_score": 0,
+            "source_ids": [source],
+        },
+    )
 
     online(server, a, "awa@example.com")
     run(a)
@@ -364,7 +378,9 @@ def test_applications_documents_searches_and_monitors_follow_the_user(
     assert [n["body"] for n in b.get(f"/saved/{saved['id']}/notes").json()["items"]] == ["Demander deux lettres."]
     doc_b = b.get(f"/generated/{doc['id']}").json()
     assert doc_b["current_version"] == 2 and doc_b["content"] == "Version retouchée de la lettre."
-    assert [q["saved_name"] for q in b.get("/search/history", params={"saved": True}).json()["items"]] == ["Bourses suivies"]
+    assert [q["saved_name"] for q in b.get("/search/history", params={"saved": True}).json()["items"]] == [
+        "Bourses suivies"
+    ]
     monitors = b.get("/monitors").json()["items"]
     assert [m["name"] for m in monitors] == ["Veille bourses"]
 

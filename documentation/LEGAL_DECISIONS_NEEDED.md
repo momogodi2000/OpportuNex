@@ -6,3 +6,4 @@
 - [ ] Apply to SignPath Foundation (free code signing for open-source projects). Until it is approved, binaries ship unsigned.
 - [ ] Set up an official contact address for security reports (`SECURITY.md`) and support (user guide).
 - [ ] Review the terms of use of each source in the catalogue (D-20). Sources without clear permission are disabled by default.
+- [ ] Confirm the AGPL compatibility of the `regex` package (Apache-2.0 AND CNRI-Python, a transitive dependency of `dateparser`); see `THIRD_PARTY_NOTICES.md`, section "Reviewed by hand".

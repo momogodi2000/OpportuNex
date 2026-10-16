@@ -1,0 +1,78 @@
+# Checks on every push and pull request: engine, sync server and desktop app.
+name: CI
+
+on:
+  push:
+    branches: [main, finalisation]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  engine:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: engine
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: engine/requirements*.txt
+      - run: python -m pip install -r requirements.txt -r requirements-dev.txt
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m mypy .
+      - run: python -m pytest -q --cov --cov-report=term
+      - run: python main.py --self-test
+
+  sync-server:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: sync-server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt pytest httpx ruff mypy
+      - run: python -m ruff check .
+      - run: python -m mypy opx_sync
+      - run: python -m pytest -q
+
+  desktop:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: apps/desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.2"
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - run: flutter analyze
+      - run: flutter test
+
+  sync-server-image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image and check it against PostgreSQL
+        working-directory: sync-server
+        run: |
+          docker compose -f docker-compose.test.yml up -d --build
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:18080/v1/health && break; sleep 2; done
+          curl -fsS http://127.0.0.1:18080/v1/health
+          docker compose -f docker-compose.test.yml down -v

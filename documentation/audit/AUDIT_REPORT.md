@@ -274,6 +274,38 @@ Not verified in this session:
 - No official instance exists (D-35).
 - SMTP delivery was not tested against a real mail server; the logged-message fallback was used.
 
+### Phase 7 — Licensing, identity and distributable builds
+**Licence and identity.**
+- `LICENSE` held unresolved merge-conflict markers mixing a truncated AGPL notice with the GPL v3 text. It is now the verbatim AGPL-3.0 from gnu.org (661 lines).
+- New legal and community files: `NOTICE` (copyright Momo Godi Yvan / ETS Monthe Network and contributors; docs under CC BY-SA 4.0; connectors under Apache 2.0), `AUTHORS`, `CONTRIBUTING.md` (DCO plus an inbound licence grant, listed for legal review), `CODE_OF_CONDUCT.md`, `SECURITY.md` (GitHub private reporting, no personal e-mail), `TRADEMARKS.md`, `CHANGELOG.md`.
+- `README.md` (FR) and `README.en.md` rewritten. The old README credited PROTEGE QV, promised weekly backups kept 6 weeks (the code does daily, keeps 7) and "60+ sources" (the catalogue has 74, of which 20 verified feeds).
+- Windows `Runner.rc`, the Linux application id and the in-app About page carry the new identity. The only remaining "PROTEGE QV" text is in `apps/desktop/_legacy_lib/`, archived code that is not compiled.
+
+**Third-party licences.** `engine/tools/third_party_notices.py` walks the engine's runtime dependency tree and the desktop's `pubspec.lock`. It writes `THIRD_PARTY_NOTICES.md` and the full texts to `packaging/licenses/`, which ship with the app.
+- 179 components; none flagged as incompatible with AGPL v3.
+- Three licences were reviewed by hand: certifi (MPL-2.0), tld (LGPL-2.1-or-later option) and regex (Apache-2.0 and CNRI-Python). regex was added to `LEGAL_DECISIONS_NEEDED.md` for the owner's lawyer.
+
+**Engine binary.** `packaging/engine/opportunex-engine.spec` builds a PyInstaller one-folder engine (D-13) with the schema, migrations, connector catalogue and word lists. It carries a version resource for ETS Monthe Network.
+- `--self-test` now also exercises the libraries that only fail when frozen: text and structured-data extraction, dates, language detection, PDF and DOCX generation, the isolated CV parser (multiprocessing), XLSX, libsodium and the keychain.
+- That check found that **structured-data extraction silently failed in the frozen engine**: extruct's own dependencies were missing. They are now bundled, and the error that was swallowed is logged.
+
+**Windows.** `packaging/windows/build.ps1` builds and self-tests the engine, builds the Flutter release and assembles `dist/windows/Opportunex/` with `engine/` and `licenses/`. It then produces:
+- the portable ZIP;
+- the Inno Setup installer (`packaging/windows/opportunex.iss`);
+- `SHA256SUMS.txt`.
+
+The installer installs per user without administrator rights (per-machine on request), in French or English, with a licence page and an optional desktop icon. On uninstall it removes the "launch at sign-in" entry and asks before deleting user data (default: keep; silent uninstalls keep it). Binaries are unsigned (D-12).
+
+**Linux.** `packaging/linux/Dockerfile` (Ubuntu 24.04 builder) and `build-deb.sh` build the PyInstaller engine and the Flutter bundle into `/opt/opportunex`, with a `.desktop` file, icons, the correct `Depends:` (GTK 3, appindicator, libnotify, libsecret) and postinst/postrm. `test-deb.sh` installs the package in a clean container, runs the engine self-test, starts the app under Xvfb and checks removal. **Not run**: Docker does not start on this machine.
+
+**CI.** `.github/workflows/ci.yml` runs engine lint, types, tests and self-test on Ubuntu and Windows, plus the sync-server tests, Flutter analyze and test, and a sync-server image check against PostgreSQL. `release.yml` builds the Windows and Debian packages on a version tag. Neither has run yet: nothing has been pushed.
+
+**Obsolete scripts.** `build-windows.ps1`, `build-linux.ps1`, `build-deb.sh` and `Dockerfile.linux-builder` were moved from the root to `packaging/legacy/` with a note. They shipped a raw Python environment instead of an engine binary. They were moved rather than deleted.
+
+Found and fixed while doing it:
+- **Orphan engine after a crash.** Testing the installed build showed that when the app is killed or crashes, the engine keeps running. It then holds the single-instance lock, so the next launch fails with "already running". The cause: the UI closes stdin after sending the token, so the engine has no way to notice. The UI now passes `--parent-pid` and the engine shuts down when that process ends (`core/parent_watch.py`, two regression tests, one of them with a real engine process).
+- `ruff format` had never been applied to the engine; it is now, so the CI format check is meaningful.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -326,6 +358,20 @@ Phase 6 (2026-10-16):
 | 2026-10-16 | `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (18 s)**, now also checks local mode on a fresh profile |
 | 2026-10-16 | `flutter test integration_test/ui_tour_test.dart -d windows` | **1 passed (5 min 18 s)** with a real local sync server; 0 layout problems, 0 unlabelled controls, 4 contrast findings reviewed as sampling artifacts |
 | — | `docker build` / `docker compose up` | **Not run**: Docker Desktop does not start on this machine |
+
+Phase 7 (2026-10-16):
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-10-16 | `engine: pytest -q --cov` | **129 passed**, 89 % coverage (8,798 statements); ruff check, ruff format --check and mypy clean |
+| 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **58 passed** |
+| 2026-10-16 | `engine/tools/third_party_notices.py` | 179 components, 0 flagged |
+| 2026-10-16 | `packaging/windows/build.ps1` | Engine self-test in the bundle `SELF-TEST OK engine=1.0.0 schema=0004_sync libs=9`; portable ZIP and installer produced with SHA-256 sums |
+| 2026-10-16 | Silent install (`/VERYSILENT /CURRENTUSER /DIR=<temp>`) | Exit 0; app, `engine/`, `licenses/` and Start-menu shortcut present; installed engine self-test OK; installed app started its engine, which reported ready, and the UI connected to it (separate data folder) |
+| 2026-10-16 | App killed while running (before the fix) | Engine kept running → bug fixed above |
+| 2026-10-16 | Rebuilt installer, app killed twice | Engine exits within 6 s each time; relaunch starts normally (no `already_running`) |
+| 2026-10-16 | Silent uninstall | Exit 0; program folder, shortcut and uninstall registry key removed; user data kept |
+| — | `.deb` build and install test, sync-server image | **Not run**: Docker does not start on this machine |
 
 Traceability after phase 6 (176 requirements):
 - 15 operational end to end.
