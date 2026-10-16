@@ -1,0 +1,1635 @@
+{
+  "@@locale": "fr",
+  "appName": "Opportunex",
+  "slogan": "Trouvez · Analysez · Réalisez",
+  "tagline": "Votre assistant pour les opportunités publiques et privées",
+  "commonCancel": "Annuler",
+  "commonConfirm": "Confirmer",
+  "commonContinue": "Continuer",
+  "commonBack": "Retour",
+  "commonSave": "Enregistrer",
+  "commonDelete": "Supprimer",
+  "commonEdit": "Modifier",
+  "commonClose": "Fermer",
+  "commonRetry": "Réessayer",
+  "commonCopy": "Copier",
+  "commonCopied": "Copié dans le presse-papiers",
+  "commonLoading": "Chargement…",
+  "commonOptional": "facultatif",
+  "commonShow": "Afficher",
+  "commonHide": "Masquer",
+  "commonYes": "Oui",
+  "commonNo": "Non",
+  "commonDone": "Terminé",
+  "commonSearch": "Rechercher",
+  "commonNotSpecified": "Non précisé",
+  "commonUnknownError": "Une erreur inattendue est survenue. Réessayez ; si le problème persiste, exportez les journaux depuis Paramètres › Maintenance.",
+  "startupStarting": "Démarrage du moteur local…",
+  "startupRestarting": "Le moteur s'est arrêté. Redémarrage (tentative {attempt} sur 3)…",
+  "@startupRestarting": {
+    "placeholders": {
+      "attempt": {
+        "type": "int"
+      }
+    }
+  },
+  "diagTitle": "Le moteur local n'a pas pu démarrer",
+  "diagNotFound": "Le moteur Opportunex est introuvable. Réinstallez l'application ou, en développement, exécutez « launch-dev.ps1 -Setup ».",
+  "diagAlreadyRunning": "Opportunex est déjà ouvert pour cet utilisateur. Fermez l'autre fenêtre avant de réessayer.",
+  "diagHandshake": "Le moteur n'a pas répondu à temps. Votre antivirus bloque peut-être son lancement.",
+  "diagCrashed": "Le moteur s'est arrêté plusieurs fois de suite.",
+  "diagHealth": "Le moteur a démarré mais ne répond pas aux vérifications.",
+  "diagDetails": "Détails techniques",
+  "diagExportLogs": "Ouvrir le dossier des journaux",
+  "diagRetry": "Relancer le moteur",
+  "authWelcomeTitle": "Bienvenue",
+  "authWelcomeSubtitle": "Vos données restent sur cet ordinateur, chiffrées.",
+  "authChooseProfile": "Choisissez votre profil",
+  "authNewProfile": "Créer un profil",
+  "authOtherAccount": "Se connecter avec un autre courriel",
+  "authImportProfile": "Importer un profil depuis une sauvegarde",
+  "authEmail": "Adresse électronique",
+  "authPassword": "Mot de passe",
+  "authConfirmPassword": "Confirmer le mot de passe",
+  "authDisplayName": "Nom affiché",
+  "authLanguage": "Langue",
+  "authSignIn": "Se connecter",
+  "authSignInTitle": "Connexion",
+  "authForgotPassword": "Mot de passe oublié ?",
+  "authCreateAccount": "Créer un compte",
+  "authRegisterTitle": "Créer votre profil local",
+  "authRegisterSubtitle": "Un profil est chiffré avec votre mot de passe. Personne d'autre, pas même ETS Monthe Network, ne peut le lire.",
+  "authAcceptTerms": "J'accepte les conditions d'utilisation et la politique de confidentialité",
+  "authReadTerms": "Lire les conditions",
+  "authAlreadyHaveAccount": "J'ai déjà un profil",
+  "authPasswordHint": "12 caractères minimum. Une phrase de plusieurs mots est idéale.",
+  "authStrength0": "Très faible",
+  "authStrength1": "Faible",
+  "authStrength2": "Moyen",
+  "authStrength3": "Bon",
+  "authStrength4": "Excellent",
+  "authPhraseTitle": "Votre phrase de récupération",
+  "authPhraseBody": "Notez ces 12 mots dans l'ordre et conservez-les hors de l'ordinateur. Ils sont le seul moyen de récupérer vos données si vous oubliez votre mot de passe. Ils ne seront plus jamais affichés.",
+  "authPhraseConfirm": "J'ai noté ma phrase de récupération en lieu sûr",
+  "authUnlockTitle": "Profil verrouillé",
+  "authUnlockInactivity": "Verrouillé après une période d'inactivité.",
+  "authUnlockManual": "Profil verrouillé.",
+  "authUnlockExpired": "Votre session a expiré.",
+  "authUnlock": "Déverrouiller",
+  "authSwitchProfile": "Changer de profil",
+  "authRecoverTitle": "Récupérer votre profil",
+  "authRecoverBody": "Saisissez les 12 mots de votre phrase de récupération, puis choisissez un nouveau mot de passe.",
+  "authRecoveryPhrase": "Phrase de récupération (12 mots)",
+  "authNewPassword": "Nouveau mot de passe",
+  "authRecover": "Récupérer et se connecter",
+  "authLock": "Verrouiller",
+  "authSignOut": "Se déconnecter",
+  "authModeLocal": "Mode local",
+  "authModeSynced": "Synchronisé",
+  "authLockedFor": "Trop de tentatives. Réessayez dans {seconds} s.",
+  "@authLockedFor": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "validationRequired": "Champ obligatoire",
+  "validationEmail": "Adresse électronique invalide",
+  "validationPasswordMatch": "Les mots de passe ne correspondent pas",
+  "validationPhraseWords": "La phrase doit contenir exactement 12 mots",
+  "navDashboard": "Tableau de bord",
+  "navSearch": "Recherche",
+  "navSaved": "Sauvegardées",
+  "navApplications": "Candidatures",
+  "navMonitors": "Veilles",
+  "navWorkspaces": "Espaces",
+  "navSources": "Sources",
+  "navProfile": "Mon profil",
+  "navSettings": "Paramètres",
+  "navCollapse": "Réduire le menu",
+  "navExpand": "Déployer le menu",
+  "errInvalidCredentials": "Adresse ou mot de passe incorrect.",
+  "errAccountLocked": "Trop de tentatives échouées. Patientez avant de réessayer.",
+  "errEmailTaken": "Un profil utilise déjà cette adresse sur cet ordinateur.",
+  "errPasswordPolicy": "Mot de passe trop faible : 12 caractères minimum, non présent dans la liste des mots de passe compromis.",
+  "errPasswordMismatch": "Les mots de passe ne correspondent pas.",
+  "errTermsNotAccepted": "Vous devez accepter les conditions d'utilisation.",
+  "errInvalidRecovery": "Phrase de récupération incorrecte.",
+  "errSessionLocked": "Votre session est verrouillée.",
+  "errEngineUnreachable": "Le moteur local ne répond pas. Il redémarre peut-être.",
+  "errValidation": "Certains champs sont invalides.",
+  "errNotFound": "Élément introuvable.",
+  "errProfileCorrupted": "Le profil ne peut pas être déchiffré. Restaurez une sauvegarde.",
+  "errUpstream": "Le service externe est indisponible pour le moment.",
+  "settingsAccount": "Compte et sécurité",
+  "settingsBackups": "Sauvegardes",
+  "settingsMaintenance": "Maintenance",
+  "settingsAbout": "À propos",
+  "settingsSaved": "Modifications enregistrées",
+  "settingsProfileSection": "Profil",
+  "settingsModeLocalHelp": "Vos données restent uniquement sur cet ordinateur.",
+  "settingsModeSyncedHelp": "Vos données sont chiffrées de bout en bout et synchronisées entre vos appareils.",
+  "settingsAppearance": "Langue et apparence",
+  "settingsTheme": "Thème",
+  "settingsThemeSystem": "Système",
+  "settingsThemeLight": "Clair",
+  "settingsThemeDark": "Sombre",
+  "settingsSecurity": "Sécurité",
+  "settingsAutoLock": "Verrouillage automatique",
+  "settingsAutoLockHelp": "Après cette durée d'inactivité, le profil se verrouille et la clé de chiffrement est effacée de la mémoire.",
+  "settingsMinutes": "{minutes} min",
+  "@settingsMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsChangePassword": "Changer le mot de passe",
+  "settingsChangePasswordHelp": "Vos données restent chiffrées ; seule l'enveloppe de la clé est renouvelée.",
+  "settingsCurrentPassword": "Mot de passe actuel",
+  "settingsPasswordChanged": "Mot de passe modifié",
+  "settingsDangerZone": "Zone sensible",
+  "settingsDeleteAccount": "Supprimer le compte",
+  "settingsDeleteAccountHelp": "Efface définitivement de cet ordinateur le profil, la base chiffrée, les documents et les sauvegardes.",
+  "settingsDeleteAccountConfirm": "Cette action est irréversible : toutes vos données locales seront supprimées. Tapez DELETE pour confirmer.",
+  "settingsConfirmWithPassword": "Confirmez avec votre mot de passe",
+  "backupsTitle": "Sauvegardes",
+  "backupsHelp": "Archives chiffrées de votre base et de vos documents. Les 7 dernières sauvegardes automatiques sont conservées.",
+  "backupsCreate": "Sauvegarder maintenant",
+  "backupsCreated": "Sauvegarde créée",
+  "backupsAuto": "Sauvegarde automatique quotidienne",
+  "backupsAutoHelp": "Effectuée quand l'application est ouverte, au plus une fois par jour.",
+  "backupsFolder": "Dossier des sauvegardes",
+  "backupsHistory": "Historique",
+  "backupsEmpty": "Aucune sauvegarde pour le moment.",
+  "backupsOkTag": "intègre",
+  "backupsRestoredTag": "restaurée",
+  "backupsVerify": "Vérifier l'intégrité",
+  "backupsVerified": "Sauvegarde vérifiée : intègre",
+  "backupsRestore": "Restaurer",
+  "backupsRestoreConfirm": "Vos données actuelles seront remplacées par celles de la sauvegarde. Une sauvegarde de sécurité est d'abord créée. Tapez RESTORE pour confirmer.",
+  "backupsRestored": "Restauration terminée",
+  "backupsDelete": "Supprimer la sauvegarde",
+  "backupsDeleteConfirm": "Le fichier de sauvegarde sera supprimé définitivement.",
+  "backupsDeleted": "Sauvegarde supprimée",
+  "backupKindManual": "manuelle",
+  "backupKindScheduled": "automatique",
+  "backupKindPreMigration": "avant mise à jour",
+  "backupKindPreRestore": "avant restauration",
+  "maintenanceStorage": "Espace utilisé",
+  "maintenanceDatabase": "Base de données",
+  "maintenanceVault": "Documents chiffrés",
+  "maintenanceDataDir": "Dossier des données",
+  "maintenanceTools": "Outils",
+  "maintenanceRun": "Lancer",
+  "maintenanceIntegrity": "Contrôle d'intégrité",
+  "maintenanceIntegrityHelp": "Vérifie la base, les clés étrangères et l'index de recherche.",
+  "maintenanceIntegrityOk": "Aucun problème détecté",
+  "maintenanceOptimize": "Optimiser la base",
+  "maintenanceOptimizeHelp": "Compacte la base et optimise l'index de recherche.",
+  "maintenanceOptimized": "Base optimisée",
+  "maintenanceLogs": "Journaux techniques",
+  "maintenanceLogsHelp": "Exporte les journaux expurgés (sans courriel, jeton ni clé) pour l'assistance.",
+  "maintenanceExport": "Exporter",
+  "maintenanceLogsSaved": "Journaux exportés",
+  "aboutVersion": "Version",
+  "aboutEngine": "moteur",
+  "aboutSchema": "schéma",
+  "aboutCredits": "Éditeur et auteur",
+  "aboutPublisher": "Éditeur",
+  "aboutAuthor": "Développeur principal",
+  "aboutCopyright": "Droit d'auteur",
+  "aboutLicense": "Licence",
+  "aboutLicenseBody": "Opportunex est un logiciel libre et gratuit, distribué sous la licence GNU Affero General Public License v3. Vous pouvez l'utiliser, l'étudier, le modifier et le redistribuer selon les termes de cette licence. Le nom et le logo Opportunex restent réservés.",
+  "aboutSourceCode": "Code source",
+  "aboutThirdParty": "Licences des composants tiers",
+  "aboutTermsPrivacy": "Conditions et confidentialité",
+  "legalTerms": "Conditions d'utilisation",
+  "legalPrivacy": "Confidentialité",
+  "importProfileBody": "Choisissez un fichier de sauvegarde Opportunex (.opxbak) et saisissez le mot de passe du profil sauvegardé.",
+  "importChooseFile": "Choisir une sauvegarde…",
+  "importAction": "Importer et se connecter",
+  "badgeAiGenerated": "Généré par IA",
+  "badgeDeadlineSoon": "Échéance proche",
+  "badgeDeadlineUnknown": "Date limite inconnue",
+  "badgeEligibilityUncertain": "Éligibilité incertaine",
+  "badgeExpired": "Expirée",
+  "badgeModified": "Modifiée",
+  "badgeNew": "Nouvelle",
+  "badgeVerified": "Vérifiée",
+  "scoreLabel": "Pertinence {score} sur 100",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "catAcceleration": "Incubation et accélération",
+  "catCall": "Appels à candidatures",
+  "catCompetition": "Concours et prix",
+  "catEmployment": "Emploi",
+  "catEntrepreneurship": "Entrepreneuriat",
+  "catFreelance": "Missions freelance",
+  "catGrant": "Subventions et financements",
+  "catInternship": "Stages",
+  "catOther": "Autres opportunités",
+  "catPartnership": "Partenariats",
+  "catResearch": "Recherche",
+  "catScholarship": "Bourses",
+  "catTender": "Appels d'offres",
+  "catTraining": "Formations",
+  "catVolunteering": "Volontariat",
+  "critDeadline": "Date limite",
+  "critEducation": "Formation",
+  "critExperience": "Expérience",
+  "critLanguage": "Langues",
+  "critLocation": "Localisation",
+  "critNotEvaluated": "Critère non évalué faute d'information",
+  "critObjectives": "Objectifs",
+  "critSkills": "Compétences",
+  "daysLeft": "{days, plural, =0{dernier jour} =1{1 jour restant} other{{days} jours restants}}",
+  "@daysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "deadlineUnknownShort": "Date limite non précisée",
+  "eligLikely": "Éligibilité probable (selon les critères publiés)",
+  "eligNot": "Non éligible : date limite dépassée",
+  "eligUncertain": "Éligibilité à vérifier",
+  "eligUnlikely": "Éligibilité peu probable",
+  "exportAction": "Exporter",
+  "exportDone": "Export enregistré",
+  "filterAdd": "Ajouter",
+  "filterAddKeyword": "Ajouter un mot-clé",
+  "filterAmountMin": "Montant minimal",
+  "filterAnyBadge": "Tous les signalements",
+  "filterAnyDate": "Toute date",
+  "filterAnyScore": "Toute pertinence",
+  "filterBadge": "Signalement",
+  "filterCategories": "Catégories",
+  "filterCountries": "Pays",
+  "filterDeadlineBefore": "Date limite avant le",
+  "filterIncludeExpired": "Inclure les expirées",
+  "filterKeywords": "Mots-clés",
+  "filterMinScore": "Pertinence minimale",
+  "filterWorkMode": "Mode de travail",
+  "filtersSubtitle": "Voici comment Opportunex a compris votre demande. Corrigez librement avant de lancer la recherche.",
+  "filtersTitle": "Critères de recherche",
+  "gapEducation": "Niveau d'études demandé : {value}",
+  "@gapEducation": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapExperience": "Expérience demandée : {value} an(s)",
+  "@gapExperience": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLanguage": "Langue demandée : {value}",
+  "@gapLanguage": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLocation": "Localisation : {value}",
+  "@gapLocation": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapSkills": "Compétences absentes de votre profil : {value}",
+  "@gapSkills": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "historyClear": "Effacer l'historique",
+  "historyClearConfirm": "Les recherches non enregistrées seront supprimées. Les recherches enregistrées sont conservées.",
+  "historyEmpty": "Aucune recherche pour le moment.",
+  "historyHint": "Enregistrez une recherche pour la relancer plus tard ou en faire une veille.",
+  "historyOpen": "Voir les résultats",
+  "historyRerun": "Relancer",
+  "historySave": "Enregistrer la recherche",
+  "historyUnsave": "Ne plus enregistrer",
+  "loadMore": "Afficher plus",
+  "oppAddWorkspace": "Ajouter à un espace",
+  "oppAmount": "Montant",
+  "oppApplicationUrl": "Lien de candidature",
+  "oppContact": "Contact public",
+  "oppDeadline": "Date limite",
+  "oppDismiss": "Écarter",
+  "oppDocumentsRequired": "Pièces à fournir",
+  "oppEligibility": "Éligibilité",
+  "oppFeedbackThanks": "Merci, vos recommandations seront ajustées",
+  "oppFinancial": "Avantages financiers",
+  "oppFullText": "Texte complet de l'annonce",
+  "oppGaps": "Écarts et points à vérifier",
+  "oppLastChecked": "Dernière vérification",
+  "oppLocation": "Lieu",
+  "oppMethod": "Méthode d'analyse",
+  "oppMethodRules": "Règles déterministes (sans IA)",
+  "oppMore": "Plus d'actions",
+  "oppNoCriteria": "L'annonce ne publie pas de critères d'éligibilité précis : vérifiez auprès de l'éditeur.",
+  "oppNoGaps": "Aucun écart détecté avec votre profil.",
+  "oppNotRelevant": "Non pertinent",
+  "oppOfficialLink": "Lien officiel",
+  "oppOpenTracking": "Voir le suivi",
+  "oppOriginalPublisher": "Éditeur d'origine",
+  "oppOverview": "Aperçu",
+  "oppProcedure": "Procédure",
+  "oppPublished": "Publiée le",
+  "oppPublisher": "Éditeur et sources",
+  "oppQualifications": "Qualifications demandées",
+  "oppRecheck": "Revérifier sur le site officiel",
+  "oppRechecked": "Vérification terminée",
+  "oppRelevance": "Pertinence pour vous",
+  "oppRelevant": "Pertinent",
+  "oppRepost": "Republication",
+  "oppSave": "Sauvegarder",
+  "oppSaved": "Sauvegardée",
+  "oppSavedToast": "Opportunité sauvegardée",
+  "oppStatus": "Statut",
+  "oppStrengths": "Vos atouts",
+  "oppSubmissionNotice": "Opportunex ne soumet jamais de candidature : postulez sur le canal officiel de l'éditeur.",
+  "oppSummary": "Résumé",
+  "oppToVerify": "À vérifier vous-même",
+  "oppVerbatimNote": "Clauses reproduites mot pour mot depuis l'annonce.",
+  "oppVerification": "Vérification",
+  "provExplicit": "Explicite",
+  "provGenerated": "Généré",
+  "provInferred": "Déduit",
+  "reqEducation": "Formation",
+  "reqExperience": "Expérience",
+  "reqLanguages": "Langues",
+  "reqSkills": "Compétences",
+  "resultsCount": "{count, plural, =0{Aucun résultat} =1{1 résultat} other{{count} résultats}}",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsEmptyBody": "Élargissez vos critères ou ajoutez des sources dans la section Sources.",
+  "resultsEmptyTitle": "Aucune opportunité ne correspond",
+  "runCancelled": "annulée",
+  "runCompleted": "terminée",
+  "runFailed": "échouée",
+  "runPartial": "terminée partiellement",
+  "runProgress": "Recherche en cours : {done} source(s) sur {total}",
+  "@runProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "runResume": "Reprendre",
+  "runStatus": "Recherche {status}",
+  "@runStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "runUnavailableBody": "Ces sources n'ont pas pu être consultées automatiquement ou ne le permettent pas. Consultez-les directement :",
+  "runUnavailableTitle": "Sources à consulter manuellement",
+  "searchEmptyBody": "Décrivez ce que vous cherchez en français ou en anglais, par exemple « bourse de master en France » ou « stage en informatique à Douala ».",
+  "searchEmptyTitle": "Que recherchez-vous ?",
+  "searchHelper": "Recherche en langage naturel, en français ou en anglais",
+  "searchHint": "Ex. : bourse de master en santé publique pour 2027",
+  "searchInterpret": "Analyser",
+  "searchLaunch": "Lancer la recherche",
+  "searchSuggestions": "Suggestions",
+  "searchTabHistory": "Historique",
+  "searchTabNew": "Recherche",
+  "sortAmount": "Montant",
+  "sortDeadline": "Date limite",
+  "sortPublished": "Publication",
+  "sortRecent": "Ajout récent",
+  "sortRelevance": "Pertinence",
+  "sourcesCount": "{count} sources",
+  "@sourcesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workHybrid": "Hybride",
+  "workOnsite": "Présentiel",
+  "workRemote": "À distance",
+  "wsAdded": "Ajoutée à l'espace",
+  "wsNoneYet": "Créez d'abord un espace dans la section Espaces.",
+  "calDeadline": "Date limite officielle",
+  "calEmpty": "Aucune échéance ce mois-ci.",
+  "calExportIcs": "Exporter le calendrier (.ics)",
+  "calNext": "Mois suivant",
+  "calPersonalDeadline": "Échéance personnelle",
+  "calPrev": "Mois précédent",
+  "cvAccept": "Accepter",
+  "cvApplied": "{count, plural, =0{Aucun élément ajouté au profil} =1{1 élément ajouté au profil} other{{count} éléments ajoutés au profil}}",
+  "@cvApplied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cvApply": "Ajouter au profil",
+  "cvConfidence": "Confiance de l'extraction : {pct} %",
+  "@cvConfidence": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "cvDiscard": "Abandonner l'import",
+  "cvIdentity": "Identité",
+  "cvImport": "Importer un CV",
+  "cvKeepFile": "Conserver le fichier du CV",
+  "cvKeepFileHelp": "Le fichier est chiffré dans votre coffre local. Sinon il est supprimé après l'analyse.",
+  "cvNothingFound": "Rien n'a pu être extrait",
+  "cvNothingFoundBody": "Le document est peut-être scanné (image) ou protégé. Vous pouvez remplir votre profil manuellement.",
+  "cvPick": "Choisir un fichier",
+  "cvPickBody": "PDF, DOCX ou TXT, 10 Mo maximum. L'analyse se fait sur cet ordinateur, sans envoi en ligne.",
+  "cvPickTitle": "Importer votre CV",
+  "cvReject": "Rejeter",
+  "cvReviewHelp": "Vérifiez chaque élément détecté : acceptez, corrigez ou rejetez. Seuls les éléments acceptés seront ajoutés.",
+  "cvSubtitle": "Pré-remplissez votre profil à partir d'un CV existant",
+  "dashActivity": "Activité récente",
+  "dashApplications": "Candidatures par statut",
+  "dashDeadlines": "Échéances à venir",
+  "dashDiscovered": "Découvertes",
+  "dashFirstStepsBody": "Quelques étapes pour obtenir des résultats pertinents.",
+  "dashFirstStepsTitle": "Premiers pas",
+  "dashFollowUp": "Relance conseillée : {title}",
+  "@dashFollowUp": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dashHello": "Bonjour {name}",
+  "@dashHello": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashInProgress": "En préparation",
+  "dashManage": "Gérer",
+  "dashNew": "Nouvelles",
+  "dashNewSearch": "Nouvelle recherche",
+  "dashNoActivity": "Aucune activité pour le moment.",
+  "dashNoApplications": "Aucune candidature suivie.",
+  "dashNoDeadlines": "Aucune échéance dans les 30 prochains jours.",
+  "dashNoRecommendations": "Lancez une recherche pour obtenir des recommandations.",
+  "dashNoStats": "Les statistiques apparaîtront après vos premières candidatures.",
+  "dashRecommendations": "Recommandations",
+  "dashRecommendationsHelp": "Opportunités ouvertes les mieux classées pour votre profil (score indicatif).",
+  "dashRelevant": "Pertinentes",
+  "dashSaved": "Sauvegardées",
+  "dashSourceFailing": "{count, plural, =1{1 échec consécutif} other{{count} échecs consécutifs}}",
+  "@dashSourceFailing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashSources": "État des sources",
+  "dashSourcesSummary": "{active} actives, {healthy} en bon état, {total} au total",
+  "@dashSourcesSummary": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "healthy": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStatAccepted": "Acceptées : {count}",
+  "@dashStatAccepted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStatDelay": "Délai moyen de réponse : {days} jours",
+  "@dashStatDelay": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatRate": "Taux d'acceptation : {rate}",
+  "@dashStatRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatSubmitted": "Soumises : {count}",
+  "@dashStatSubmitted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStats": "Statistiques personnelles",
+  "dashStepCv": "Importer un CV",
+  "dashStepMonitor": "Créer une veille",
+  "dashStepProfile": "Compléter le profil",
+  "dashStepSearch": "Lancer une recherche",
+  "dashSubmitted": "Soumises",
+  "dashSubmittedOn": "Soumise le {date}",
+  "@dashSubmittedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dashSubtitle": "Vue d'ensemble de vos opportunités et candidatures",
+  "dashWithin": "{days} jours : {count}",
+  "@dashWithin": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dayFri": "Vendredi",
+  "dayMon": "Lundi",
+  "daySat": "Samedi",
+  "daySun": "Dimanche",
+  "dayThu": "Jeudi",
+  "dayTue": "Mardi",
+  "dayWed": "Mercredi",
+  "docCoverLetter": "Lettre de motivation",
+  "docCvSuggestions": "Suggestions d'adaptation du CV",
+  "docEmail": "E-mail de candidature",
+  "docGrant": "Demande de subvention",
+  "docInterview": "Préparation d'entretien",
+  "docProjectSummary": "Résumé de projet",
+  "docScholarship": "Lettre de candidature à une bourse",
+  "edBac": "Baccalauréat",
+  "edBac2": "Bac+2 (BTS, DUT, HND)",
+  "edBachelor": "Licence / Bachelor",
+  "edDoctorate": "Doctorat",
+  "edMaster": "Master",
+  "edNone": "Aucun diplôme",
+  "edPostdoc": "Post-doctorat",
+  "edPrimary": "Primaire",
+  "edSecondary": "Secondaire",
+  "edVocational": "Formation professionnelle",
+  "eraseAction": "Effacer la sélection",
+  "eraseConfirm": "Les données sélectionnées seront supprimées définitivement de cet ordinateur. Saisissez ERASE pour confirmer.",
+  "eraseDocuments": "Documents joints aux candidatures",
+  "eraseDone": "Données effacées",
+  "eraseHelp": "Choisissez précisément ce que vous voulez supprimer. Votre compte et vos candidatures sont conservés.",
+  "eraseHistory": "Historique des recherches non enregistrées",
+  "eraseLogs": "Journaux techniques",
+  "eraseNotifications": "Notifications",
+  "eraseOpportunities": "Opportunités non sauvegardées",
+  "eraseProfile": "Détails du profil (formation, expérience, compétences…)",
+  "eraseTitle": "Effacement sélectif",
+  "etConsulting": "Conseil",
+  "etFreelance": "Freelance",
+  "etFullTime": "Temps plein",
+  "etInternship": "Stage",
+  "etPartTime": "Temps partiel",
+  "etVolunteer": "Bénévolat",
+  "evCall": "Appel",
+  "evFollowUp": "Relance",
+  "evInterview": "Entretien",
+  "evMeeting": "Rendez-vous",
+  "evOther": "Autre",
+  "evTest": "Test",
+  "genCreate": "Créer un brouillon",
+  "genEmpty": "Aucun brouillon pour cette opportunité.",
+  "genIntegrityTitle": "À vérifier : éléments absents de votre profil validé",
+  "genNotice": "Brouillon généré à partir de votre profil validé. Relisez-le et adaptez-le avant tout envoi.",
+  "genSaveVersion": "Enregistrer une version",
+  "genSubtitle": "Brouillons modifiables, avec historique des versions",
+  "genTitle": "Documents générés",
+  "monCreate": "Nouvelle veille",
+  "monDaily": "Tous les jours à {time}",
+  "@monDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monDailyLabel": "Quotidienne",
+  "monEmptyBody": "Une veille relance une recherche à intervalle régulier et vous signale les nouveautés.",
+  "monEmptyTitle": "Aucune veille",
+  "monFrequencyNote": "La fréquence réelle respecte les limites de chaque source (au plus une fois par jour en général).",
+  "monLastRun": "Dernière exécution : {date} · {count} nouvelles",
+  "@monLastRun": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monMinScore": "Score minimal pour être notifié : {score}",
+  "@monMinScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "monName": "Nom de la veille",
+  "monNextRun": "Prochaine exécution : {date}",
+  "@monNextRun": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "monOnlyWhileOpen": "Les veilles s'exécutent uniquement lorsque Opportunex est ouvert (y compris réduit dans la zone de notification).",
+  "monQuery": "Recherche à surveiller",
+  "monRunNow": "Exécuter maintenant",
+  "monScheduleSummary": "{schedule} · score minimal {score}",
+  "@monScheduleSummary": {
+    "placeholders": {
+      "schedule": {
+        "type": "String"
+      },
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "monStarted": "Veille lancée",
+  "monTabMonitors": "Veilles",
+  "monTabNotifications": "Notifications",
+  "monWeekly": "Chaque semaine : {when}",
+  "@monWeekly": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "monWeeklyLabel": "Hebdomadaire",
+  "nkChanged": "Opportunité suivie modifiée",
+  "nkDeadline": "Rappels d'échéance",
+  "nkMonitor": "Échec d'une veille",
+  "nkNew": "Nouvelles opportunités",
+  "nkSource": "Source indisponible",
+  "notifEmpty": "Aucune notification",
+  "notifMarkAllRead": "Tout marquer comme lu",
+  "onbDone": "Profil enregistré. Bienvenue !",
+  "onbFinish": "Terminer",
+  "onbLater": "Plus tard",
+  "onbOptionalNote": "Toutes les étapes sont facultatives et modifiables à tout moment depuis votre profil.",
+  "onbResume": "Reprendre la configuration",
+  "onbSkip": "Passer",
+  "onbStep1": "Informations générales et liens",
+  "onbStep2": "Formation",
+  "onbStep3": "Expérience",
+  "onbStep4": "Compétences et langues",
+  "onbStep5": "Objectifs",
+  "onbStep6": "Projet ou organisation",
+  "onbStep7": "Récapitulatif",
+  "onbStepOf": "Étape {step} sur {total} — {title}",
+  "@onbStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onbTitle": "Configurer votre profil",
+  "orgAcademic": "Établissement académique",
+  "orgAssociation": "Association",
+  "orgBudget": "Budget annuel",
+  "orgCooperative": "Coopérative / GIC",
+  "orgHelp": "Renseignez-la si vous cherchez des opportunités au nom d'une structure.",
+  "orgName": "Nom de l'organisation",
+  "orgNgo": "ONG",
+  "orgNone": "Aucune organisation renseignée.",
+  "orgPublic": "Organisme public",
+  "orgRegistration": "Numéro d'immatriculation (RCCM…)",
+  "orgSector": "Secteur d'activité",
+  "orgSme": "PME",
+  "orgStartup": "Start-up",
+  "orgTitle": "Organisation",
+  "orgType": "Type d'organisation",
+  "pfAchievements": "Réalisations",
+  "pfAdd": "Ajouter",
+  "pfAddLanguage": "Ajouter une langue",
+  "pfAddLink": "Ajouter un lien",
+  "pfAddSkill": "Ajouter une compétence",
+  "pfAnyMode": "Indifférent",
+  "pfBeneficiaries": "Bénéficiaires",
+  "pfBio": "Présentation",
+  "pfCertName": "Intitulé de la certification",
+  "pfCertifications": "Certifications",
+  "pfCity": "Ville",
+  "pfCompleteness": "Profil complété à {pct} %",
+  "@pfCompleteness": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "pfCountry": "Pays",
+  "pfCredentialUrl": "Lien de vérification",
+  "pfCurrency": "Devise",
+  "pfCurrentJob": "Poste actuel",
+  "pfCustomObjective": "Autre objectif…",
+  "pfDegree": "Diplôme",
+  "pfEducation": "Formation",
+  "pfEducationLevel": "Niveau d'études le plus élevé",
+  "pfEmployer": "Employeur",
+  "pfEmploymentType": "Type de contrat",
+  "pfEnd": "Fin",
+  "pfExperience": "Expérience",
+  "pfExperienceYears": "Années d'expérience",
+  "pfExpiresOn": "Expire le",
+  "pfField": "Domaine d'études",
+  "pfFullName": "Nom complet",
+  "pfFundingHelp": "Montant entier dans la devise choisie (en centimes pour EUR et USD).",
+  "pfFundingMax": "Financement maximal recherché",
+  "pfFundingMin": "Financement minimal recherché",
+  "pfGeneral": "Informations générales",
+  "pfGrade": "Mention",
+  "pfImproveHint": "Pour des résultats plus pertinents, complétez :",
+  "pfInstitution": "Établissement",
+  "pfIssuer": "Organisme émetteur",
+  "pfJobTitle": "Intitulé du poste",
+  "pfLanguages": "Langues",
+  "pfLegalStatus": "Statut juridique",
+  "pfLinkKind": "Type de lien",
+  "pfLinks": "Liens",
+  "pfLinksLocations": "Liens et localisations",
+  "pfMissingEducation": "votre formation",
+  "pfMissingExperience": "votre expérience",
+  "pfMissingIdentity": "votre nom et votre pays",
+  "pfMissingLanguages": "vos langues",
+  "pfMissingObjectives": "vos objectifs",
+  "pfMissingPreferences": "vos préférences de localisation",
+  "pfMissingSkills": "vos compétences",
+  "pfMissingStatus": "votre situation professionnelle",
+  "pfMissions": "Missions principales",
+  "pfNative": "Langue maternelle",
+  "pfNothingYet": "Rien pour le moment.",
+  "pfObjectives": "Objectifs",
+  "pfObjectivesHelp": "Ce que vous recherchez : ils orientent les recherches et le classement.",
+  "pfObtainedOn": "Obtenu le",
+  "pfOccupation": "Occupation actuelle",
+  "pfOngoing": "En cours",
+  "pfPhone": "Téléphone",
+  "pfPhoneHelp": "Utilisé uniquement dans les brouillons de documents que vous générez.",
+  "pfPortfolio": "Portfolio",
+  "pfPreferredLocations": "Localisations recherchées",
+  "pfProjectDescription": "Description",
+  "pfProjectTitle": "Nom du projet",
+  "pfProjects": "Projets",
+  "pfRegionCentralAfrica": "Toute l'Afrique centrale (CEMAC)",
+  "pfRelocate": "Prêt à déménager",
+  "pfSkillPrimaryToggle": "Marquer comme compétence principale",
+  "pfSkills": "Compétences",
+  "pfSkillsLanguages": "Compétences et langues",
+  "pfStage": "Stade du projet",
+  "pfStart": "Début",
+  "pfStatus": "Situation professionnelle",
+  "pfSubtitle": "Ces informations restent sur cet ordinateur et servent au classement des opportunités.",
+  "pfSummary": "Résumé du profil",
+  "pfSummaryApprove": "Valider ce résumé",
+  "pfSummaryApproved": "Résumé validé",
+  "pfSummaryGenerate": "Composer à partir du profil",
+  "pfSummaryHelp": "Résumé composé uniquement à partir de vos informations. Modifiez-le puis validez-le.",
+  "pfTimeline": "Durée prévue (mois)",
+  "pfWebsite": "Site web",
+  "prefBandwidth": "Volume maximal par recherche : {mb} Mo",
+  "@prefBandwidth": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "prefDataSaver": "Économiseur de données",
+  "prefDataSaverHelp": "Ne télécharge pas les pages de détail ni les pièces jointes pendant la recherche.",
+  "prefNetwork": "Réseau",
+  "prefNotifications": "Notifications",
+  "prefProxy": "Proxy (facultatif)",
+  "prefReminders": "Rappels avant échéance",
+  "prefRemindersHelp": "Nombre de jours avant la date limite, séparés par des virgules (ex. 14, 7, 3, 1).",
+  "prefWeights": "Pondération du score",
+  "prefWeightsHelp": "Ajustez l'importance de chaque critère dans le score de pertinence.",
+  "prioHigh": "Haute",
+  "prioLow": "Basse",
+  "prioMedium": "Moyenne",
+  "privConsentAi": "Traitement par un service d'IA",
+  "privConsentSync": "Synchronisation",
+  "privConsents": "Consentements",
+  "privDisclosures": "Données envoyées à des tiers",
+  "privExportAll": "Exporter toutes mes données",
+  "privImportJson": "Importer un export JSON",
+  "privImported": "{count, plural, =0{Import terminé} =1{Import terminé : 1 opportunité suivie} other{Import terminé : {count} opportunités suivies}}",
+  "@privImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privNoDisclosures": "Aucune donnée personnelle n'a été envoyée à un tiers.",
+  "privNoTelemetry": "Aucune télémétrie : Opportunex n'envoie aucune statistique d'utilisation.",
+  "privOpportunities": "Opportunités en cache",
+  "privPortability": "Portabilité",
+  "privPortabilityHelp": "Archive ZIP lisible (JSON + fichiers) de toutes vos données, ou réimport d'un export JSON.",
+  "privRevoke": "Retirer",
+  "privRevokedOn": "retiré le {date}",
+  "@privRevokedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "privSearches": "Recherches",
+  "privStored": "Données stockées",
+  "privStoredHelp": "Tout est chiffré dans la base locale de ce profil.",
+  "psEmployed": "Salarié(e)",
+  "psEntrepreneur": "Entrepreneur(e)",
+  "psFreelancer": "Freelance",
+  "psJobSeeker": "En recherche d'emploi",
+  "psOther": "Autre",
+  "psResearcher": "Chercheur(se)",
+  "psRetired": "Retraité(e)",
+  "psSelfEmployed": "Indépendant(e)",
+  "psStudent": "Étudiant(e)",
+  "psUnemployed": "Sans emploi",
+  "srcActive": "Actives",
+  "srcAdd": "Ajouter une source",
+  "srcAddHelp": "Indiquez l'adresse d'une page publique. Opportunex détecte un flux RSS/Atom et respecte robots.txt.",
+  "srcAdded": "{count, plural, =0{Source ajoutée (aucun élément détecté pour l'instant)} =1{Source ajoutée : 1 élément détecté} other{Source ajoutée : {count} éléments détectés}}",
+  "@srcAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "srcAll": "Toutes",
+  "srcCount": "{shown} sur {total}",
+  "@srcCount": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "srcCustom": "Ajoutées par moi",
+  "srcDetect": "Détecter et ajouter",
+  "srcFailing": "En échec",
+  "srcLastError": "Erreur : {error}",
+  "@srcLastError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "srcLastSuccess": "Dernier succès : {date}",
+  "@srcLastSuccess": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "srcLinkOnly": "Lien officiel uniquement",
+  "srcLinks": "Liens officiels",
+  "srcName": "Nom (facultatif)",
+  "srcOppCount": "{count, plural, =1{1 opportunité} other{{count} opportunités}}",
+  "@srcOppCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "srcPolicy": "Opportunex n'interroge que des sources publiques, respecte robots.txt et les conditions d'utilisation, et espace ses requêtes. Les portails sans flux sont proposés sous forme de lien officiel.",
+  "srcReliability": "Fiabilité {pct} %",
+  "@srcReliability": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "srcSubtitle": "Catalogue des sources publiques interrogées lors des recherches",
+  "stAccepted": "Acceptée",
+  "stArchived": "Archivée",
+  "stDiscovered": "Découverte",
+  "stExpired": "Expirée",
+  "stInterview": "Entretien",
+  "stPreparing": "En préparation",
+  "stReady": "Prête à soumettre",
+  "stRejected": "Refusée",
+  "stSubmitted": "Soumise",
+  "stToReview": "À examiner",
+  "stWithdrawn": "Retirée",
+  "stgEarly": "Démarrage",
+  "stgEstablished": "Établi",
+  "stgGrowth": "Croissance",
+  "stgIdea": "Idée",
+  "stgPrototype": "Prototype",
+  "stgScale": "Changement d'échelle",
+  "trackAddEvent": "Ajouter un événement",
+  "trackAddItem": "Ajouter un élément",
+  "trackAddNote": "Ajouter une note",
+  "trackAddTag": "Ajouter une étiquette",
+  "trackAllPriorities": "Toutes priorités",
+  "trackAllStatuses": "Tous statuts",
+  "trackAllTags": "Toutes étiquettes",
+  "trackArchive": "Archiver",
+  "trackArchived": "Archivées",
+  "trackAttach": "Joindre un fichier",
+  "trackBoard": "Tableau",
+  "trackCalendar": "Calendrier",
+  "trackChecklist": "Liste de contrôle",
+  "trackChecklistEmpty": "Aucun élément. Les pièces demandées par l'annonce apparaissent ici quand elles sont connues.",
+  "trackChecklistProgress": "{done} sur {total} terminés",
+  "@trackChecklistProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "trackDocumentLabel": "Libellé du document",
+  "trackDocuments": "Documents joints",
+  "trackDocumentsHelp": "Les fichiers sont chiffrés dans votre coffre local.",
+  "trackDownload": "Enregistrer une copie",
+  "trackDropHere": "Déposer ici",
+  "trackEmptyBody": "Sauvegardez des opportunités depuis les résultats de recherche pour les suivre ici.",
+  "trackEmptyTitle": "Aucune opportunité suivie",
+  "trackEventContact": "Contact",
+  "trackEventLocation": "Lieu",
+  "trackEventTitle": "Intitulé",
+  "trackEventType": "Type",
+  "trackEventWhen": "Date et heure",
+  "trackEvents": "Événements et contacts",
+  "trackFromListing": "Exigé par l'annonce",
+  "trackHistory": "Historique",
+  "trackIneligible": "Non éligible",
+  "trackIneligibleReason": "Raison (facultatif)",
+  "trackInterest": "Intérêt",
+  "trackInterested": "Intéressante",
+  "trackList": "Liste",
+  "trackNoDocuments": "Aucun document joint.",
+  "trackNoEvents": "Aucun événement.",
+  "trackNoPersonalDeadline": "Aucune échéance personnelle",
+  "trackNoteHint": "Écrire une note…",
+  "trackNotes": "Notes",
+  "trackOpenSheet": "Ouvrir la fiche",
+  "trackPersonalDeadline": "Échéance personnelle",
+  "trackPriority": "Priorité",
+  "trackReminders": "Rappels programmés",
+  "trackSearchHint": "Filtrer par titre ou organisme",
+  "trackSettings": "Suivi",
+  "trackStatus": "Statut",
+  "trackStatusChanged": "Statut mis à jour : {status}",
+  "@trackStatusChanged": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSubmittedOn": "Date de soumission",
+  "trackTag": "Étiquette",
+  "trackUnarchive": "Désarchiver",
+  "trackUndecided": "À décider",
+  "trackUnsave": "Ne plus suivre",
+  "trackUnsaveConfirm": "Les notes, documents et l'historique de cette candidature seront supprimés.",
+  "wsCompare": "Comparer ({count})",
+  "@wsCompare": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wsCounts": "{queries} recherches · {saved} suivies · {opportunities} opportunités",
+  "@wsCounts": {
+    "placeholders": {
+      "queries": {
+        "type": "int"
+      },
+      "saved": {
+        "type": "int"
+      },
+      "opportunities": {
+        "type": "int"
+      }
+    }
+  },
+  "wsCreate": "Nouvel espace",
+  "wsEmptyBody": "Un espace regroupe des recherches, des opportunités et des notes autour d'un projet.",
+  "wsEmptyTitle": "Aucun espace de travail",
+  "wsName": "Nom de l'espace",
+  "wsNoOpportunities": "Aucune opportunité dans cet espace.",
+  "wsNoQueries": "Aucune recherche enregistrée dans cet espace.",
+  "wsNoTemplate": "Vide",
+  "wsOpportunities": "Opportunités",
+  "wsQueries": "Recherches",
+  "wsRemove": "Retirer de l'espace",
+  "wsSearchHere": "Rechercher dans cet espace",
+  "wsSubtitle": "Organisez vos recherches par projet",
+  "wsTemplate": "Modèle",
+  "settingsPreferences": "Préférences",
+  "settingsPrivacy": "Confidentialité",
+  "genSaved": "Version enregistrée",
+  "prefCloseToTray": "Continuer dans la zone de notification à la fermeture",
+  "prefCloseToTrayHelp": "Les veilles et les rappels ne fonctionnent que lorsque l'application est ouverte ; fermer la fenêtre la réduit alors à côté de l'horloge.",
+  "trayOpen": "Ouvrir Opportunex",
+  "trayQuit": "Quitter",
+  "trayStillRunning": "Opportunex continue dans la zone de notification pour exécuter vos veilles. Clic droit sur l'icône pour quitter.",
+  "aiAddProvider": "Ajouter un fournisseur",
+  "aiAllow": "Autoriser",
+  "aiAnalyze": "Analyser avec l'IA",
+  "aiAnalyzed": "Analyse terminée : {applied} champs vérifiés ajoutés, {unverifiable} non vérifiables",
+  "@aiAnalyzed": {
+    "placeholders": {
+      "applied": {
+        "type": "int"
+      },
+      "unverifiable": {
+        "type": "int"
+      }
+    }
+  },
+  "aiBaseUrl": "Adresse du service (facultatif)",
+  "aiBaseUrlHelp": "HTTPS obligatoire, sauf pour un serveur sur cet ordinateur.",
+  "aiBaseUrlRequired": "Adresse du service",
+  "aiConsentGiven": "consentement donné",
+  "aiConsentIntro": "Pour cette action, Opportunex doit envoyer des données à {provider}, un service en ligne :",
+  "@aiConsentIntro": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiConsentNever": "Votre nom, vos coordonnées, vos liens et vos identifiants ne sont jamais envoyés. Chaque envoi est inscrit dans le tableau de bord de confidentialité.",
+  "aiConsentRevoke": "Vous pourrez retirer ce consentement à tout moment dans Paramètres > Confidentialité.",
+  "aiConsentTitle": "Envoyer des données à {provider} ?",
+  "@aiConsentTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDeleteConfirm": "Le fournisseur et sa clé (retirée du trousseau du système) seront supprimés.",
+  "aiDisplayName": "Nom affiché",
+  "aiEnable": "Activer les fonctions d'IA",
+  "aiEnableHelp": "Désactivées par défaut. Toutes les fonctions marchent sans IA ; l'IA ne fait qu'aider à structurer, résumer, traduire et rédiger.",
+  "aiErrAuth": "Clé d'API refusée par le fournisseur.",
+  "aiErrNetwork": "Service injoignable. Vérifiez la connexion et l'adresse.",
+  "aiErrOther": "Erreur du fournisseur ({code}).",
+  "@aiErrOther": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "aiErrRateLimited": "Quota atteint chez le fournisseur. Réessayez plus tard.",
+  "aiErrTimeout": "Le fournisseur n'a pas répondu à temps.",
+  "aiFieldAmount": "Montant",
+  "aiFieldApplicationUrl": "Lien de candidature",
+  "aiFieldAudience": "Public visé",
+  "aiFieldCategory": "Catégorie",
+  "aiFieldCountry": "Pays",
+  "aiFieldCurrency": "Devise",
+  "aiFieldOrganization": "Organisme",
+  "aiFields": "Informations extraites par l'IA",
+  "aiKey": "Clé d'API",
+  "aiKeyHelp": "Conservée dans le trousseau sécurisé du système, jamais dans la base ni dans les journaux.",
+  "aiKeyMissing": "clé manquante",
+  "aiKeyReplace": "Nouvelle clé d'API (laisser vide pour garder l'actuelle)",
+  "aiKind": "Fournisseur",
+  "aiKindLmStudio": "LM Studio (sur cet ordinateur)",
+  "aiKindOllama": "Ollama (sur cet ordinateur)",
+  "aiKindOpenAi": "Compatible OpenAI (adresse personnalisée)",
+  "aiLocal": "sur cet ordinateur",
+  "aiLocalHelp": "Modèle exécuté sur cet ordinateur : aucune donnée ne quitte la machine, aucun consentement n'est demandé.",
+  "aiModel": "Modèle",
+  "aiModelHelp": "Nom exact du modèle ; « Tester » liste les modèles disponibles.",
+  "aiModelNotListed": "Le modèle « {model} » n'apparaît pas dans la liste : choisissez-en un ci-dessous.",
+  "@aiModelNotListed": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiModelsAvailable": "{count, plural, =0{Aucun modèle listé} =1{1 modèle disponible} other{{count} modèles disponibles}}",
+  "@aiModelsAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiMoveDown": "Descendre dans l'ordre de repli",
+  "aiMoveUp": "Monter dans l'ordre de repli",
+  "aiNoProvider": "Aucun fournisseur configuré.",
+  "aiProviderAdded": "Fournisseur ajouté. Utilisez « Tester » pour vérifier la connexion.",
+  "aiProviders": "Fournisseurs et ordre de repli",
+  "aiProvidersHelp": "Les fournisseurs sont essayés dans cet ordre ; en dernier recours, l'application utilise ses règles sans IA.",
+  "aiPurposeContent": "Le texte nécessaire à la tâche (requête ou annonce publique)",
+  "aiPurposeCv": "Le texte de votre CV, sans nom, courriel, téléphone ni liens",
+  "aiPurposeProfile": "Votre profil anonymisé (formations, expériences, compétences, langues)",
+  "aiRemote": "service en ligne",
+  "aiRemoteHelp": "Service en ligne : un consentement vous sera demandé avant le premier envoi, et chaque envoi sera journalisé.",
+  "aiRouting": "Modèle par tâche",
+  "aiRoutingAuto": "Automatique (ordre de repli)",
+  "aiRoutingHelp": "Choisissez un fournisseur précis pour certaines tâches.",
+  "aiRule1": "Les valeurs extraites sont vérifiées dans le texte de l'annonce ; sinon elles sont marquées « Non vérifiable ».",
+  "aiRule2": "Le score de pertinence reste calculé sans IA, de façon explicable.",
+  "aiRule3": "Les brouillons n'utilisent que votre profil validé ; tout ajout inventé est signalé.",
+  "aiRule4": "Les modèles locaux (Ollama, LM Studio) ne font sortir aucune donnée de l'ordinateur.",
+  "aiSummary": "Résumé généré par l'IA",
+  "aiTaskCv": "Analyse de CV",
+  "aiTaskDrafting": "Rédaction de documents",
+  "aiTaskExtraction": "Analyse des annonces",
+  "aiTaskQuery": "Interprétation des recherches",
+  "aiTaskTranslation": "Traduction",
+  "aiTest": "Tester",
+  "aiTestFailed": "échec du test",
+  "aiTestOk": "testé le {date}",
+  "@aiTestOk": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiTestSuccess": "Connexion réussie",
+  "aiTitle": "Intelligence artificielle",
+  "aiTranslate": "Traduire",
+  "aiUnavailable": "L'IA n'a pas pu traiter la demande ; les informations sans IA restent affichées.",
+  "aiUsage": "Consommation",
+  "aiUsageCache": "Cache",
+  "aiUsageCalls": "Appels",
+  "aiUsageDay": "Jour",
+  "aiUsageEmpty": "Aucun appel pour l'instant.",
+  "aiUsageErrors": "Erreurs",
+  "aiUsageHelp": "30 derniers jours, par fournisseur. Les jetons sont ceux déclarés par le fournisseur.",
+  "aiUsageProvider": "Fournisseur",
+  "aiUsageRules": "Repli sans IA",
+  "aiUsageTokens": "Jetons",
+  "aiWithout": "Continuer sans IA",
+  "commonRefresh": "Actualiser",
+  "cvUseAi": "Analyser avec l'IA",
+  "cvUseAiHelp": "Le texte du CV est envoyé sans nom, courriel, téléphone ni liens ; chaque élément reste à valider.",
+  "genFromTemplate": "Modèle intégré",
+  "genFromTemplateHelp": "Rédigé localement à partir de votre profil.",
+  "genWithAi": "Rédiger avec l'IA",
+  "genWithAiHelp": "À partir de votre profil anonymisé ; les ajouts non présents dans le profil sont signalés.",
+  "provUnverifiable": "Non vérifiable",
+  "settingsAi": "IA",
+  "compareGone": "Disparues",
+  "compareModified": "Modifiées",
+  "compareNew": "Nouvelles",
+  "compareSame": "Aucune différence entre les deux exécutions.",
+  "dashDaysShort": "J-{days}",
+  "@dashDaysShort": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freqDaily": "tous les jours",
+  "freqEveryDays": "tous les {days} jours",
+  "@freqEveryDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freqEveryHours": "toutes les {hours} h",
+  "@freqEveryHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "freqMonthly": "tous les mois",
+  "freqWeekly": "chaque semaine",
+  "historyCompare": "Comparer avec l'exécution précédente",
+  "monHistory": "Historique",
+  "monHistoryEmpty": "Aucune exécution pour l'instant.",
+  "monHistoryLine": "{date} · {created} nouvelles · {updated} modifiées",
+  "@monHistoryLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "created": {
+        "type": "int"
+      },
+      "updated": {
+        "type": "int"
+      }
+    }
+  },
+  "paletteEmpty": "Aucune commande ne correspond.",
+  "paletteGoTo": "Aller à : {section}",
+  "@paletteGoTo": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "paletteHint": "Tapez une commande ou une page…",
+  "paletteTheme": "Changer de thème (clair, sombre, système)",
+  "prefAutoArchive": "Archiver les candidatures closes",
+  "prefAutoArchiveHelp": "Acceptées, refusées, retirées ou expirées, sans activité depuis ce délai.",
+  "prefAutostart": "Lancer Opportunex à l'ouverture de session",
+  "prefAutostartHelp": "L'application démarre réduite dans la zone de notification pour exécuter vos veilles.",
+  "prefDays": "{days, plural, =1{après 1 jour} other{après {days} jours}}",
+  "@prefDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "prefNever": "jamais",
+  "prefTracking": "Suivi et démarrage",
+  "runUnavailableCount": "{count, plural, =1{1 source à consulter manuellement} other{{count} sources à consulter manuellement}}",
+  "@runUnavailableCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shortcutClose": "Fermer une fenêtre de dialogue",
+  "shortcutHelp": "Afficher cette aide",
+  "shortcutPalette": "Palette de commandes",
+  "shortcutSearch": "Nouvelle recherche",
+  "shortcutSections": "Aller à une section du menu",
+  "shortcutsTitle": "Raccourcis clavier",
+  "srcCategories": "Catégories couvertes",
+  "srcFrequency": "Fréquence d'analyse",
+  "srcFrequencyHelp": "Jamais plus d'une fois par heure ; les délais de politesse et robots.txt restent appliqués.",
+  "srcSettings": "Fréquence et catégories",
+  "strEducation": "Niveau d'études atteint : {level}",
+  "@strEducation": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "strExperience": "Expérience suffisante (au moins {years} ans demandés)",
+  "@strExperience": {
+    "placeholders": {
+      "years": {
+        "type": "String"
+      }
+    }
+  },
+  "strLanguages": "Langues demandées maîtrisées",
+  "strLocation": "Pays recherché : {country}",
+  "@strLocation": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "strObjective": "Correspond à votre objectif : {objective}",
+  "@strObjective": {
+    "placeholders": {
+      "objective": {
+        "type": "String"
+      }
+    }
+  },
+  "strRemote": "Télétravail possible",
+  "strSkills": "Compétences : {skills}",
+  "@strSkills": {
+    "placeholders": {
+      "skills": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yToggle": "Activer ou désactiver : {name}",
+  "@a11yToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11ySelect": "Sélectionner : {title}",
+  "@a11ySelect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "auditCreate": "Organisation créée",
+  "auditInvite": "Invitation envoyée",
+  "auditInviteRevoke": "Invitation annulée",
+  "auditJoin": "Membre arrivé",
+  "auditKeyShare": "Clé transmise à un membre",
+  "auditLeave": "Membre parti",
+  "auditRemove": "Membre retiré",
+  "auditRole": "Rôle modifié",
+  "auditRotate": "Clé renouvelée",
+  "errSyncCodeInvalid": "Code invalide ou expiré.",
+  "errSyncEmailNotVerified": "Confirmez d'abord votre adresse avec le code reçu par e-mail.",
+  "errSyncInviteInvalid": "Invitation invalide, expirée ou déjà utilisée.",
+  "errSyncInviteOtherEmail": "Cette invitation est destinée à une autre adresse.",
+  "errSyncLastOwner": "Une organisation doit garder au moins un propriétaire.",
+  "errSyncPairingMismatch": "Le code ne correspond pas à l'appareil en attente. Vérifiez le code affiché sur le nouvel appareil.",
+  "errSyncQuota": "Espace du compte en ligne épuisé.",
+  "errSyncRateLimited": "Trop de tentatives. Réessayez dans une minute.",
+  "errSyncRegistrationClosed": "Ce serveur n'accepte pas de nouveaux comptes.",
+  "errSyncTotpInvalid": "Code de double authentification incorrect.",
+  "errSyncTotpRequired": "Saisissez le code de votre application d'authentification.",
+  "errSyncUnreachable": "Serveur de synchronisation injoignable. Vos modifications seront envoyées plus tard.",
+  "errSyncUrlInsecure": "Le serveur doit utiliser HTTPS.",
+  "errSyncUrlInvalid": "Adresse de serveur invalide.",
+  "navOrgs": "Organisations",
+  "orgsAudit": "Journal d'activité",
+  "orgsCopyCode": "Copier le code",
+  "orgsCreate": "Créer une organisation",
+  "orgsEmpty": "Aucune organisation",
+  "orgsEmptyBody": "Créez une organisation ou rejoignez-en une avec un code d'invitation.",
+  "orgsFingerprint": "empreinte {code}",
+  "@orgsFingerprint": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsInvite": "Inviter",
+  "orgsInviteCode": "Code d'invitation",
+  "orgsInviteEmail": "Adresse e-mail (facultatif)",
+  "orgsInviteEmailHelp": "Sans adresse, un code à transmettre vous-même est créé.",
+  "orgsInviteExpires": "Valable jusqu'au {date}.",
+  "@orgsInviteExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsInviteReady": "Invitation prête",
+  "orgsInviteSent": "Un e-mail a été envoyé à {email}. Vous pouvez aussi transmettre ce code :",
+  "@orgsInviteSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsInviteShare": "Transmettez ce code à la personne invitée :",
+  "orgsJoin": "Rejoindre",
+  "orgsJoined": "Organisation rejointe. Les éléments partagés arrivent à la prochaine synchronisation.",
+  "orgsJoinedOn": "depuis le {date}",
+  "@orgsJoinedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsKeyPending": "clé en attente",
+  "orgsKeyVersion": "clé n° {version}",
+  "@orgsKeyVersion": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "orgsLeave": "Quitter",
+  "orgsLeaveConfirm": "Vous gardez une copie personnelle des espaces et opportunités partagés. Les autres membres ne verront plus vos modifications.",
+  "orgsLeft": "Vous avez quitté l'organisation.",
+  "orgsMadePersonal": "L'élément est redevenu personnel.",
+  "orgsMakePersonal": "Ne plus partager (personnel)",
+  "orgsMembers": "Membres",
+  "orgsMembersHelp": "Comparez l'empreinte de clé d'un membre avec celle affichée chez lui pour vérifier qu'aucun intermédiaire ne s'est glissé.",
+  "orgsNeedSync": "Synchronisation requise",
+  "orgsNeedSyncBody": "Les organisations passent par un serveur de synchronisation chiffré de bout en bout. Liez d'abord cet appareil.",
+  "orgsNoneToShare": "Aucune organisation : créez-en une ou rejoignez-en une d'abord.",
+  "orgsOpenSync": "Ouvrir les réglages de synchronisation",
+  "orgsRemove": "Retirer de l'organisation",
+  "orgsRole": "Rôle",
+  "orgsShareTitle": "Partager avec une organisation",
+  "orgsShared2": "Partagé. Les membres le recevront à la prochaine synchronisation.",
+  "orgsSubtitle": "Espaces et opportunités partagés, chiffrés avec une clé commune",
+  "roleAdmin": "Administrateur",
+  "roleEditor": "Éditeur",
+  "roleOwner": "Propriétaire",
+  "roleViewer": "Lecteur",
+  "settingsSync": "Synchronisation",
+  "syncApprove": "Approuver",
+  "syncApproveHelp": "Saisissez le code affiché sur le nouvel appareil. S'il ne correspond pas, n'approuvez pas.",
+  "syncApproveTitle": "Approuver « {name} »",
+  "@syncApproveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncApproved": "Appareil approuvé.",
+  "syncCodeSent": "Si un compte existe, un code a été envoyé par e-mail.",
+  "syncConflictOn": "{kind} · champ « {field} » modifié sur deux appareils",
+  "@syncConflictOn": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "syncConflicts": "Conflits à résoudre",
+  "syncConflictsHelp": "Le même texte a été modifié sur deux appareils. Choisissez la version à garder ; elle sera envoyée partout.",
+  "syncCopyUri": "Copier le lien otpauth://",
+  "syncCreate": "Créer un compte en ligne",
+  "syncDeleteRemote": "Supprimer le compte en ligne",
+  "syncDeleteRemoteHelp": "Toutes vos données sont effacées du serveur. Les données de cet ordinateur sont conservées.",
+  "syncDeletedRemote": "Compte en ligne supprimé. Cet appareil est revenu en mode local.",
+  "syncDeviceActive": "couplé",
+  "syncDevicePending": "en attente d'approbation",
+  "syncDeviceRevoked": "révoqué",
+  "syncDevices": "Appareils",
+  "syncDevicesHelp": "Un nouvel appareil reçoit les clés seulement après votre approbation.",
+  "syncDone": "Synchronisation terminée.",
+  "syncEmailCode": "Code reçu par e-mail",
+  "syncEmailCodeHelp": "Collez le code du message.",
+  "syncForgot": "Mot de passe oublié",
+  "syncKeepMine": "Garder la version de cet appareil",
+  "syncLast": "Dernière synchronisation : {date}",
+  "@syncLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "syncLink": "Se connecter et lier cet appareil",
+  "syncLinked": "Appareil lié au compte en ligne.",
+  "syncLocalMode": "Mode actuel : local uniquement. Vos données ne quittent pas cet ordinateur.",
+  "syncNewPassword": "Nouveau mot de passe",
+  "syncNow": "Synchroniser",
+  "syncOnlinePassword": "Mot de passe du compte en ligne",
+  "syncOtherVersion": "Autre appareil",
+  "syncPairCheck": "Vérifier le couplage",
+  "syncPairCode": "Code de couplage",
+  "syncPairHelp": "Sur un appareil déjà couplé, ouvrez Paramètres > Synchronisation > Appareils, choisissez cet appareil et saisissez ce code.",
+  "syncPairTitle": "Couplage en attente",
+  "syncPasswordReset": "Mot de passe modifié. Reconnectez-vous.",
+  "syncPending": "{count, plural, =0{Aucune modification en attente} =1{1 modification en attente d'envoi} other{{count} modifications en attente d'envoi}}",
+  "@syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncQuota": "Espace utilisé : {used} sur {total}",
+  "@syncQuota": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "syncResend": "Renvoyer le code",
+  "syncResetTitle": "Réinitialiser le mot de passe",
+  "syncResetWarning": "La réinitialisation rend l'accès au compte, pas aux données : seuls vos appareils déjà couplés détiennent les clés.",
+  "syncRevoke": "Révoquer l'appareil",
+  "syncRule1": "Chiffrement de bout en bout : le serveur ne peut lire ni votre profil, ni vos notes, ni vos candidatures.",
+  "syncRule2": "Serveur auto-hébergé : vous choisissez l'instance (aucune instance officielle n'existe encore).",
+  "syncRule3": "Facultatif : sans compte en ligne, l'application fonctionne entièrement en local.",
+  "syncSecurity": "Sécurité du compte en ligne",
+  "syncSendCode": "Envoyer un code",
+  "syncServer": "Adresse du serveur",
+  "syncServerHelp": "HTTPS obligatoire. Exemple : https://sync.mon-association.org",
+  "syncSkipped": "Élément non appliqué sur cet appareil ({reason}).",
+  "@syncSkipped": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "syncSyncedMode": "Mode actuel : synchronisé, chiffré de bout en bout ({email})",
+  "@syncSyncedMode": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "syncTakeOther": "Prendre l'autre version",
+  "syncThisDevice": "{name} (cet appareil)",
+  "@syncThisDevice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisVersion": "Cet appareil",
+  "syncTitle": "Synchronisation chiffrée",
+  "syncTotp": "Double authentification (TOTP)",
+  "syncTotpCode": "Code à 6 chiffres",
+  "syncTotpEnable": "Activer",
+  "syncTotpHelp": "Un code de votre application d'authentification sera demandé à chaque connexion d'un appareil.",
+  "syncTotpOn": "Double authentification activée.",
+  "syncTotpOptional": "Code de double authentification (si activée)",
+  "syncTotpSetup": "Ajoutez ce secret dans votre application d'authentification, puis saisissez le code qu'elle affiche.",
+  "syncUnlink": "Délier cet appareil",
+  "syncUnlinkConfirm": "La synchronisation s'arrête sur cet appareil. Ses données restent disponibles en local.",
+  "syncVerifyAndLink": "Confirmer et lier cet appareil",
+  "syncVerifyTitle": "Confirmer l'adresse e-mail"
+}

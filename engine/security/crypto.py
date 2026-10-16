@@ -1,106 +1,116 @@
-import re
+"""Key management primitives (architecture §9.1).
+
+* Authentication hash: Argon2id PHC string (own random salt).
+* Key-encryption keys: Argon2id raw derivation with a *different* random salt.
+* The 256-bit data key (SQLCipher + vault) is wrapped with AES-256-GCM, once by the
+  password-derived key and once by the recovery-phrase-derived key.
+"""
+
+from __future__ import annotations
+
+import base64
+import hmac
 import secrets
-from typing import Tuple
+from dataclasses import dataclass
+
+import argon2.low_level as argon2_ll
 from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
+from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
+from cryptography.exceptions import InvalidTag
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-# Configure Argon2id as requested: memory=65536, iterations=3, parallelism=1
-ph = PasswordHasher(
-    time_cost=3,
-    memory_cost=65536,
-    parallelism=1,
-    hash_len=32,
-    salt_len=16
-)
+DATA_KEY_BYTES = 32
+SALT_BYTES = 16
+NONCE_BYTES = 12
 
-# 100-word subset of BIP39 English wordlist
-WORDLIST = [
-    "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse",
-    "access", "accident", "account", "accuse", "achieve", "acid", "acoustic", "acquire", "across", "act",
-    "action", "actor", "actress", "actual", "adapt", "add", "addict", "address", "adjust", "admit",
-    "adult", "advance", "advice", "aerobic", "afford", "afraid", "again", "age", "agent", "agree",
-    "ahead", "aim", "air", "airport", "aisle", "alarm", "album", "alcohol", "alert", "alien",
-    "all", "alley", "allow", "almost", "alone", "alpha", "already", "alter", "always", "amateur",
-    "amazing", "among", "amount", "amused", "analyst", "anchor", "ancient", "anger", "angle", "angry",
-    "animal", "ankle", "announce", "annual", "another", "answer", "antenna", "antique", "anxiety", "any",
-    "apart", "apology", "appear", "apple", "approve", "april", "arch", "arctic", "area", "arena",
-    "argue", "arm", "armed", "armor", "army", "around"
-]
 
-def hash_password(password: str) -> str:
-    """Hashes a password using Argon2id."""
-    return ph.hash(password)
+@dataclass(frozen=True)
+class KdfParams:
+    memory_kib: int = 65536
+    iterations: int = 3
+    parallelism: int = 1
 
-def verify_password(password: str, hash_str: str) -> bool:
-    """Verifies a password against a hash. Returns True if valid, False otherwise."""
+    def hasher(self) -> PasswordHasher:
+        return PasswordHasher(
+            time_cost=self.iterations,
+            memory_cost=self.memory_kib,
+            parallelism=self.parallelism,
+            hash_len=32,
+            salt_len=SALT_BYTES,
+        )
+
+
+class UnwrapError(Exception):
+    """Wrong secret or tampered wrapped key."""
+
+
+def b64e(data: bytes) -> str:
+    return base64.b64encode(data).decode("ascii")
+
+
+def b64d(text: str) -> bytes:
+    return base64.b64decode(text.encode("ascii"))
+
+
+def new_salt() -> bytes:
+    return secrets.token_bytes(SALT_BYTES)
+
+
+def new_data_key() -> bytes:
+    return secrets.token_bytes(DATA_KEY_BYTES)
+
+
+def hash_secret(secret: str, params: KdfParams) -> str:
+    return params.hasher().hash(secret)
+
+
+def verify_secret(secret: str, phc: str, params: KdfParams) -> bool:
     try:
-        return ph.verify(hash_str, password)
-    except VerifyMismatchError:
+        return params.hasher().verify(phc, secret)
+    except (VerifyMismatchError, VerificationError, InvalidHashError):
         return False
 
-def generate_recovery_phrase() -> Tuple[str, str]:
-    """Generates a 12-word recovery phrase and its Argon2id hash."""
-    words = [secrets.choice(WORDLIST) for _ in range(12)]
-    phrase = " ".join(words)
-    hashed_phrase = hash_password(phrase)
-    return phrase, hashed_phrase
 
-def verify_recovery_phrase(phrase: str, stored_hash: str) -> bool:
-    """Verifies a recovery phrase against its stored Argon2id hash."""
-    return verify_password(phrase, stored_hash)
-
-def derive_key_from_password(password: str, salt: bytes) -> bytes:
-    """Derives a 32-byte key from a password and salt using Argon2id KDF logic."""
-    import argon2.low_level as al
-    
-    return al.hash_secret_raw(
-        secret=password.encode("utf-8"),
+def derive_kek(secret: str, salt: bytes, params: KdfParams) -> bytes:
+    return argon2_ll.hash_secret_raw(
+        secret=secret.encode("utf-8"),
         salt=salt,
-        time_cost=3,
-        memory_cost=65536,
-        parallelism=1,
-        hash_len=32,
-        type=al.Type.ID
+        time_cost=params.iterations,
+        memory_cost=params.memory_kib,
+        parallelism=params.parallelism,
+        hash_len=DATA_KEY_BYTES,
+        type=argon2_ll.Type.ID,
     )
 
-def generate_data_key() -> bytes:
-    """Generates a random 32-byte data key."""
-    return secrets.token_bytes(32)
 
-def wrap_key(key: bytes, wrapping_key: bytes) -> bytes:
-    """Encrypts a key using AES-256-GCM with the provided wrapping key."""
-    iv = secrets.token_bytes(12)
-    cipher = Cipher(algorithms.AES(wrapping_key), modes.GCM(iv), backend=default_backend())
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(key) + encryptor.finalize()
-    return iv + encryptor.tag + ciphertext
+def wrap_key(data_key: bytes, kek: bytes, aad: bytes) -> bytes:
+    nonce = secrets.token_bytes(NONCE_BYTES)
+    return nonce + AESGCM(kek).encrypt(nonce, data_key, aad)
 
-def unwrap_key(wrapped: bytes, wrapping_key: bytes) -> bytes:
-    """Decrypts a key using AES-256-GCM with the provided wrapping key."""
-    iv = wrapped[:12]
-    tag = wrapped[12:28]
-    ciphertext = wrapped[28:]
-    
-    cipher = Cipher(algorithms.AES(wrapping_key), modes.GCM(iv, tag), backend=default_backend())
-    decryptor = cipher.decryptor()
-    return decryptor.update(ciphertext) + decryptor.finalize()
 
-def expurgate_log(text: str) -> str:
-    """Removes sensitive information like emails, phone numbers, and API keys from text."""
-    # Remove emails
-    text = re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '[EMAIL REDACTED]', text)
-    
-    # Remove phone numbers (simple pattern for international formats)
-    text = re.sub(r'\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}', '[PHONE REDACTED]', text)
-    
-    # Remove Bearer tokens
-    text = re.sub(r'Bearer\s+[A-Za-z0-9\-._~+/]+=*', 'Bearer [TOKEN REDACTED]', text)
-    
-    # Remove API keys (sk-*, AIza*, key=*)
-    text = re.sub(r'\bsk-[A-Za-z0-9_-]+\b', '[API KEY REDACTED]', text)
-    text = re.sub(r'\bAIza[A-Za-z0-9_-]+\b', '[API KEY REDACTED]', text)
-    text = re.sub(r'(?i)key=[A-Za-z0-9_-]+', 'key=[API KEY REDACTED]', text)
-    
-    return text
+def unwrap_key(wrapped: bytes, kek: bytes, aad: bytes) -> bytes:
+    try:
+        return AESGCM(kek).decrypt(wrapped[:NONCE_BYTES], wrapped[NONCE_BYTES:], aad)
+    except (InvalidTag, ValueError) as exc:
+        raise UnwrapError("invalid secret or corrupted key") from exc
+
+
+def encrypt_blob(data: bytes, key: bytes, aad: bytes) -> bytes:
+    nonce = secrets.token_bytes(NONCE_BYTES)
+    return nonce + AESGCM(key).encrypt(nonce, data, aad)
+
+
+def decrypt_blob(blob: bytes, key: bytes, aad: bytes) -> bytes:
+    try:
+        return AESGCM(key).decrypt(blob[:NONCE_BYTES], blob[NONCE_BYTES:], aad)
+    except (InvalidTag, ValueError) as exc:
+        raise UnwrapError("cannot decrypt blob") from exc
+
+
+def sqlcipher_key_pragma(data_key: bytes) -> str:
+    """Raw-key PRAGMA so SQLCipher skips its own PBKDF2 (our key is already strong)."""
+    return f"PRAGMA key = \"x'{data_key.hex()}'\""
+
+
+def constant_time_equals(a: str, b: str) -> bool:
+    return hmac.compare_digest(a.encode("utf-8"), b.encode("utf-8"))

@@ -1,0 +1,590 @@
+{
+  "checked_on": "2026-10-15",
+  "results": [
+    {
+      "registry_id": "afd-appels",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "afdb-careers",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "http_403"
+    },
+    {
+      "registry_id": "afdb-procurement",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "http_403"
+    },
+    {
+      "registry_id": "africa-prize",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "afterschoolafrica",
+      "kind": "rss",
+      "status": "robots_disallowed",
+      "error": "https://www.afterschoolafrica.com/feed/"
+    },
+    {
+      "registry_id": "arbeitnow",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 50,
+      "sample": [
+        "Operations Manager (m/f/d)",
+        "Business Development (BDR) | DACH Remote (d/f/m)",
+        "Account Executive (AE) | DACH (d/f/m)"
+      ],
+      "with_deadline": 0,
+      "seconds": 34.2
+    },
+    {
+      "registry_id": "auf",
+      "kind": "rss",
+      "status": "http_403",
+      "error": "https://www.auf.org/feed/"
+    },
+    {
+      "registry_id": "bdeac",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "network_error"
+    },
+    {
+      "registry_id": "beac",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "campusfrance",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cemac",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "chevening",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cm-apme",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cm-armp",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cm-coleps",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "network_error"
+    },
+    {
+      "registry_id": "cm-fne",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cm-minefop",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "dns_failed"
+    },
+    {
+      "registry_id": "cm-minesup",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cm-minfopra",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "cm-minpmeesa",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "network_error"
+    },
+    {
+      "registry_id": "commonwealth-scholarships",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "coursera-aid",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "daad",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "devpost",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 1,
+      "sample": [
+        "EurekaDev 2026"
+      ],
+      "with_deadline": 1,
+      "seconds": 29.8
+    },
+    {
+      "registry_id": "erasmus-plus",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "eu-funding-tenders",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "euraxess",
+      "kind": "link",
+      "status": "robots_disallowed",
+      "error": "robots_disallowed"
+    },
+    {
+      "registry_id": "fao-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "fulbright",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "fundsforngos",
+      "kind": "rss",
+      "status": "ok",
+      "items": 25,
+      "sample": [
+        "Apply Now: Developing a Data Lab for Science with EOSC and RAISE",
+        "CFAs: Transformative Change towards a Nature-positive Economy and Society Program",
+        "CFAs: Innovative Solutions to Fight Wildlife Trafficking and Reduce Invasion of Invasive A"
+      ],
+      "with_deadline": 0,
+      "seconds": 21.6
+    },
+    {
+      "registry_id": "giz-tenders",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "globalsouthopportunities",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "Anthropic Fellows Program 2027: AI Safety and Security Research Fellowship",
+        "Research Fellow (Uganda) at the London School of Hygiene & Tropical Medicine (LSHTM) – Sal",
+        "Google DeepMind Research Scientist, Philosophy and Human Values – London, UK"
+      ],
+      "with_deadline": 0,
+      "seconds": 22.6
+    },
+    {
+      "registry_id": "grants-gov",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 25,
+      "sample": [
+        "Artificial Intelligence and Cybersecurity Education Innovation and Scholarship for Service",
+        "University Nuclear Leadership Program– Scholarship and Fellowship Support",
+        "The Science, Mathematics and Research for Transformation (SMART) Scholarship for Service P"
+      ],
+      "with_deadline": 18,
+      "seconds": 35.2
+    },
+    {
+      "registry_id": "himalayas",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 20,
+      "sample": [
+        "Administrador Senior de Monitorización BMC",
+        "LQA Game Tester (Polish) - Freelance Remote",
+        "Atlassian Technical Consultant"
+      ],
+      "with_deadline": 20,
+      "seconds": 23.3
+    },
+    {
+      "registry_id": "ilo-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "iom-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "jobicy",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 50,
+      "sample": [
+        "Senior Technical Account Manager",
+        "Site Reliability Engineer",
+        "Senior Manager, Sales Engineering - US Public Sector"
+      ],
+      "with_deadline": 0,
+      "seconds": 27.0
+    },
+    {
+      "registry_id": "kaggle",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "kamerpower",
+      "kind": "rss",
+      "status": "feed_malformed",
+      "error": "feed_malformed: <unknown>:4:196: not well-formed (invalid token)"
+    },
+    {
+      "registry_id": "mastercard-foundation",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "mladiinfo",
+      "kind": "rss",
+      "status": "ok",
+      "items": 12,
+      "sample": [
+        "Call for an Intern through World University Service",
+        "Beyond the Internship: The Global Network That Keeps Paying Off",
+        "International Youth Math Challenge 2026"
+      ],
+      "with_deadline": 0,
+      "seconds": 66.0
+    },
+    {
+      "registry_id": "oif",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "opportunitiescircle",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "RISE Summer Internship 2027 in Germany | Fully Funded",
+        "Doha Institute Scholarships 2027 in Qatar | Fully Funded",
+        "World Bank Government Analytics Fellowship 2027"
+      ],
+      "with_deadline": 0,
+      "seconds": 29.1
+    },
+    {
+      "registry_id": "opportunitiescorners",
+      "kind": "rss",
+      "status": "ok",
+      "items": 6,
+      "sample": [
+        "Universal Youth Leadership Summit Malaysia 2027 (Fully Funded)",
+        "University of Tokyo MEXT Scholarship 2027 in Japan (Fully Funded)",
+        "UNU Junior Fellows Internship 2027 in Japan (PAID)"
+      ],
+      "with_deadline": 0,
+      "seconds": 24.3
+    },
+    {
+      "registry_id": "opportunitiesforafricans",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "The Changemakers for Youth Programme 2027 for young changemakers and social entrepreneurs.",
+        "WWF’s Russell E. Train Fellowships 2027/2028 for master’s or doctoral students ($15,000 pe",
+        "The APDD Individual Research Fellowships 2027 for African Researchers."
+      ],
+      "with_deadline": 0,
+      "seconds": 21.3
+    },
+    {
+      "registry_id": "opportunitiesforyouth",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "Comprehensive Guide to the 2027–2028 CFR International Affairs Fellowship in Canada: Mid-C",
+        "National Young Farmers Coalition Board of Directors Application 2026: Leadership Opportuni",
+        "WHO Calls for Experts in Artificial Intelligence for Health: Apply to Join the Technical A"
+      ],
+      "with_deadline": 0,
+      "seconds": 9.4
+    },
+    {
+      "registry_id": "opportunitydesk",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "Toronto Metropolitan University Global Migration Institute Scholarships 2027-2028",
+        "Deutsche Welle (DW) Traineeship 2028-2029",
+        "25 UN Administration and Facilities Management Jobs Currently Open – October 15, 2026"
+      ],
+      "with_deadline": 0,
+      "seconds": 36.9
+    },
+    {
+      "registry_id": "reliefweb-jobs",
+      "kind": "json_api",
+      "status": "robots_disallowed",
+      "error": "https://api.reliefweb.int/v2/jobs?appname=opportunex&profile=list&preset=latest&limit=40&query%5Bvalue%5D=scholarship&fields%5Binclude%5D%5B%5D=date.closing&fie"
+    },
+    {
+      "registry_id": "reliefweb-training",
+      "kind": "json_api",
+      "status": "robots_disallowed",
+      "error": "https://api.reliefweb.int/v2/training?appname=opportunex&profile=list&preset=latest&limit=30&query%5Bvalue%5D=scholarship&fields%5Binclude%5D%5B%5D=date.registr"
+    },
+    {
+      "registry_id": "remoteok",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 50,
+      "sample": [
+        "Payment Operations Specialist",
+        "AI Trainer",
+        "Customer Support Specialist"
+      ],
+      "with_deadline": 0,
+      "seconds": 29.1
+    },
+    {
+      "registry_id": "scholars4dev",
+      "kind": "rss",
+      "status": "empty",
+      "items": 0,
+      "sample": [],
+      "with_deadline": 0,
+      "seconds": 21.9
+    },
+    {
+      "registry_id": "scholarship-positions",
+      "kind": "rss",
+      "status": "dns_failed",
+      "error": "cloudflare.vc"
+    },
+    {
+      "registry_id": "scholarshiproar",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "Fully Funded Scholarships in China for International Students 2027",
+        "Johns Hopkins University Scholarships 2027 | USA",
+        "Heidelberg University Scholarships 2027 | Germany"
+      ],
+      "with_deadline": 0,
+      "seconds": 7.6
+    },
+    {
+      "registry_id": "scholarshipsads",
+      "kind": "rss",
+      "status": "http_404",
+      "error": "https://www.scholarshipsads.com/feed/"
+    },
+    {
+      "registry_id": "ted-europa",
+      "kind": "link",
+      "status": "ok",
+      "http": 202
+    },
+    {
+      "registry_id": "tef",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "un-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "undp-jobs",
+      "kind": "link",
+      "status": "robots_disallowed",
+      "error": "robots_disallowed"
+    },
+    {
+      "registry_id": "undp-procurement",
+      "kind": "link",
+      "status": "robots_disallowed",
+      "error": "robots_disallowed"
+    },
+    {
+      "registry_id": "unesco-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "ungm",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "unhcr-careers",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "http_403"
+    },
+    {
+      "registry_id": "unicef-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "unv",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "weworkremotely",
+      "kind": "rss",
+      "status": "ok",
+      "items": 50,
+      "sample": [
+        "Zapier: Sr. Motion Designer",
+        "ClickHouse: Principal Product Marketing Manager",
+        "Emerging Travel Group: Senior Python Developer (CRM - AI/LLM)"
+      ],
+      "with_deadline": 0,
+      "seconds": 29.8
+    },
+    {
+      "registry_id": "wfp-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "who-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "workingnomads",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 50,
+      "sample": [
+        "Video Creator (100% remote)",
+        "Senior AI Engineer / Architect",
+        "Language specialist"
+      ],
+      "with_deadline": 0,
+      "seconds": 27.6
+    },
+    {
+      "registry_id": "worldbank-careers",
+      "kind": "link",
+      "status": "ok",
+      "http": 200
+    },
+    {
+      "registry_id": "worldbank-procurement",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 38,
+      "sample": [
+        "Hiring of Education Testing Commission / Human Resource Development - Higher Education Com",
+        "School grants and Teacher Training Institutes operating cost fund management service",
+        "Hiring of Nine Universities for female Scholarships (BS/BEd Education) under PB-6 GRADES-B"
+      ],
+      "with_deadline": 19,
+      "seconds": 33.1
+    },
+    {
+      "registry_id": "yali",
+      "kind": "link",
+      "status": "unreachable",
+      "error": "http_407"
+    },
+    {
+      "registry_id": "youthhubafrica",
+      "kind": "rss",
+      "status": "ok",
+      "items": 10,
+      "sample": [
+        "Youth Organisation Database in Africa (YODA)",
+        "African Youth Charter @ 20",
+        "Girl Champions Training on Ending Child Marriage"
+      ],
+      "with_deadline": 0,
+      "seconds": 8.8
+    },
+    {
+      "registry_id": "youthop",
+      "kind": "rss",
+      "status": "http_404",
+      "error": "https://www.youthop.com/feed"
+    },
+    {
+      "registry_id": "zindi",
+      "kind": "json_api",
+      "status": "ok",
+      "items": 40,
+      "sample": [
+        "Climate Risk and Health Prediction Challenge",
+        "Sasol Customer Value Recruitment Challenge",
+        "Bias Bounty Mapping Equity Challenge"
+      ],
+      "with_deadline": 40,
+      "seconds": 56.4
+    }
+  ]
+}

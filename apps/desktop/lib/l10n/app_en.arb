@@ -1,0 +1,1635 @@
+{
+  "@@locale": "en",
+  "appName": "Opportunex",
+  "slogan": "Find · Analyse · Achieve",
+  "tagline": "Your assistant for public and private opportunities",
+  "commonCancel": "Cancel",
+  "commonConfirm": "Confirm",
+  "commonContinue": "Continue",
+  "commonBack": "Back",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonClose": "Close",
+  "commonRetry": "Retry",
+  "commonCopy": "Copy",
+  "commonCopied": "Copied to clipboard",
+  "commonLoading": "Loading…",
+  "commonOptional": "optional",
+  "commonShow": "Show",
+  "commonHide": "Hide",
+  "commonYes": "Yes",
+  "commonNo": "No",
+  "commonDone": "Done",
+  "commonSearch": "Search",
+  "commonNotSpecified": "Not specified",
+  "commonUnknownError": "Something unexpected went wrong. Try again; if it keeps happening, export the logs from Settings › Maintenance.",
+  "startupStarting": "Starting the local engine…",
+  "startupRestarting": "The engine stopped. Restarting (attempt {attempt} of 3)…",
+  "@startupRestarting": {
+    "placeholders": {
+      "attempt": {
+        "type": "int"
+      }
+    }
+  },
+  "diagTitle": "The local engine could not start",
+  "diagNotFound": "The Opportunex engine could not be found. Reinstall the application or, in development, run \"launch-dev.ps1 -Setup\".",
+  "diagAlreadyRunning": "Opportunex is already open for this user. Close the other window, then retry.",
+  "diagHandshake": "The engine did not answer in time. Your antivirus may be blocking it.",
+  "diagCrashed": "The engine stopped several times in a row.",
+  "diagHealth": "The engine started but does not pass its health checks.",
+  "diagDetails": "Technical details",
+  "diagExportLogs": "Open the logs folder",
+  "diagRetry": "Restart the engine",
+  "authWelcomeTitle": "Welcome",
+  "authWelcomeSubtitle": "Your data stays on this computer, encrypted.",
+  "authChooseProfile": "Choose your profile",
+  "authNewProfile": "Create a profile",
+  "authOtherAccount": "Sign in with another e-mail",
+  "authImportProfile": "Import a profile from a backup",
+  "authEmail": "E-mail address",
+  "authPassword": "Password",
+  "authConfirmPassword": "Confirm password",
+  "authDisplayName": "Display name",
+  "authLanguage": "Language",
+  "authSignIn": "Sign in",
+  "authSignInTitle": "Sign in",
+  "authForgotPassword": "Forgot your password?",
+  "authCreateAccount": "Create an account",
+  "authRegisterTitle": "Create your local profile",
+  "authRegisterSubtitle": "A profile is encrypted with your password. Nobody else, not even ETS Monthe Network, can read it.",
+  "authAcceptTerms": "I accept the terms of use and the privacy policy",
+  "authReadTerms": "Read the terms",
+  "authAlreadyHaveAccount": "I already have a profile",
+  "authPasswordHint": "At least 12 characters. A phrase of several words works best.",
+  "authStrength0": "Very weak",
+  "authStrength1": "Weak",
+  "authStrength2": "Fair",
+  "authStrength3": "Good",
+  "authStrength4": "Excellent",
+  "authPhraseTitle": "Your recovery phrase",
+  "authPhraseBody": "Write these 12 words down in order and keep them away from this computer. They are the only way to recover your data if you forget your password. They will never be shown again.",
+  "authPhraseConfirm": "I have stored my recovery phrase in a safe place",
+  "authUnlockTitle": "Profile locked",
+  "authUnlockInactivity": "Locked after a period of inactivity.",
+  "authUnlockManual": "Profile locked.",
+  "authUnlockExpired": "Your session has expired.",
+  "authUnlock": "Unlock",
+  "authSwitchProfile": "Switch profile",
+  "authRecoverTitle": "Recover your profile",
+  "authRecoverBody": "Enter the 12 words of your recovery phrase, then choose a new password.",
+  "authRecoveryPhrase": "Recovery phrase (12 words)",
+  "authNewPassword": "New password",
+  "authRecover": "Recover and sign in",
+  "authLock": "Lock",
+  "authSignOut": "Sign out",
+  "authModeLocal": "Local mode",
+  "authModeSynced": "Synced",
+  "authLockedFor": "Too many attempts. Try again in {seconds} s.",
+  "@authLockedFor": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "validationRequired": "Required",
+  "validationEmail": "Invalid e-mail address",
+  "validationPasswordMatch": "Passwords do not match",
+  "validationPhraseWords": "The phrase must contain exactly 12 words",
+  "navDashboard": "Dashboard",
+  "navSearch": "Search",
+  "navSaved": "Saved",
+  "navApplications": "Applications",
+  "navMonitors": "Monitors",
+  "navWorkspaces": "Workspaces",
+  "navSources": "Sources",
+  "navProfile": "My profile",
+  "navSettings": "Settings",
+  "navCollapse": "Collapse menu",
+  "navExpand": "Expand menu",
+  "errInvalidCredentials": "Wrong e-mail or password.",
+  "errAccountLocked": "Too many failed attempts. Please wait before trying again.",
+  "errEmailTaken": "A profile already uses this e-mail on this computer.",
+  "errPasswordPolicy": "Password too weak: at least 12 characters and not in the compromised-password list.",
+  "errPasswordMismatch": "Passwords do not match.",
+  "errTermsNotAccepted": "You must accept the terms of use.",
+  "errInvalidRecovery": "Wrong recovery phrase.",
+  "errSessionLocked": "Your session is locked.",
+  "errEngineUnreachable": "The local engine is not responding. It may be restarting.",
+  "errValidation": "Some fields are invalid.",
+  "errNotFound": "Item not found.",
+  "errProfileCorrupted": "The profile cannot be decrypted. Restore a backup.",
+  "errUpstream": "The external service is unavailable right now.",
+  "settingsAccount": "Account & security",
+  "settingsBackups": "Backups",
+  "settingsMaintenance": "Maintenance",
+  "settingsAbout": "About",
+  "settingsSaved": "Changes saved",
+  "settingsProfileSection": "Profile",
+  "settingsModeLocalHelp": "Your data stays on this computer only.",
+  "settingsModeSyncedHelp": "Your data is end-to-end encrypted and synced across your devices.",
+  "settingsAppearance": "Language & appearance",
+  "settingsTheme": "Theme",
+  "settingsThemeSystem": "System",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsSecurity": "Security",
+  "settingsAutoLock": "Auto-lock",
+  "settingsAutoLockHelp": "After this long without activity, the profile locks and the encryption key is erased from memory.",
+  "settingsMinutes": "{minutes} min",
+  "@settingsMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsChangePassword": "Change password",
+  "settingsChangePasswordHelp": "Your data stays encrypted; only the key wrapping is renewed.",
+  "settingsCurrentPassword": "Current password",
+  "settingsPasswordChanged": "Password changed",
+  "settingsDangerZone": "Danger zone",
+  "settingsDeleteAccount": "Delete account",
+  "settingsDeleteAccountHelp": "Permanently erases the profile, encrypted database, documents and backups from this computer.",
+  "settingsDeleteAccountConfirm": "This cannot be undone: all your local data will be deleted. Type DELETE to confirm.",
+  "settingsConfirmWithPassword": "Confirm with your password",
+  "backupsTitle": "Backups",
+  "backupsHelp": "Encrypted archives of your database and documents. The last 7 automatic backups are kept.",
+  "backupsCreate": "Back up now",
+  "backupsCreated": "Backup created",
+  "backupsAuto": "Daily automatic backup",
+  "backupsAutoHelp": "Runs while the application is open, at most once a day.",
+  "backupsFolder": "Backup folder",
+  "backupsHistory": "History",
+  "backupsEmpty": "No backups yet.",
+  "backupsOkTag": "intact",
+  "backupsRestoredTag": "restored",
+  "backupsVerify": "Check integrity",
+  "backupsVerified": "Backup checked: intact",
+  "backupsRestore": "Restore",
+  "backupsRestoreConfirm": "Your current data will be replaced by the backup. A safety backup is made first. Type RESTORE to confirm.",
+  "backupsRestored": "Restore complete",
+  "backupsDelete": "Delete backup",
+  "backupsDeleteConfirm": "The backup file will be permanently deleted.",
+  "backupsDeleted": "Backup deleted",
+  "backupKindManual": "manual",
+  "backupKindScheduled": "automatic",
+  "backupKindPreMigration": "before update",
+  "backupKindPreRestore": "before restore",
+  "maintenanceStorage": "Storage used",
+  "maintenanceDatabase": "Database",
+  "maintenanceVault": "Encrypted documents",
+  "maintenanceDataDir": "Data folder",
+  "maintenanceTools": "Tools",
+  "maintenanceRun": "Run",
+  "maintenanceIntegrity": "Integrity check",
+  "maintenanceIntegrityHelp": "Checks the database, the foreign keys and the search index.",
+  "maintenanceIntegrityOk": "No problems found",
+  "maintenanceOptimize": "Optimise the database",
+  "maintenanceOptimizeHelp": "Compacts the database and optimises the search index.",
+  "maintenanceOptimized": "Database optimised",
+  "maintenanceLogs": "Technical logs",
+  "maintenanceLogsHelp": "Exports redacted logs (no e-mails, tokens or keys) for support.",
+  "maintenanceExport": "Export",
+  "maintenanceLogsSaved": "Logs exported",
+  "aboutVersion": "Version",
+  "aboutEngine": "engine",
+  "aboutSchema": "schema",
+  "aboutCredits": "Publisher & author",
+  "aboutPublisher": "Publisher",
+  "aboutAuthor": "Lead developer",
+  "aboutCopyright": "Copyright",
+  "aboutLicense": "Licence",
+  "aboutLicenseBody": "Opportunex is free, open-source software, distributed under the GNU Affero General Public License v3. You may use, study, modify and redistribute it under the terms of that licence. The Opportunex name and logo remain reserved.",
+  "aboutSourceCode": "Source code",
+  "aboutThirdParty": "Third-party licences",
+  "aboutTermsPrivacy": "Terms & privacy",
+  "legalTerms": "Terms of use",
+  "legalPrivacy": "Privacy",
+  "importProfileBody": "Choose an Opportunex backup file (.opxbak) and enter the password of the backed-up profile.",
+  "importChooseFile": "Choose a backup…",
+  "importAction": "Import and sign in",
+  "badgeAiGenerated": "AI-generated",
+  "badgeDeadlineSoon": "Deadline soon",
+  "badgeDeadlineUnknown": "Deadline unknown",
+  "badgeEligibilityUncertain": "Eligibility uncertain",
+  "badgeExpired": "Expired",
+  "badgeModified": "Modified",
+  "badgeNew": "New",
+  "badgeVerified": "Verified",
+  "scoreLabel": "Relevance {score} out of 100",
+  "@scoreLabel": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "catAcceleration": "Incubation & acceleration",
+  "catCall": "Calls for applications",
+  "catCompetition": "Competitions & awards",
+  "catEmployment": "Employment",
+  "catEntrepreneurship": "Entrepreneurship",
+  "catFreelance": "Freelance missions",
+  "catGrant": "Grants & funding",
+  "catInternship": "Internships",
+  "catOther": "Other opportunities",
+  "catPartnership": "Partnerships",
+  "catResearch": "Research",
+  "catScholarship": "Scholarships",
+  "catTender": "Tenders",
+  "catTraining": "Training",
+  "catVolunteering": "Volunteering",
+  "critDeadline": "Deadline",
+  "critEducation": "Education",
+  "critExperience": "Experience",
+  "critLanguage": "Languages",
+  "critLocation": "Location",
+  "critNotEvaluated": "Not evaluated for lack of information",
+  "critObjectives": "Goals",
+  "critSkills": "Skills",
+  "daysLeft": "{days, plural, =0{last day} =1{1 day left} other{{days} days left}}",
+  "@daysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "deadlineUnknownShort": "Deadline not specified",
+  "eligLikely": "Likely eligible (based on published criteria)",
+  "eligNot": "Not eligible: the deadline has passed",
+  "eligUncertain": "Eligibility to check",
+  "eligUnlikely": "Unlikely to be eligible",
+  "exportAction": "Export",
+  "exportDone": "Export saved",
+  "filterAdd": "Add",
+  "filterAddKeyword": "Add a keyword",
+  "filterAmountMin": "Minimum amount",
+  "filterAnyBadge": "All flags",
+  "filterAnyDate": "Any date",
+  "filterAnyScore": "Any relevance",
+  "filterBadge": "Flag",
+  "filterCategories": "Categories",
+  "filterCountries": "Countries",
+  "filterDeadlineBefore": "Deadline before",
+  "filterIncludeExpired": "Include expired",
+  "filterKeywords": "Keywords",
+  "filterMinScore": "Minimum relevance",
+  "filterWorkMode": "Work mode",
+  "filtersSubtitle": "This is how Opportunex understood your request. Correct it freely before starting the search.",
+  "filtersTitle": "Search criteria",
+  "gapEducation": "Required education: {value}",
+  "@gapEducation": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapExperience": "Required experience: {value} year(s)",
+  "@gapExperience": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLanguage": "Required language: {value}",
+  "@gapLanguage": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLocation": "Location: {value}",
+  "@gapLocation": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "gapSkills": "Skills missing from your profile: {value}",
+  "@gapSkills": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "historyClear": "Clear history",
+  "historyClearConfirm": "Unsaved searches will be deleted. Saved searches are kept.",
+  "historyEmpty": "No searches yet.",
+  "historyHint": "Save a search to rerun it later or turn it into a monitor.",
+  "historyOpen": "View results",
+  "historyRerun": "Run again",
+  "historySave": "Save search",
+  "historyUnsave": "Stop saving",
+  "loadMore": "Show more",
+  "oppAddWorkspace": "Add to a workspace",
+  "oppAmount": "Amount",
+  "oppApplicationUrl": "Application link",
+  "oppContact": "Public contact",
+  "oppDeadline": "Deadline",
+  "oppDismiss": "Dismiss",
+  "oppDocumentsRequired": "Documents required",
+  "oppEligibility": "Eligibility",
+  "oppFeedbackThanks": "Thanks, your recommendations will be adjusted",
+  "oppFinancial": "Financial benefits",
+  "oppFullText": "Full listing text",
+  "oppGaps": "Gaps and points to check",
+  "oppLastChecked": "Last checked",
+  "oppLocation": "Location",
+  "oppMethod": "Analysis method",
+  "oppMethodRules": "Deterministic rules (no AI)",
+  "oppMore": "More actions",
+  "oppNoCriteria": "The listing does not publish precise eligibility criteria: check with the publisher.",
+  "oppNoGaps": "No gap detected with your profile.",
+  "oppNotRelevant": "Not relevant",
+  "oppOfficialLink": "Official link",
+  "oppOpenTracking": "View tracking",
+  "oppOriginalPublisher": "Original publisher",
+  "oppOverview": "Overview",
+  "oppProcedure": "Procedure",
+  "oppPublished": "Published on",
+  "oppPublisher": "Publisher & sources",
+  "oppQualifications": "Required qualifications",
+  "oppRecheck": "Re-check on the official site",
+  "oppRechecked": "Check complete",
+  "oppRelevance": "Relevance for you",
+  "oppRelevant": "Relevant",
+  "oppRepost": "Repost",
+  "oppSave": "Save",
+  "oppSaved": "Saved",
+  "oppSavedToast": "Opportunity saved",
+  "oppStatus": "Status",
+  "oppStrengths": "Your strengths",
+  "oppSubmissionNotice": "Opportunex never submits applications: apply through the publisher's official channel.",
+  "oppSummary": "Summary",
+  "oppToVerify": "To check yourself",
+  "oppVerbatimNote": "Clauses reproduced word for word from the listing.",
+  "oppVerification": "Verification",
+  "provExplicit": "Explicit",
+  "provGenerated": "Generated",
+  "provInferred": "Inferred",
+  "reqEducation": "Education",
+  "reqExperience": "Experience",
+  "reqLanguages": "Languages",
+  "reqSkills": "Skills",
+  "resultsCount": "{count, plural, =0{No results} =1{1 result} other{{count} results}}",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsEmptyBody": "Broaden your criteria or add sources in the Sources section.",
+  "resultsEmptyTitle": "No matching opportunity",
+  "runCancelled": "cancelled",
+  "runCompleted": "complete",
+  "runFailed": "failed",
+  "runPartial": "partly complete",
+  "runProgress": "Searching: {done} of {total} source(s)",
+  "@runProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "runResume": "Resume",
+  "runStatus": "Search {status}",
+  "@runStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "runUnavailableBody": "These sources could not be read automatically or do not allow it. Check them directly:",
+  "runUnavailableTitle": "Sources to check manually",
+  "searchEmptyBody": "Describe what you are looking for in French or English, for example \"master's scholarship in France\" or \"IT internship in Douala\".",
+  "searchEmptyTitle": "What are you looking for?",
+  "searchHelper": "Natural-language search, in French or English",
+  "searchHint": "E.g. master's scholarship in public health for 2027",
+  "searchInterpret": "Analyse",
+  "searchLaunch": "Start search",
+  "searchSuggestions": "Suggestions",
+  "searchTabHistory": "History",
+  "searchTabNew": "Search",
+  "sortAmount": "Amount",
+  "sortDeadline": "Deadline",
+  "sortPublished": "Publication",
+  "sortRecent": "Recently added",
+  "sortRelevance": "Relevance",
+  "sourcesCount": "{count} sources",
+  "@sourcesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workHybrid": "Hybrid",
+  "workOnsite": "On site",
+  "workRemote": "Remote",
+  "wsAdded": "Added to the workspace",
+  "wsNoneYet": "Create a workspace first in the Workspaces section.",
+  "calDeadline": "Official deadline",
+  "calEmpty": "No deadlines this month.",
+  "calExportIcs": "Export calendar (.ics)",
+  "calNext": "Next month",
+  "calPersonalDeadline": "Personal deadline",
+  "calPrev": "Previous month",
+  "cvAccept": "Accept",
+  "cvApplied": "{count, plural, =0{No item added to the profile} =1{1 item added to the profile} other{{count} items added to the profile}}",
+  "@cvApplied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cvApply": "Add to profile",
+  "cvConfidence": "Extraction confidence: {pct}%",
+  "@cvConfidence": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "cvDiscard": "Discard import",
+  "cvIdentity": "Identity",
+  "cvImport": "Import a CV",
+  "cvKeepFile": "Keep the CV file",
+  "cvKeepFileHelp": "The file is encrypted in your local vault. Otherwise it is deleted after parsing.",
+  "cvNothingFound": "Nothing could be extracted",
+  "cvNothingFoundBody": "The document may be scanned (image) or protected. You can fill in your profile manually.",
+  "cvPick": "Choose a file",
+  "cvPickBody": "PDF, DOCX or TXT, up to 10 MB. Parsing happens on this computer, nothing is sent online.",
+  "cvPickTitle": "Import your CV",
+  "cvReject": "Reject",
+  "cvReviewHelp": "Check each detected item: accept, correct or reject it. Only accepted items will be added.",
+  "cvSubtitle": "Pre-fill your profile from an existing CV",
+  "dashActivity": "Recent activity",
+  "dashApplications": "Applications by status",
+  "dashDeadlines": "Upcoming deadlines",
+  "dashDiscovered": "Discovered",
+  "dashFirstStepsBody": "A few steps to get relevant results.",
+  "dashFirstStepsTitle": "Getting started",
+  "dashFollowUp": "Follow-up suggested: {title}",
+  "@dashFollowUp": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "dashHello": "Hello {name}",
+  "@dashHello": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashInProgress": "In preparation",
+  "dashManage": "Manage",
+  "dashNew": "New",
+  "dashNewSearch": "New search",
+  "dashNoActivity": "No activity yet.",
+  "dashNoApplications": "No tracked applications.",
+  "dashNoDeadlines": "No deadlines in the next 30 days.",
+  "dashNoRecommendations": "Run a search to get recommendations.",
+  "dashNoStats": "Statistics will appear after your first applications.",
+  "dashRecommendations": "Recommendations",
+  "dashRecommendationsHelp": "Open opportunities ranked best for your profile (indicative score).",
+  "dashRelevant": "Relevant",
+  "dashSaved": "Saved",
+  "dashSourceFailing": "{count, plural, =1{1 consecutive failure} other{{count} consecutive failures}}",
+  "@dashSourceFailing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashSources": "Source health",
+  "dashSourcesSummary": "{active} active, {healthy} healthy, {total} in total",
+  "@dashSourcesSummary": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "healthy": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStatAccepted": "Accepted: {count}",
+  "@dashStatAccepted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStatDelay": "Average response time: {days} days",
+  "@dashStatDelay": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatRate": "Acceptance rate: {rate}",
+  "@dashStatRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatSubmitted": "Submitted: {count}",
+  "@dashStatSubmitted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashStats": "Personal statistics",
+  "dashStepCv": "Import a CV",
+  "dashStepMonitor": "Create a monitor",
+  "dashStepProfile": "Complete the profile",
+  "dashStepSearch": "Run a search",
+  "dashSubmitted": "Submitted",
+  "dashSubmittedOn": "Submitted on {date}",
+  "@dashSubmittedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dashSubtitle": "Overview of your opportunities and applications",
+  "dashWithin": "{days} days: {count}",
+  "@dashWithin": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dayFri": "Friday",
+  "dayMon": "Monday",
+  "daySat": "Saturday",
+  "daySun": "Sunday",
+  "dayThu": "Thursday",
+  "dayTue": "Tuesday",
+  "dayWed": "Wednesday",
+  "docCoverLetter": "Cover letter",
+  "docCvSuggestions": "CV tailoring suggestions",
+  "docEmail": "Application e-mail",
+  "docGrant": "Grant application",
+  "docInterview": "Interview preparation",
+  "docProjectSummary": "Project summary",
+  "docScholarship": "Scholarship application letter",
+  "edBac": "High-school diploma",
+  "edBac2": "Associate degree (BTS, DUT, HND)",
+  "edBachelor": "Bachelor's degree",
+  "edDoctorate": "Doctorate",
+  "edMaster": "Master's degree",
+  "edNone": "No diploma",
+  "edPostdoc": "Postdoctoral",
+  "edPrimary": "Primary school",
+  "edSecondary": "Secondary school",
+  "edVocational": "Vocational training",
+  "eraseAction": "Erase selection",
+  "eraseConfirm": "The selected data will be permanently deleted from this computer. Type ERASE to confirm.",
+  "eraseDocuments": "Documents attached to applications",
+  "eraseDone": "Data erased",
+  "eraseHelp": "Choose exactly what you want to delete. Your account and applications are kept.",
+  "eraseHistory": "Unsaved search history",
+  "eraseLogs": "Technical logs",
+  "eraseNotifications": "Notifications",
+  "eraseOpportunities": "Unsaved opportunities",
+  "eraseProfile": "Profile details (education, experience, skills…)",
+  "eraseTitle": "Selective erasure",
+  "etConsulting": "Consulting",
+  "etFreelance": "Freelance",
+  "etFullTime": "Full time",
+  "etInternship": "Internship",
+  "etPartTime": "Part time",
+  "etVolunteer": "Volunteering",
+  "evCall": "Call",
+  "evFollowUp": "Follow-up",
+  "evInterview": "Interview",
+  "evMeeting": "Meeting",
+  "evOther": "Other",
+  "evTest": "Test",
+  "genCreate": "Create a draft",
+  "genEmpty": "No draft for this opportunity.",
+  "genIntegrityTitle": "Check: items not found in your validated profile",
+  "genNotice": "Draft generated from your validated profile. Review and adapt it before sending anything.",
+  "genSaveVersion": "Save a version",
+  "genSubtitle": "Editable drafts with version history",
+  "genTitle": "Generated documents",
+  "monCreate": "New monitor",
+  "monDaily": "Every day at {time}",
+  "@monDaily": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "monDailyLabel": "Daily",
+  "monEmptyBody": "A monitor reruns a search on a schedule and tells you what is new.",
+  "monEmptyTitle": "No monitors",
+  "monFrequencyNote": "The actual frequency respects each source's limits (usually at most once a day).",
+  "monLastRun": "Last run: {date} · {count} new",
+  "@monLastRun": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monMinScore": "Minimum score to be notified: {score}",
+  "@monMinScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "monName": "Monitor name",
+  "monNextRun": "Next run: {date}",
+  "@monNextRun": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "monOnlyWhileOpen": "Monitors only run while Opportunex is open (including minimised to the system tray).",
+  "monQuery": "Search to monitor",
+  "monRunNow": "Run now",
+  "monScheduleSummary": "{schedule} · minimum score {score}",
+  "@monScheduleSummary": {
+    "placeholders": {
+      "schedule": {
+        "type": "String"
+      },
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "monStarted": "Monitor started",
+  "monTabMonitors": "Monitors",
+  "monTabNotifications": "Notifications",
+  "monWeekly": "Every week: {when}",
+  "@monWeekly": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "monWeeklyLabel": "Weekly",
+  "nkChanged": "Tracked opportunity changed",
+  "nkDeadline": "Deadline reminders",
+  "nkMonitor": "Monitor failure",
+  "nkNew": "New opportunities",
+  "nkSource": "Source unavailable",
+  "notifEmpty": "No notifications",
+  "notifMarkAllRead": "Mark all as read",
+  "onbDone": "Profile saved. Welcome!",
+  "onbFinish": "Finish",
+  "onbLater": "Later",
+  "onbOptionalNote": "Every step is optional and can be changed at any time from your profile.",
+  "onbResume": "Resume setup",
+  "onbSkip": "Skip",
+  "onbStep1": "General information and links",
+  "onbStep2": "Education",
+  "onbStep3": "Experience",
+  "onbStep4": "Skills and languages",
+  "onbStep5": "Objectives",
+  "onbStep6": "Project or organisation",
+  "onbStep7": "Summary",
+  "onbStepOf": "Step {step} of {total} — {title}",
+  "@onbStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onbTitle": "Set up your profile",
+  "orgAcademic": "Academic institution",
+  "orgAssociation": "Association",
+  "orgBudget": "Annual budget",
+  "orgCooperative": "Cooperative",
+  "orgHelp": "Fill this in if you look for opportunities on behalf of an organisation.",
+  "orgName": "Organisation name",
+  "orgNgo": "NGO",
+  "orgNone": "No organisation provided.",
+  "orgPublic": "Public body",
+  "orgRegistration": "Registration number",
+  "orgSector": "Sector",
+  "orgSme": "SME",
+  "orgStartup": "Start-up",
+  "orgTitle": "Organisation",
+  "orgType": "Organisation type",
+  "pfAchievements": "Achievements",
+  "pfAdd": "Add",
+  "pfAddLanguage": "Add a language",
+  "pfAddLink": "Add a link",
+  "pfAddSkill": "Add a skill",
+  "pfAnyMode": "No preference",
+  "pfBeneficiaries": "Beneficiaries",
+  "pfBio": "About me",
+  "pfCertName": "Certification name",
+  "pfCertifications": "Certifications",
+  "pfCity": "City",
+  "pfCompleteness": "Profile {pct}% complete",
+  "@pfCompleteness": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "pfCountry": "Country",
+  "pfCredentialUrl": "Verification link",
+  "pfCurrency": "Currency",
+  "pfCurrentJob": "Current position",
+  "pfCustomObjective": "Other objective…",
+  "pfDegree": "Degree",
+  "pfEducation": "Education",
+  "pfEducationLevel": "Highest education level",
+  "pfEmployer": "Employer",
+  "pfEmploymentType": "Employment type",
+  "pfEnd": "End",
+  "pfExperience": "Experience",
+  "pfExperienceYears": "Years of experience",
+  "pfExpiresOn": "Expires on",
+  "pfField": "Field of study",
+  "pfFullName": "Full name",
+  "pfFundingHelp": "Whole amount in the chosen currency (in cents for EUR and USD).",
+  "pfFundingMax": "Maximum funding sought",
+  "pfFundingMin": "Minimum funding sought",
+  "pfGeneral": "General information",
+  "pfGrade": "Grade",
+  "pfImproveHint": "For more relevant results, complete:",
+  "pfInstitution": "Institution",
+  "pfIssuer": "Issuer",
+  "pfJobTitle": "Job title",
+  "pfLanguages": "Languages",
+  "pfLegalStatus": "Legal status",
+  "pfLinkKind": "Link type",
+  "pfLinks": "Links",
+  "pfLinksLocations": "Links and locations",
+  "pfMissingEducation": "your education",
+  "pfMissingExperience": "your experience",
+  "pfMissingIdentity": "your name and country",
+  "pfMissingLanguages": "your languages",
+  "pfMissingObjectives": "your objectives",
+  "pfMissingPreferences": "your location preferences",
+  "pfMissingSkills": "your skills",
+  "pfMissingStatus": "your professional status",
+  "pfMissions": "Main responsibilities",
+  "pfNative": "Native language",
+  "pfNothingYet": "Nothing yet.",
+  "pfObjectives": "Objectives",
+  "pfObjectivesHelp": "What you are looking for: they guide searches and ranking.",
+  "pfObtainedOn": "Obtained on",
+  "pfOccupation": "Current occupation",
+  "pfOngoing": "Ongoing",
+  "pfPhone": "Phone",
+  "pfPhoneHelp": "Only used in the document drafts you generate.",
+  "pfPortfolio": "Portfolio",
+  "pfPreferredLocations": "Preferred locations",
+  "pfProjectDescription": "Description",
+  "pfProjectTitle": "Project name",
+  "pfProjects": "Projects",
+  "pfRegionCentralAfrica": "All of Central Africa (CEMAC)",
+  "pfRelocate": "Willing to relocate",
+  "pfSkillPrimaryToggle": "Mark as primary skill",
+  "pfSkills": "Skills",
+  "pfSkillsLanguages": "Skills and languages",
+  "pfStage": "Project stage",
+  "pfStart": "Start",
+  "pfStatus": "Professional status",
+  "pfSubtitle": "This information stays on this computer and is used to rank opportunities.",
+  "pfSummary": "Profile summary",
+  "pfSummaryApprove": "Approve this summary",
+  "pfSummaryApproved": "Summary approved",
+  "pfSummaryGenerate": "Compose from profile",
+  "pfSummaryHelp": "Summary composed only from your information. Edit it, then approve it.",
+  "pfTimeline": "Planned duration (months)",
+  "pfWebsite": "Website",
+  "prefBandwidth": "Maximum data per search: {mb} MB",
+  "@prefBandwidth": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "prefDataSaver": "Data saver",
+  "prefDataSaverHelp": "Does not download detail pages or attachments during searches.",
+  "prefNetwork": "Network",
+  "prefNotifications": "Notifications",
+  "prefProxy": "Proxy (optional)",
+  "prefReminders": "Reminders before deadlines",
+  "prefRemindersHelp": "Days before the deadline, separated by commas (e.g. 14, 7, 3, 1).",
+  "prefWeights": "Score weighting",
+  "prefWeightsHelp": "Adjust how much each criterion counts in the relevance score.",
+  "prioHigh": "High",
+  "prioLow": "Low",
+  "prioMedium": "Medium",
+  "privConsentAi": "Processing by an AI service",
+  "privConsentSync": "Synchronisation",
+  "privConsents": "Consents",
+  "privDisclosures": "Data sent to third parties",
+  "privExportAll": "Export all my data",
+  "privImportJson": "Import a JSON export",
+  "privImported": "{count, plural, =0{Import complete} =1{Import complete: 1 tracked opportunity} other{Import complete: {count} tracked opportunities}}",
+  "@privImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privNoDisclosures": "No personal data has been sent to a third party.",
+  "privNoTelemetry": "No telemetry: Opportunex sends no usage statistics.",
+  "privOpportunities": "Cached opportunities",
+  "privPortability": "Portability",
+  "privPortabilityHelp": "Readable ZIP archive (JSON + files) of all your data, or re-import of a JSON export.",
+  "privRevoke": "Withdraw",
+  "privRevokedOn": "withdrawn on {date}",
+  "@privRevokedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "privSearches": "Searches",
+  "privStored": "Stored data",
+  "privStoredHelp": "Everything is encrypted in this profile's local database.",
+  "psEmployed": "Employed",
+  "psEntrepreneur": "Entrepreneur",
+  "psFreelancer": "Freelancer",
+  "psJobSeeker": "Job seeker",
+  "psOther": "Other",
+  "psResearcher": "Researcher",
+  "psRetired": "Retired",
+  "psSelfEmployed": "Self-employed",
+  "psStudent": "Student",
+  "psUnemployed": "Unemployed",
+  "srcActive": "Active",
+  "srcAdd": "Add a source",
+  "srcAddHelp": "Enter the address of a public page. Opportunex detects an RSS/Atom feed and respects robots.txt.",
+  "srcAdded": "{count, plural, =0{Source added (no item detected yet)} =1{Source added: 1 item detected} other{Source added: {count} items detected}}",
+  "@srcAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "srcAll": "All",
+  "srcCount": "{shown} of {total}",
+  "@srcCount": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "srcCustom": "Added by me",
+  "srcDetect": "Detect and add",
+  "srcFailing": "Failing",
+  "srcLastError": "Error: {error}",
+  "@srcLastError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "srcLastSuccess": "Last success: {date}",
+  "@srcLastSuccess": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "srcLinkOnly": "Official link only",
+  "srcLinks": "Official links",
+  "srcName": "Name (optional)",
+  "srcOppCount": "{count, plural, =1{1 opportunity} other{{count} opportunities}}",
+  "@srcOppCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "srcPolicy": "Opportunex only queries public sources, respects robots.txt and terms of use, and spaces out its requests. Portals without a feed are offered as an official link.",
+  "srcReliability": "Reliability {pct}%",
+  "@srcReliability": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "srcSubtitle": "Catalogue of public sources queried during searches",
+  "stAccepted": "Accepted",
+  "stArchived": "Archived",
+  "stDiscovered": "Discovered",
+  "stExpired": "Expired",
+  "stInterview": "Interview",
+  "stPreparing": "Preparing",
+  "stReady": "Ready to submit",
+  "stRejected": "Rejected",
+  "stSubmitted": "Submitted",
+  "stToReview": "To review",
+  "stWithdrawn": "Withdrawn",
+  "stgEarly": "Early stage",
+  "stgEstablished": "Established",
+  "stgGrowth": "Growth",
+  "stgIdea": "Idea",
+  "stgPrototype": "Prototype",
+  "stgScale": "Scaling",
+  "trackAddEvent": "Add an event",
+  "trackAddItem": "Add an item",
+  "trackAddNote": "Add a note",
+  "trackAddTag": "Add a tag",
+  "trackAllPriorities": "All priorities",
+  "trackAllStatuses": "All statuses",
+  "trackAllTags": "All tags",
+  "trackArchive": "Archive",
+  "trackArchived": "Archived",
+  "trackAttach": "Attach a file",
+  "trackBoard": "Board",
+  "trackCalendar": "Calendar",
+  "trackChecklist": "Checklist",
+  "trackChecklistEmpty": "No items. Documents required by the listing appear here when known.",
+  "trackChecklistProgress": "{done} of {total} done",
+  "@trackChecklistProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "trackDocumentLabel": "Document label",
+  "trackDocuments": "Attached documents",
+  "trackDocumentsHelp": "Files are encrypted in your local vault.",
+  "trackDownload": "Save a copy",
+  "trackDropHere": "Drop here",
+  "trackEmptyBody": "Save opportunities from search results to track them here.",
+  "trackEmptyTitle": "No tracked opportunities",
+  "trackEventContact": "Contact",
+  "trackEventLocation": "Location",
+  "trackEventTitle": "Title",
+  "trackEventType": "Type",
+  "trackEventWhen": "Date and time",
+  "trackEvents": "Events and contacts",
+  "trackFromListing": "Required by the listing",
+  "trackHistory": "History",
+  "trackIneligible": "Not eligible",
+  "trackIneligibleReason": "Reason (optional)",
+  "trackInterest": "Interest",
+  "trackInterested": "Interested",
+  "trackList": "List",
+  "trackNoDocuments": "No attached documents.",
+  "trackNoEvents": "No events.",
+  "trackNoPersonalDeadline": "No personal deadline",
+  "trackNoteHint": "Write a note…",
+  "trackNotes": "Notes",
+  "trackOpenSheet": "Open the sheet",
+  "trackPersonalDeadline": "Personal deadline",
+  "trackPriority": "Priority",
+  "trackReminders": "Scheduled reminders",
+  "trackSearchHint": "Filter by title or organisation",
+  "trackSettings": "Tracking",
+  "trackStatus": "Status",
+  "trackStatusChanged": "Status updated: {status}",
+  "@trackStatusChanged": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSubmittedOn": "Submission date",
+  "trackTag": "Tag",
+  "trackUnarchive": "Unarchive",
+  "trackUndecided": "Undecided",
+  "trackUnsave": "Stop tracking",
+  "trackUnsaveConfirm": "This application's notes, documents and history will be deleted.",
+  "wsCompare": "Compare ({count})",
+  "@wsCompare": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wsCounts": "{queries} searches · {saved} tracked · {opportunities} opportunities",
+  "@wsCounts": {
+    "placeholders": {
+      "queries": {
+        "type": "int"
+      },
+      "saved": {
+        "type": "int"
+      },
+      "opportunities": {
+        "type": "int"
+      }
+    }
+  },
+  "wsCreate": "New workspace",
+  "wsEmptyBody": "A workspace groups searches, opportunities and notes around a project.",
+  "wsEmptyTitle": "No workspaces",
+  "wsName": "Workspace name",
+  "wsNoOpportunities": "No opportunities in this workspace.",
+  "wsNoQueries": "No searches saved in this workspace.",
+  "wsNoTemplate": "Blank",
+  "wsOpportunities": "Opportunities",
+  "wsQueries": "Searches",
+  "wsRemove": "Remove from workspace",
+  "wsSearchHere": "Search in this workspace",
+  "wsSubtitle": "Organise your searches by project",
+  "wsTemplate": "Template",
+  "settingsPreferences": "Preferences",
+  "settingsPrivacy": "Privacy",
+  "genSaved": "Version saved",
+  "prefCloseToTray": "Keep running in the notification area when closed",
+  "prefCloseToTrayHelp": "Monitors and reminders only run while the app is open; closing the window then minimises it next to the clock.",
+  "trayOpen": "Open Opportunex",
+  "trayQuit": "Quit",
+  "trayStillRunning": "Opportunex keeps running in the notification area to run your monitors. Right-click the icon to quit.",
+  "aiAddProvider": "Add a provider",
+  "aiAllow": "Allow",
+  "aiAnalyze": "Analyse with AI",
+  "aiAnalyzed": "Analysis done: {applied} verified fields added, {unverifiable} unverifiable",
+  "@aiAnalyzed": {
+    "placeholders": {
+      "applied": {
+        "type": "int"
+      },
+      "unverifiable": {
+        "type": "int"
+      }
+    }
+  },
+  "aiBaseUrl": "Service address (optional)",
+  "aiBaseUrlHelp": "HTTPS is required, except for a server on this computer.",
+  "aiBaseUrlRequired": "Service address",
+  "aiConsentGiven": "consent given",
+  "aiConsentIntro": "For this action, Opportunex must send data to {provider}, an online service:",
+  "@aiConsentIntro": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiConsentNever": "Your name, contact details, links and identifiers are never sent. Every send is listed in the privacy dashboard.",
+  "aiConsentRevoke": "You can withdraw this consent at any time in Settings > Privacy.",
+  "aiConsentTitle": "Send data to {provider}?",
+  "@aiConsentTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDeleteConfirm": "The provider and its key (removed from the system keychain) will be deleted.",
+  "aiDisplayName": "Display name",
+  "aiEnable": "Turn on AI features",
+  "aiEnableHelp": "Off by default. Every feature works without AI; AI only helps to structure, summarise, translate and draft.",
+  "aiErrAuth": "The provider rejected the API key.",
+  "aiErrNetwork": "Service unreachable. Check the connection and address.",
+  "aiErrOther": "Provider error ({code}).",
+  "@aiErrOther": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "aiErrRateLimited": "The provider's quota is reached. Try again later.",
+  "aiErrTimeout": "The provider did not answer in time.",
+  "aiFieldAmount": "Amount",
+  "aiFieldApplicationUrl": "Application link",
+  "aiFieldAudience": "Target audience",
+  "aiFieldCategory": "Category",
+  "aiFieldCountry": "Country",
+  "aiFieldCurrency": "Currency",
+  "aiFieldOrganization": "Organisation",
+  "aiFields": "Information extracted by AI",
+  "aiKey": "API key",
+  "aiKeyHelp": "Kept in the system's secure keychain, never in the database or the logs.",
+  "aiKeyMissing": "key missing",
+  "aiKeyReplace": "New API key (leave empty to keep the current one)",
+  "aiKind": "Provider",
+  "aiKindLmStudio": "LM Studio (on this computer)",
+  "aiKindOllama": "Ollama (on this computer)",
+  "aiKindOpenAi": "OpenAI-compatible (custom address)",
+  "aiLocal": "on this computer",
+  "aiLocalHelp": "Model running on this computer: no data leaves the machine and no consent is needed.",
+  "aiModel": "Model",
+  "aiModelHelp": "Exact model name; \"Test\" lists the available models.",
+  "aiModelNotListed": "The model \"{model}\" is not in the list: pick one below.",
+  "@aiModelNotListed": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiModelsAvailable": "{count, plural, =0{No model listed} =1{1 model available} other{{count} models available}}",
+  "@aiModelsAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiMoveDown": "Move down the fallback order",
+  "aiMoveUp": "Move up the fallback order",
+  "aiNoProvider": "No provider configured.",
+  "aiProviderAdded": "Provider added. Use \"Test\" to check the connection.",
+  "aiProviders": "Providers and fallback order",
+  "aiProvidersHelp": "Providers are tried in this order; as a last resort the application uses its rules without AI.",
+  "aiPurposeContent": "The text needed for the task (query or public announcement)",
+  "aiPurposeCv": "Your CV text, without name, e-mail, phone or links",
+  "aiPurposeProfile": "Your anonymised profile (education, experience, skills, languages)",
+  "aiRemote": "online service",
+  "aiRemoteHelp": "Online service: you will be asked for consent before the first send, and every send is logged.",
+  "aiRouting": "Model per task",
+  "aiRoutingAuto": "Automatic (fallback order)",
+  "aiRoutingHelp": "Pick a specific provider for some tasks.",
+  "aiRule1": "Extracted values are checked against the announcement text; otherwise they are marked \"Unverifiable\".",
+  "aiRule2": "The relevance score is still computed without AI, in an explainable way.",
+  "aiRule3": "Drafts only use your validated profile; any invented addition is flagged.",
+  "aiRule4": "Local models (Ollama, LM Studio) keep all data on this computer.",
+  "aiSummary": "AI-generated summary",
+  "aiTaskCv": "CV parsing",
+  "aiTaskDrafting": "Document drafting",
+  "aiTaskExtraction": "Announcement analysis",
+  "aiTaskQuery": "Search interpretation",
+  "aiTaskTranslation": "Translation",
+  "aiTest": "Test",
+  "aiTestFailed": "test failed",
+  "aiTestOk": "tested on {date}",
+  "@aiTestOk": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiTestSuccess": "Connection successful",
+  "aiTitle": "Artificial intelligence",
+  "aiTranslate": "Translate",
+  "aiUnavailable": "AI could not process the request; the information obtained without AI is still shown.",
+  "aiUsage": "Usage",
+  "aiUsageCache": "Cache",
+  "aiUsageCalls": "Calls",
+  "aiUsageDay": "Day",
+  "aiUsageEmpty": "No calls yet.",
+  "aiUsageErrors": "Errors",
+  "aiUsageHelp": "Last 30 days, per provider. Tokens are those reported by the provider.",
+  "aiUsageProvider": "Provider",
+  "aiUsageRules": "Fallback without AI",
+  "aiUsageTokens": "Tokens",
+  "aiWithout": "Continue without AI",
+  "commonRefresh": "Refresh",
+  "cvUseAi": "Analyse with AI",
+  "cvUseAiHelp": "The CV text is sent without name, e-mail, phone or links; every item still needs your validation.",
+  "genFromTemplate": "Built-in template",
+  "genFromTemplateHelp": "Written locally from your profile.",
+  "genWithAi": "Draft with AI",
+  "genWithAiHelp": "From your anonymised profile; additions not in the profile are flagged.",
+  "provUnverifiable": "Unverifiable",
+  "settingsAi": "AI",
+  "compareGone": "Gone",
+  "compareModified": "Modified",
+  "compareNew": "New",
+  "compareSame": "No difference between the two runs.",
+  "dashDaysShort": "D-{days}",
+  "@dashDaysShort": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freqDaily": "daily",
+  "freqEveryDays": "every {days} days",
+  "@freqEveryDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freqEveryHours": "every {hours} h",
+  "@freqEveryHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "freqMonthly": "monthly",
+  "freqWeekly": "weekly",
+  "historyCompare": "Compare with the previous run",
+  "monHistory": "History",
+  "monHistoryEmpty": "No runs yet.",
+  "monHistoryLine": "{date} · {created} new · {updated} changed",
+  "@monHistoryLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "created": {
+        "type": "int"
+      },
+      "updated": {
+        "type": "int"
+      }
+    }
+  },
+  "paletteEmpty": "No matching command.",
+  "paletteGoTo": "Go to: {section}",
+  "@paletteGoTo": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "paletteHint": "Type a command or a page…",
+  "paletteTheme": "Switch theme (light, dark, system)",
+  "prefAutoArchive": "Archive closed applications",
+  "prefAutoArchiveHelp": "Accepted, rejected, withdrawn or expired, with no activity for this long.",
+  "prefAutostart": "Start Opportunex when you sign in to the computer",
+  "prefAutostartHelp": "The app starts minimised in the notification area to run your monitors.",
+  "prefDays": "{days, plural, =1{after 1 day} other{after {days} days}}",
+  "@prefDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "prefNever": "never",
+  "prefTracking": "Tracking and start-up",
+  "runUnavailableCount": "{count, plural, =1{1 source to check manually} other{{count} sources to check manually}}",
+  "@runUnavailableCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shortcutClose": "Close a dialog",
+  "shortcutHelp": "Show this help",
+  "shortcutPalette": "Command palette",
+  "shortcutSearch": "New search",
+  "shortcutSections": "Go to a menu section",
+  "shortcutsTitle": "Keyboard shortcuts",
+  "srcCategories": "Categories covered",
+  "srcFrequency": "Scan frequency",
+  "srcFrequencyHelp": "Never more than once an hour; politeness delays and robots.txt still apply.",
+  "srcSettings": "Frequency and categories",
+  "strEducation": "Education level met: {level}",
+  "@strEducation": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "strExperience": "Enough experience (at least {years} years required)",
+  "@strExperience": {
+    "placeholders": {
+      "years": {
+        "type": "String"
+      }
+    }
+  },
+  "strLanguages": "Required languages mastered",
+  "strLocation": "Wanted country: {country}",
+  "@strLocation": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "strObjective": "Matches your objective: {objective}",
+  "@strObjective": {
+    "placeholders": {
+      "objective": {
+        "type": "String"
+      }
+    }
+  },
+  "strRemote": "Remote work possible",
+  "strSkills": "Skills: {skills}",
+  "@strSkills": {
+    "placeholders": {
+      "skills": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yToggle": "Turn on or off: {name}",
+  "@a11yToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11ySelect": "Select: {title}",
+  "@a11ySelect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "auditCreate": "Organisation created",
+  "auditInvite": "Invitation sent",
+  "auditInviteRevoke": "Invitation cancelled",
+  "auditJoin": "Member joined",
+  "auditKeyShare": "Key handed to a member",
+  "auditLeave": "Member left",
+  "auditRemove": "Member removed",
+  "auditRole": "Role changed",
+  "auditRotate": "Key renewed",
+  "errSyncCodeInvalid": "Invalid or expired code.",
+  "errSyncEmailNotVerified": "Confirm your address first with the code you received by e-mail.",
+  "errSyncInviteInvalid": "Invitation invalid, expired or already used.",
+  "errSyncInviteOtherEmail": "This invitation is for another address.",
+  "errSyncLastOwner": "An organisation must keep at least one owner.",
+  "errSyncPairingMismatch": "The code does not match the waiting device. Check the code shown on the new device.",
+  "errSyncQuota": "Online account storage is full.",
+  "errSyncRateLimited": "Too many attempts. Try again in a minute.",
+  "errSyncRegistrationClosed": "This server does not accept new accounts.",
+  "errSyncTotpInvalid": "Wrong two-factor code.",
+  "errSyncTotpRequired": "Enter the code from your authenticator app.",
+  "errSyncUnreachable": "Sync server unreachable. Your changes will be sent later.",
+  "errSyncUrlInsecure": "The server must use HTTPS.",
+  "errSyncUrlInvalid": "Invalid server address.",
+  "navOrgs": "Organisations",
+  "orgsAudit": "Activity log",
+  "orgsCopyCode": "Copy the code",
+  "orgsCreate": "Create an organisation",
+  "orgsEmpty": "No organisation",
+  "orgsEmptyBody": "Create an organisation or join one with an invitation code.",
+  "orgsFingerprint": "fingerprint {code}",
+  "@orgsFingerprint": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsInvite": "Invite",
+  "orgsInviteCode": "Invitation code",
+  "orgsInviteEmail": "E-mail address (optional)",
+  "orgsInviteEmailHelp": "Without an address, you get a code to pass on yourself.",
+  "orgsInviteExpires": "Valid until {date}.",
+  "@orgsInviteExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsInviteReady": "Invitation ready",
+  "orgsInviteSent": "An e-mail was sent to {email}. You can also pass on this code:",
+  "@orgsInviteSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsInviteShare": "Pass this code on to the person you invite:",
+  "orgsJoin": "Join",
+  "orgsJoined": "Organisation joined. Shared items arrive with the next sync.",
+  "orgsJoinedOn": "since {date}",
+  "@orgsJoinedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "orgsKeyPending": "key pending",
+  "orgsKeyVersion": "key no. {version}",
+  "@orgsKeyVersion": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "orgsLeave": "Leave",
+  "orgsLeaveConfirm": "You keep a personal copy of the shared workspaces and opportunities. Other members will no longer see your changes.",
+  "orgsLeft": "You left the organisation.",
+  "orgsMadePersonal": "The item is personal again.",
+  "orgsMakePersonal": "Stop sharing (personal)",
+  "orgsMembers": "Members",
+  "orgsMembersHelp": "Compare a member's key fingerprint with the one shown on their side to make sure nobody stepped in between.",
+  "orgsNeedSync": "Sync required",
+  "orgsNeedSyncBody": "Organisations go through an end-to-end encrypted sync server. Link this device first.",
+  "orgsNoneToShare": "No organisation: create or join one first.",
+  "orgsOpenSync": "Open sync settings",
+  "orgsRemove": "Remove from the organisation",
+  "orgsRole": "Role",
+  "orgsShareTitle": "Share with an organisation",
+  "orgsShared2": "Shared. Members receive it with the next sync.",
+  "orgsSubtitle": "Shared workspaces and opportunities, encrypted with a group key",
+  "roleAdmin": "Administrator",
+  "roleEditor": "Editor",
+  "roleOwner": "Owner",
+  "roleViewer": "Viewer",
+  "settingsSync": "Sync",
+  "syncApprove": "Approve",
+  "syncApproveHelp": "Type the code shown on the new device. If it does not match, do not approve.",
+  "syncApproveTitle": "Approve “{name}”",
+  "@syncApproveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncApproved": "Device approved.",
+  "syncCodeSent": "If an account exists, a code was sent by e-mail.",
+  "syncConflictOn": "{kind} · field “{field}” changed on two devices",
+  "@syncConflictOn": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "syncConflicts": "Conflicts to resolve",
+  "syncConflictsHelp": "The same text was changed on two devices. Choose the version to keep; it will be sent everywhere.",
+  "syncCopyUri": "Copy the otpauth:// link",
+  "syncCreate": "Create an online account",
+  "syncDeleteRemote": "Delete the online account",
+  "syncDeleteRemoteHelp": "All your data is erased from the server. The data on this computer is kept.",
+  "syncDeletedRemote": "Online account deleted. This device is back to local mode.",
+  "syncDeviceActive": "paired",
+  "syncDevicePending": "waiting for approval",
+  "syncDeviceRevoked": "revoked",
+  "syncDevices": "Devices",
+  "syncDevicesHelp": "A new device receives the keys only after you approve it.",
+  "syncDone": "Sync complete.",
+  "syncEmailCode": "Code received by e-mail",
+  "syncEmailCodeHelp": "Paste the code from the message.",
+  "syncForgot": "Forgot password",
+  "syncKeepMine": "Keep this device's version",
+  "syncLast": "Last sync: {date}",
+  "@syncLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "syncLink": "Sign in and link this device",
+  "syncLinked": "Device linked to the online account.",
+  "syncLocalMode": "Current mode: local only. Your data stays on this computer.",
+  "syncNewPassword": "New password",
+  "syncNow": "Sync now",
+  "syncOnlinePassword": "Online account password",
+  "syncOtherVersion": "Other device",
+  "syncPairCheck": "Check pairing",
+  "syncPairCode": "Pairing code",
+  "syncPairHelp": "On a paired device, open Settings > Sync > Devices, pick this device and type this code.",
+  "syncPairTitle": "Pairing pending",
+  "syncPasswordReset": "Password changed. Sign in again.",
+  "syncPending": "{count, plural, =0{No pending change} =1{1 change waiting to be sent} other{{count} changes waiting to be sent}}",
+  "@syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncQuota": "Storage used: {used} of {total}",
+  "@syncQuota": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "syncResend": "Resend the code",
+  "syncResetTitle": "Reset the password",
+  "syncResetWarning": "Resetting gives back access to the account, not to the data: only your paired devices hold the keys.",
+  "syncRevoke": "Revoke the device",
+  "syncRule1": "End-to-end encryption: the server cannot read your profile, notes or applications.",
+  "syncRule2": "Self-hosted server: you choose the instance (no official instance exists yet).",
+  "syncRule3": "Optional: without an online account the app works fully offline.",
+  "syncSecurity": "Online account security",
+  "syncSendCode": "Send a code",
+  "syncServer": "Server address",
+  "syncServerHelp": "HTTPS required. Example: https://sync.my-association.org",
+  "syncSkipped": "Item not applied on this device ({reason}).",
+  "@syncSkipped": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "syncSyncedMode": "Current mode: synced, end-to-end encrypted ({email})",
+  "@syncSyncedMode": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "syncTakeOther": "Take the other version",
+  "syncThisDevice": "{name} (this device)",
+  "@syncThisDevice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisVersion": "This device",
+  "syncTitle": "Encrypted sync",
+  "syncTotp": "Two-factor authentication (TOTP)",
+  "syncTotpCode": "6-digit code",
+  "syncTotpEnable": "Turn on",
+  "syncTotpHelp": "A code from your authenticator app is asked whenever a device signs in.",
+  "syncTotpOn": "Two-factor authentication on.",
+  "syncTotpOptional": "Two-factor code (if enabled)",
+  "syncTotpSetup": "Add this secret to your authenticator app, then type the code it shows.",
+  "syncUnlink": "Unlink this device",
+  "syncUnlinkConfirm": "Sync stops on this device. Its data stays available locally.",
+  "syncVerifyAndLink": "Confirm and link this device",
+  "syncVerifyTitle": "Confirm the e-mail address"
+}

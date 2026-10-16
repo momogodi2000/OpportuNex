@@ -1,435 +1,340 @@
-"""
-AI Gateway — provider-agnostic interface for all AI operations.
-Supports: OpenAI-compatible APIs, Gemini, Anthropic, Ollama, LM Studio.
-Falls back to deterministic rules if all providers fail (ADR-008).
+"""AI gateway (arch §7.1-7.2, ADR-008, M14).
+
+Order of operations for one task:
+
+1. AI must be switched on (``ai.enabled``, off by default — D-15) and at least one provider enabled.
+2. Providers are tried in order: the one routed to the task (EF-14.05), then the fallback chain (EF-14.04).
+3. A remote provider is used only with the user's recorded consent for it (EF-14.09); local models need none.
+4. Daily caps and temporary suspension after HTTP 429 are honoured (EF-14.06).
+5. A cached validated answer for the same task, template version, model and content is reused (EF-14.08).
+6. The answer must validate against a strict schema; one corrective retry, then the next provider,
+   and finally ``None`` so the caller uses the deterministic path (EF-07.07).
+7. Every attempt is logged in ``ai_usage_logs`` (EF-14.07); every send to a third party in
+   ``data_disclosures`` (EF-18.07); suspected injections in ``security_events`` (arch §7.2-6).
 """
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import time
-from typing import Any, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import httpx
 import structlog
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ValidationError
+from sqlalchemy import and_, func, insert, select
 
-from collection.safe_http import SafeHTTPClient
+from ai.prompts import TEMPLATES, build, detect_injection
+from ai.providers import KEY_REQUIRED, ProviderConfig, ProviderError, complete, strip_fences
+from ai.secrets import SecretStoreError
+from core.errors import Conflict
+from services.state import ActiveProfile, EngineState
 
-log = structlog.get_logger(__name__)
+log = structlog.get_logger("ai")
 
-# ── Cache ─────────────────────────────────────────────────────────────────────
-# Simple in-memory cache: key -> (result, expiry_timestamp)
-_cache: dict[str, tuple[Any, float]] = {}
-_CACHE_TTL_SECONDS = 7 * 24 * 3600  # 7 days
-
-
-def _cache_key(*parts: str) -> str:
-    return hashlib.sha256("|".join(parts).encode()).hexdigest()
-
-
-def _cache_get(key: str) -> Optional[Any]:
-    entry = _cache.get(key)
-    if entry and time.time() < entry[1]:
-        return entry[0]
-    return None
+CACHE_DAYS = 30
+SUSPEND_DEFAULT_S = 60.0
+POLICY_VERSION = "1.0"
 
 
-def _cache_set(key: str, value: Any) -> None:
-    _cache[key] = (value, time.time() + _CACHE_TTL_SECONDS)
+class ConsentRequired(Conflict):
+    """Raised to an interactive caller so the UI can ask before the first send (EF-14.09)."""
 
 
-# ── Pydantic output schemas ───────────────────────────────────────────────────
-
-class SearchFiltersExtracted(BaseModel):
-    """Interpreted search filters from natural language query."""
-    keywords: list[str] = Field(default_factory=list)
-    categories: list[str] = Field(default_factory=list)
-    countries: list[str] = Field(default_factory=list)
-    languages: list[str] = Field(default_factory=list)
-    deadline_before: Optional[str] = None
-    amount_min: Optional[int] = None
-    amount_max: Optional[int] = None
-    remote_only: bool = False
-    confidence: float = Field(default=0.7, ge=0.0, le=1.0)
-
-
-class OpportunityExtraction(BaseModel):
-    """Structured extraction result from raw HTML/text content."""
-    title: Optional[str] = None
-    organization: Optional[str] = None
-    category: Optional[str] = None
-    deadline: Optional[str] = None      # ISO 8601 date if found
-    location: Optional[str] = None
-    amount_min: Optional[int] = None
-    amount_max: Optional[int] = None
-    currency_code: Optional[str] = None
-    language: Optional[str] = None
-    eligibility_text: Optional[str] = None
-    summary: Optional[str] = None       # ≤ 5 lines
-    required_skills: list[str] = Field(default_factory=list)
-    required_languages: list[str] = Field(default_factory=list)
-    min_education_level: Optional[str] = None
-    min_experience_years: Optional[float] = None
-    extraction_confidence: float = Field(default=0.5, ge=0.0, le=1.0)
-
-
-# ── Provider configuration ────────────────────────────────────────────────────
-
-@dataclass
-class ProviderConfig:
-    name: str
-    provider_type: str    # openai_compat | gemini | anthropic | ollama | lmstudio
+@dataclass(frozen=True)
+class AIResult[M: BaseModel]:
+    data: M
+    provider_id: str
+    provider_kind: str
     model: str
-    api_key: Optional[str]
-    base_url: str
-    is_local: bool = False
-    max_tokens: int = 2000
-    temperature: float = 0.1   # Low temperature for extraction tasks
+    prompt_version: str
+    from_cache: bool
 
 
-# ── AIGateway ─────────────────────────────────────────────────────────────────
+def setting_enabled(conn: Any, T: Any) -> bool:
+    value = conn.execute(
+        select(T.application_settings.c.value).where(T.application_settings.c.key == "ai.enabled")
+    ).scalar()
+    return value == "true"
+
 
 class AIGateway:
-    """
-    Provider-agnostic AI gateway.
-    All operations have a deterministic fallback path.
-    """
+    backoff_base = 0.5
 
-    def __init__(self, providers: list[ProviderConfig]) -> None:
-        self._providers = providers
-        # Local AI providers (Ollama/LMStudio) get an unchecked HTTP client
-        self._local_client = httpx.AsyncClient(timeout=60.0)
-        # Remote providers use the SSRF-safe client
-        self._remote_client = SafeHTTPClient()
+    def __init__(self, active: ActiveProfile, state: EngineState) -> None:
+        self.active = active
+        self.state = state
+        self.T = active.tables
+        self.uid = active.user_id
 
-    async def interpret_query(
-        self, query: str, profile_summary: Optional[dict] = None
-    ) -> SearchFiltersExtracted:
-        """
-        Interpret a natural language search query into structured filters.
-        Example: "bourses master droit francophone Cameroun 2025"
-        → {categories: ['bourse'], countries: ['CM'], languages: ['fr'], ...}
-        """
-        cache_k = _cache_key("interpret", query)
-        if cached := _cache_get(cache_k):
-            return SearchFiltersExtracted(**cached)
+    # ----------------------------------------------------------------- state
+    def enabled(self) -> bool:
+        with self.active.db.read() as conn:
+            return setting_enabled(conn, self.T)
 
-        system = """Tu es un assistant d'extraction de filtres de recherche pour une plateforme d'opportunités africaines.
-Extrais des filtres structurés à partir de la requête utilisateur.
-IMPORTANT: N'inclus PAS de données personnelles dans ta réponse. Réponds UNIQUEMENT en JSON valide."""
-
-        user_prompt = f"""REQUÊTE: {query[:500]}
-
-Extrais les filtres suivants si présents:
-- keywords: mots-clés principaux (liste de strings)
-- categories: catégories parmi: bourse, emploi, appel_offres, subvention, entrepreneuriat, recherche, volontariat, formation
-- countries: codes ISO 3166-1 alpha-2 (ex: CM, SN, CD, GA, CI)
-- languages: codes ISO 639-1 (ex: fr, en)
-- deadline_before: date limite au format YYYY-MM-DD si mentionnée
-- amount_min et amount_max: montants en XAF si mentionnés
-- remote_only: true si l'utilisateur cherche uniquement du télétravail
-
-Réponds UNIQUEMENT avec le JSON, sans texte supplémentaire."""
-
-        result = await self._call_with_fallback(
-            system_prompt=system,
-            user_prompt=user_prompt,
-            output_schema=SearchFiltersExtracted,
-            fallback_fn=lambda: self._interpret_query_fallback(query),
-        )
-        _cache_set(cache_k, result.model_dump())
-        return result
-
-    async def extract_opportunity(
-        self, content: str, source_url: str, existing_title: Optional[str] = None
-    ) -> OpportunityExtraction:
-        """
-        Extract structured opportunity data from raw content.
-        Content MUST be sanitized text (no scripts, no raw HTML).
-        """
-        content_hash = hashlib.sha256(content[:5000].encode()).hexdigest()
-        cache_k = _cache_key("extract", source_url, content_hash)
-        if cached := _cache_get(cache_k):
-            return OpportunityExtraction(**cached)
-
-        system = """Tu es un extracteur de données structurées pour des opportunités (bourses, emplois, appels d'offres, subventions).
-Extrais avec précision. Ne génère PAS d'informations non présentes dans le texte.
-Marque ta confiance dans extraction_confidence (0.0-1.0).
-Réponds UNIQUEMENT en JSON valide."""
-
-        # Prevent prompt injection: data is in a delimited block
-        user_prompt = f"""Extrais les données structurées de l'opportunité ci-dessous.
-
-URL SOURCE: {source_url[:200]}
-{'TITRE CONNU: ' + existing_title[:200] if existing_title else ''}
-
-===DÉBUT DU CONTENU===
-{content[:6000]}
-===FIN DU CONTENU===
-
-Extrais: title, organization, category, deadline (ISO 8601), location, amount_min, amount_max, currency_code, language (ISO 639-1), eligibility_text (verbatim), summary (≤5 lignes), required_skills, required_languages, min_education_level, min_experience_years, extraction_confidence."""
-
-        result = await self._call_with_fallback(
-            system_prompt=system,
-            user_prompt=user_prompt,
-            output_schema=OpportunityExtraction,
-            fallback_fn=lambda: OpportunityExtraction(
-                title=existing_title,
-                extraction_confidence=0.0,
-            ),
-        )
-        _cache_set(cache_k, result.model_dump())
-        return result
-
-    async def summarize(self, text: str, max_lines: int = 5) -> str:
-        """Generate a concise summary of opportunity text."""
-        if not text:
-            return ""
-
-        cache_k = _cache_key("summarize", hashlib.sha256(text[:3000].encode()).hexdigest())
-        if cached := _cache_get(cache_k):
-            return cached
-
-        system = f"Tu résumes des opportunités en français en maximum {max_lines} lignes courtes. Sois factuel et concis."
-        user_prompt = f"===DÉBUT DU TEXTE===\n{text[:4000]}\n===FIN DU TEXTE===\n\nRésumé en {max_lines} lignes:"
-
-        result = await self._call_provider_text(system, user_prompt, max_tokens=500)
-        _cache_set(cache_k, result)
-        return result
-
-    async def explain_match(
-        self, opportunity_summary: str, profile_summary: str, score_data: dict
-    ) -> str:
-        """
-        Generate a human-readable explanation of a match score.
-        Profile data is anonymized before sending (name/email/phone removed).
-        """
-        system = "Tu expliques en français pourquoi un profil correspond ou non à une opportunité. Sois direct et constructif."
-
-        user_prompt = f"""SCORE: {score_data.get('total_score', 0)}/100 — Éligibilité: {score_data.get('eligibility', 'uncertain')}
-
-OPPORTUNITÉ: {opportunity_summary[:500]}
-
-PROFIL (anonymisé): {profile_summary[:500]}
-
-Points forts identifiés: {', '.join(score_data.get('strengths', [])[:3])}
-Points faibles identifiés: {', '.join(score_data.get('gaps', [])[:3])}
-
-Explique en 3-4 phrases pourquoi ce profil obtient ce score pour cette opportunité."""
-
-        return await self._call_provider_text(system, user_prompt, max_tokens=400)
-
-    async def generate_document(
-        self,
-        doc_type: str,
-        opportunity_data: dict,
-        profile_data: dict,
-    ) -> str:
-        """
-        Generate a document draft (cover letter, grant proposal outline).
-        Profile must be reviewed/approved by user before sending.
-        """
-        type_names = {
-            "cover_letter": "lettre de motivation",
-            "grant_proposal": "proposition de subvention",
-            "application_summary": "résumé de candidature",
-        }
-        type_name = type_names.get(doc_type, doc_type)
-
-        system = f"""Tu rédiges une ébauche de {type_name} en français pour une opportunité africaine.
-L'ébauche DOIT être révisée et personnalisée par l'utilisateur avant envoi.
-Commence par un avertissement clair: "[ÉBAUCHE IA — À RÉVISER AVANT ENVOI]" """
-
-        user_prompt = f"""OPPORTUNITÉ: {opportunity_data.get('title', 'N/A')} — {opportunity_data.get('organization', 'N/A')}
-
-PROFIL (anonymisé): statut={profile_data.get('status', 'N/A')}, formation={profile_data.get('education_level', 'N/A')}, exp={profile_data.get('experience_years', 0)} ans
-
-Rédige une ébauche de {type_name} d'environ 300 mots."""
-
-        return await self._call_provider_text(system, user_prompt, max_tokens=800)
-
-    # ── Internal provider calls ───────────────────────────────────────────────
-
-    async def _call_with_fallback(
-        self,
-        system_prompt: str,
-        user_prompt: str,
-        output_schema: type[BaseModel],
-        fallback_fn,
-    ) -> BaseModel:
-        """Try providers in order; fall back to deterministic function."""
-        for provider in self._providers:
-            try:
-                text = await self._call_provider(provider, system_prompt, user_prompt)
-                # Extract JSON from response
-                json_text = self._extract_json(text)
-                data = json.loads(json_text)
-                return output_schema(**data)
-            except Exception as e:
-                log.warning("ai_provider_failed", provider=provider.name, error=str(e))
-                continue
-
-        # All providers failed — use deterministic fallback
-        log.info("ai_using_fallback")
-        return fallback_fn()
-
-    async def _call_provider_text(
-        self, system_prompt: str, user_prompt: str, max_tokens: int = 500
-    ) -> str:
-        """Call providers for plain text response."""
-        for provider in self._providers:
-            try:
-                return await self._call_provider(
-                    provider, system_prompt, user_prompt, max_tokens=max_tokens
+    def chain(self, task: str) -> list[dict[str, Any]]:
+        T = self.T
+        with self.active.db.read() as conn:
+            rows = [
+                dict(r)
+                for r in conn.execute(
+                    select(T.ai_providers)
+                    .where(T.ai_providers.c.user_id == self.uid, T.ai_providers.c.enabled == 1)
+                    .order_by(T.ai_providers.c.fallback_order)
+                ).mappings()
+            ]
+            routed = conn.execute(
+                select(T.ai_task_routing.c.provider_id).where(
+                    T.ai_task_routing.c.user_id == self.uid, T.ai_task_routing.c.task == task
                 )
-            except Exception as e:
-                log.warning("ai_text_provider_failed", provider=provider.name, error=str(e))
-        return ""
+            ).scalar()
+        if routed:
+            rows.sort(key=lambda r: 0 if r["id"] == routed else 1)
+        return rows
 
-    async def _call_provider(
+    def missing_consents(self, provider_id: str, purposes: tuple[str, ...]) -> list[str]:
+        T = self.T
+        with self.active.db.read() as conn:
+            granted = {
+                r[0]
+                for r in conn.execute(
+                    select(T.consents.c.purpose).where(
+                        T.consents.c.user_id == self.uid,
+                        T.consents.c.target == provider_id,
+                        T.consents.c.granted == 1,
+                        T.consents.c.revoked_at.is_(None),
+                    )
+                )
+            }
+        return [p for p in purposes if p not in granted]
+
+    def _consent_id(self, provider_id: str) -> str | None:
+        T = self.T
+        with self.active.db.read() as conn:
+            return conn.execute(
+                select(T.consents.c.id).where(
+                    T.consents.c.user_id == self.uid,
+                    T.consents.c.target == provider_id,
+                    T.consents.c.purpose == "ai_remote_processing",
+                    T.consents.c.granted == 1,
+                    T.consents.c.revoked_at.is_(None),
+                )
+            ).scalar()
+
+    def _calls_today(self, provider_id: str) -> int:
+        T = self.T
+        start = datetime.now(UTC).strftime("%Y-%m-%dT00:00:00Z")
+        with self.active.db.read() as conn:
+            return int(
+                conn.execute(
+                    select(func.count()).where(
+                        and_(
+                            T.ai_usage_logs.c.provider_id == provider_id,
+                            T.ai_usage_logs.c.created_at >= start,
+                            T.ai_usage_logs.c.outcome.notin_(("cache_hit", "fallback")),
+                        )
+                    )
+                ).scalar()
+                or 0
+            )
+
+    def _suspended(self, provider_id: str) -> bool:
+        until = self.state.ai_suspended.get(provider_id, 0.0)
+        return time.monotonic() < until
+
+    # ----------------------------------------------------------------- writes
+    def _log(self, provider: dict[str, Any] | None, task: str, outcome: str, **kw: Any) -> None:
+        with self.active.db.tx() as conn:
+            conn.execute(
+                insert(self.T.ai_usage_logs).values(
+                    user_id=self.uid,
+                    provider_id=provider["id"] if provider else None,
+                    task=task,
+                    model=provider["model"] if provider else "deterministic",
+                    outcome=outcome,
+                    **kw,
+                )
+            )
+
+    def _disclose(self, provider: dict[str, Any], category: str, size: int) -> None:
+        consent_id = self._consent_id(provider["id"])
+        with self.active.db.tx() as conn:
+            conn.execute(
+                insert(self.T.data_disclosures).values(
+                    user_id=self.uid,
+                    recipient=f"ai:{provider['kind']}:{provider['display_name']}"[:200],
+                    data_category=category,
+                    consent_id=consent_id,
+                    byte_count=size,
+                )
+            )
+
+    def _security(self, patterns: list[str], task: str) -> None:
+        with self.active.db.tx() as conn:
+            conn.execute(
+                insert(self.T.security_events).values(
+                    user_id=self.uid,
+                    event_type="prompt_injection_suspected",
+                    severity="medium",
+                    detail=",".join(patterns)[:200],
+                    related_ref=task,
+                )
+            )
+
+    def _cache_get(self, key: str) -> str | None:
+        T = self.T
+        now = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with self.active.db.read() as conn:
+            return conn.execute(
+                select(T.ai_cache.c.response).where(
+                    T.ai_cache.c.cache_key == key, (T.ai_cache.c.expires_at.is_(None)) | (T.ai_cache.c.expires_at > now)
+                )
+            ).scalar()
+
+    def _cache_put(self, key: str, task: str, version: str, model: str, response: str) -> None:
+        T = self.T
+        expires = (datetime.now(UTC) + timedelta(days=CACHE_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with self.active.db.tx() as conn:
+            conn.execute(T.ai_cache.delete().where(T.ai_cache.c.cache_key == key))
+            conn.execute(
+                insert(T.ai_cache).values(
+                    cache_key=key, task=task, prompt_version=version, model=model, response=response, expires_at=expires
+                )
+            )
+
+    # ------------------------------------------------------------------- run
+    def _client(self, local: bool) -> httpx.AsyncClient:
+        from services.privacy_service import PrivacyService
+
+        proxy = None if local else PrivacyService(self.active).network()["proxy_url"]
+        return httpx.AsyncClient(proxy=proxy, follow_redirects=False, trust_env=False)
+
+    async def run[M: BaseModel](
         self,
-        provider: ProviderConfig,
-        system_prompt: str,
-        user_prompt: str,
-        max_tokens: Optional[int] = None,
-    ) -> str:
-        """Make API call to a specific provider."""
-        max_tokens = max_tokens or provider.max_tokens
+        task: str,
+        *,
+        data: str,
+        schema: type[M],
+        data_category: str,
+        purposes: tuple[str, ...] = ("ai_remote_processing",),
+        interactive: bool = False,
+        params: dict[str, str] | None = None,
+    ) -> AIResult[M] | None:
+        """Return a validated answer, or ``None`` when the caller must use its deterministic path."""
+        if not await asyncio.to_thread(self.enabled):
+            return None
+        providers = await asyncio.to_thread(self.chain, task)
+        if not providers:
+            return None
+        template = TEMPLATES[task]
+        system, user = build(template, data, schema, **(params or {}))
+        patterns = detect_injection(data)
+        if patterns:
+            log.warning("prompt_injection_suspected", task=task, patterns=patterns)
+            await asyncio.to_thread(self._security, patterns, task)
+        content_hash = hashlib.sha256(
+            json.dumps([data[: template.max_chars], params or {}], sort_keys=True, ensure_ascii=False).encode()
+        ).hexdigest()
 
-        if provider.provider_type in ("openai_compat", "ollama", "lmstudio"):
-            return await self._call_openai_compat(provider, system_prompt, user_prompt, max_tokens)
-        elif provider.provider_type == "gemini":
-            return await self._call_gemini(provider, system_prompt, user_prompt, max_tokens)
-        elif provider.provider_type == "anthropic":
-            return await self._call_anthropic(provider, system_prompt, user_prompt, max_tokens)
-        else:
-            raise ValueError(f"Unknown provider type: {provider.provider_type}")
+        for p in providers:
+            local = bool(p["is_local"])
+            if self._suspended(p["id"]):
+                continue
+            if p["daily_call_cap"] and await asyncio.to_thread(self._calls_today, p["id"]) >= p["daily_call_cap"]:
+                continue
+            if not local:
+                missing = await asyncio.to_thread(self.missing_consents, p["id"], purposes)
+                if missing:
+                    if interactive:
+                        raise ConsentRequired(
+                            "consent required before sending data to this AI provider",
+                            code="ai_consent_required",
+                            extra={"provider_id": p["id"], "provider_name": p["display_name"], "purposes": missing},
+                        )
+                    continue
+            key = hashlib.sha256(f"{task}|{template.version}|{p['model']}|{content_hash}".encode()).hexdigest()
+            cached = await asyncio.to_thread(self._cache_get, key)
+            if cached is not None:
+                try:
+                    obj = schema.model_validate_json(cached)
+                except ValidationError:
+                    obj = None
+                if obj is not None:
+                    await asyncio.to_thread(self._log, p, task, "cache_hit")
+                    return AIResult(obj, p["id"], p["kind"], p["model"], template.version, True)
+            try:
+                api_key = self.state.secrets.get(p["keychain_ref"]) if p["keychain_ref"] else None
+            except SecretStoreError as exc:
+                await asyncio.to_thread(self._log, p, task, "error", error_code="keychain_unavailable")
+                log.warning("ai_keychain_unavailable", error=str(exc))
+                continue
+            if p["kind"] in KEY_REQUIRED and not api_key:
+                await asyncio.to_thread(self._log, p, task, "error", error_code="api_key_missing")
+                continue
+            cfg = ProviderConfig(p["kind"], p["model"], p["base_url"], api_key, float(p["timeout_seconds"]))
+            if not local:
+                await asyncio.to_thread(self._disclose, p, data_category, len(system) + len(user))
+            obj = await self._call(p, cfg, task, system, user, schema, local)
+            if obj is not None:
+                await asyncio.to_thread(self._cache_put, key, task, template.version, p["model"], obj.model_dump_json())
+                return AIResult(obj, p["id"], p["kind"], p["model"], template.version, False)
+        await asyncio.to_thread(self._log, None, task, "fallback")
+        return None
 
-    async def _call_openai_compat(
-        self, provider: ProviderConfig, system: str, user: str, max_tokens: int
-    ) -> str:
-        client = self._local_client if provider.is_local else self._remote_client
-        headers = {"Content-Type": "application/json"}
-        if provider.api_key:
-            headers["Authorization"] = f"Bearer {provider.api_key}"
-
-        body = {
-            "model": provider.model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": provider.temperature,
-        }
-
-        if provider.is_local:
-            resp = await client.post(
-                f"{provider.base_url}/chat/completions",
-                json=body, headers=headers, timeout=60.0,
-            )
-        else:
-            resp = await client.post(
-                f"{provider.base_url}/chat/completions",
-                json=body, headers=headers,
-            )
-        resp.raise_for_status()
-        data = resp.json()
-        return data["choices"][0]["message"]["content"]
-
-    async def _call_gemini(
-        self, provider: ProviderConfig, system: str, user: str, max_tokens: int
-    ) -> str:
-        url = f"{provider.base_url}/models/{provider.model}:generateContent?key={provider.api_key}"
-        body = {
-            "contents": [{"parts": [{"text": f"{system}\n\n{user}"}]}],
-            "generationConfig": {
-                "temperature": provider.temperature,
-                "maxOutputTokens": max_tokens,
-            },
-        }
-        resp = await self._remote_client.post(url, json=body)
-        resp.raise_for_status()
-        data = resp.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"]
-
-    async def _call_anthropic(
-        self, provider: ProviderConfig, system: str, user: str, max_tokens: int
-    ) -> str:
-        headers = {
-            "x-api-key": provider.api_key or "",
-            "anthropic-version": "2023-06-01",
-            "Content-Type": "application/json",
-        }
-        body = {
-            "model": provider.model,
-            "max_tokens": max_tokens,
-            "system": system,
-            "messages": [{"role": "user", "content": user}],
-        }
-        resp = await self._remote_client.post(
-            f"{provider.base_url}/messages", json=body, headers=headers,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        return data["content"][0]["text"]
-
-    @staticmethod
-    def _extract_json(text: str) -> str:
-        """Extract JSON from a model response that may have extra text."""
-        # Try to find JSON block
-        import re
-        # Look for ```json ... ``` blocks
-        match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
-        if match:
-            return match.group(1)
-        # Look for raw { ... } block
-        start = text.find("{")
-        end = text.rfind("}")
-        if start != -1 and end != -1:
-            return text[start:end + 1]
-        return text
-
-    def _interpret_query_fallback(self, query: str) -> SearchFiltersExtracted:
-        """
-        Deterministic query interpretation without AI.
-        Uses keyword matching for categories and country names.
-        """
-        q = query.lower()
-        categories = []
-        countries = []
-        keywords = [w for w in q.split() if len(w) > 3]
-
-        # Category detection
-        if any(w in q for w in ["bourse", "scholarship", "fellowship", "grant étudiant"]):
-            categories.append("bourse")
-        if any(w in q for w in ["emploi", "job", "poste", "recrutement", "vacancy"]):
-            categories.append("emploi")
-        if any(w in q for w in ["appel d'offres", "appel offres", "procurement", "tender"]):
-            categories.append("appel_offres")
-        if any(w in q for w in ["subvention", "financement", "grant", "fonds"]):
-            categories.append("subvention")
-        if any(w in q for w in ["entrepreneur", "startup", "sme", "pme"]):
-            categories.append("entrepreneuriat")
-
-        # Country detection
-        country_map = {
-            "cameroun": "CM", "cameroon": "CM",
-            "sénégal": "SN", "senegal": "SN",
-            "côte d'ivoire": "CI", "cote ivoire": "CI",
-            "gabon": "GA", "congo": "CG", "rdc": "CD", "mali": "ML",
-            "burkina": "BF", "togo": "TG", "bénin": "BJ", "niger": "NE",
-        }
-        for name, code in country_map.items():
-            if name in q:
-                countries.append(code)
-
-        return SearchFiltersExtracted(
-            keywords=keywords[:10],
-            categories=categories or [],
-            countries=countries,
-            confidence=0.4,   # Low confidence since no AI was used
-        )
+    async def _call[M: BaseModel](
+        self,
+        p: dict[str, Any],
+        cfg: ProviderConfig,
+        task: str,
+        system: str,
+        user: str,
+        schema: type[M],
+        local: bool,
+    ) -> M | None:
+        retries_left = int(p["max_retries"])
+        corrected = False
+        prompt = user
+        async with self._client(local) as client:
+            while True:
+                t0 = time.monotonic()
+                try:
+                    comp = await complete(client, cfg, system, prompt)
+                except ProviderError as exc:
+                    latency = int((time.monotonic() - t0) * 1000)
+                    outcome = {"rate_limited": "rate_limited", "timeout": "timeout"}.get(exc.code, "error")
+                    await asyncio.to_thread(self._log, p, task, outcome, error_code=exc.code, latency_ms=latency)
+                    if exc.code == "rate_limited":
+                        self.state.ai_suspended[p["id"]] = time.monotonic() + (exc.retry_after or SUSPEND_DEFAULT_S)
+                        return None
+                    if exc.retryable and retries_left > 0:
+                        retries_left -= 1
+                        await asyncio.sleep(self.backoff_base * (2 ** (int(p["max_retries"]) - retries_left - 1)))
+                        continue
+                    return None
+                latency = int((time.monotonic() - t0) * 1000)
+                usage = {
+                    "prompt_tokens": comp.prompt_tokens,
+                    "completion_tokens": comp.completion_tokens,
+                    "latency_ms": latency,
+                }
+                try:
+                    obj = schema.model_validate_json(strip_fences(comp.text))
+                except ValidationError as exc:
+                    await asyncio.to_thread(self._log, p, task, "schema_invalid", error_code="schema", **usage)
+                    if corrected:
+                        return None
+                    corrected = True
+                    problems = "; ".join(
+                        f"{'.'.join(str(x) for x in e['loc']) or 'racine'}: {e['msg']}" for e in exc.errors()[:8]
+                    )
+                    prompt = (
+                        f"{user}\n\nTa réponse précédente ne respecte pas le schéma ({problems}). "
+                        "Renvoie uniquement l'objet JSON corrigé."
+                    )
+                    continue
+                await asyncio.to_thread(self._log, p, task, "ok", **usage)
+                return obj

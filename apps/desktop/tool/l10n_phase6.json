@@ -1,0 +1,460 @@
+[
+{
+"auditCreate": "Organisation créée",
+"auditInvite": "Invitation envoyée",
+"auditInviteRevoke": "Invitation annulée",
+"auditJoin": "Membre arrivé",
+"auditKeyShare": "Clé transmise à un membre",
+"auditLeave": "Membre parti",
+"auditRemove": "Membre retiré",
+"auditRole": "Rôle modifié",
+"auditRotate": "Clé renouvelée",
+"errSyncCodeInvalid": "Code invalide ou expiré.",
+"errSyncEmailNotVerified": "Confirmez d'abord votre adresse avec le code reçu par e-mail.",
+"errSyncInviteInvalid": "Invitation invalide, expirée ou déjà utilisée.",
+"errSyncInviteOtherEmail": "Cette invitation est destinée à une autre adresse.",
+"errSyncLastOwner": "Une organisation doit garder au moins un propriétaire.",
+"errSyncPairingMismatch": "Le code ne correspond pas à l'appareil en attente. Vérifiez le code affiché sur le nouvel appareil.",
+"errSyncQuota": "Espace du compte en ligne épuisé.",
+"errSyncRateLimited": "Trop de tentatives. Réessayez dans une minute.",
+"errSyncRegistrationClosed": "Ce serveur n'accepte pas de nouveaux comptes.",
+"errSyncTotpInvalid": "Code de double authentification incorrect.",
+"errSyncTotpRequired": "Saisissez le code de votre application d'authentification.",
+"errSyncUnreachable": "Serveur de synchronisation injoignable. Vos modifications seront envoyées plus tard.",
+"errSyncUrlInsecure": "Le serveur doit utiliser HTTPS.",
+"errSyncUrlInvalid": "Adresse de serveur invalide.",
+"navOrgs": "Organisations",
+"orgsAudit": "Journal d'activité",
+"orgsCopyCode": "Copier le code",
+"orgsCreate": "Créer une organisation",
+"orgsEmpty": "Aucune organisation",
+"orgsEmptyBody": "Créez une organisation ou rejoignez-en une avec un code d'invitation.",
+"orgsFingerprint": "empreinte {code}",
+"@orgsFingerprint": {
+"placeholders": {
+"code": {
+"type": "String"
+}
+}
+},
+"orgsInvite": "Inviter",
+"orgsInviteCode": "Code d'invitation",
+"orgsInviteEmail": "Adresse e-mail (facultatif)",
+"orgsInviteEmailHelp": "Sans adresse, un code à transmettre vous-même est créé.",
+"orgsInviteExpires": "Valable jusqu'au {date}.",
+"@orgsInviteExpires": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"orgsInviteReady": "Invitation prête",
+"orgsInviteSent": "Un e-mail a été envoyé à {email}. Vous pouvez aussi transmettre ce code :",
+"@orgsInviteSent": {
+"placeholders": {
+"email": {
+"type": "String"
+}
+}
+},
+"orgsInviteShare": "Transmettez ce code à la personne invitée :",
+"orgsJoin": "Rejoindre",
+"orgsJoined": "Organisation rejointe. Les éléments partagés arrivent à la prochaine synchronisation.",
+"orgsJoinedOn": "depuis le {date}",
+"@orgsJoinedOn": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"orgsKeyPending": "clé en attente",
+"orgsKeyVersion": "clé n° {version}",
+"@orgsKeyVersion": {
+"placeholders": {
+"version": {
+"type": "int"
+}
+}
+},
+"orgsLeave": "Quitter",
+"orgsLeaveConfirm": "Vous gardez une copie personnelle des espaces et opportunités partagés. Les autres membres ne verront plus vos modifications.",
+"orgsLeft": "Vous avez quitté l'organisation.",
+"orgsMadePersonal": "L'élément est redevenu personnel.",
+"orgsMakePersonal": "Ne plus partager (personnel)",
+"orgsMembers": "Membres",
+"orgsMembersHelp": "Comparez l'empreinte de clé d'un membre avec celle affichée chez lui pour vérifier qu'aucun intermédiaire ne s'est glissé.",
+"orgsNeedSync": "Synchronisation requise",
+"orgsNeedSyncBody": "Les organisations passent par un serveur de synchronisation chiffré de bout en bout. Liez d'abord cet appareil.",
+"orgsNoneToShare": "Aucune organisation : créez-en une ou rejoignez-en une d'abord.",
+"orgsOpenSync": "Ouvrir les réglages de synchronisation",
+"orgsRemove": "Retirer de l'organisation",
+"orgsRole": "Rôle",
+"orgsShareTitle": "Partager avec une organisation",
+"orgsShared2": "Partagé. Les membres le recevront à la prochaine synchronisation.",
+"orgsSubtitle": "Espaces et opportunités partagés, chiffrés avec une clé commune",
+"roleAdmin": "Administrateur",
+"roleEditor": "Éditeur",
+"roleOwner": "Propriétaire",
+"roleViewer": "Lecteur",
+"settingsSync": "Synchronisation",
+"syncApprove": "Approuver",
+"syncApproveHelp": "Saisissez le code affiché sur le nouvel appareil. S'il ne correspond pas, n'approuvez pas.",
+"syncApproveTitle": "Approuver « {name} »",
+"@syncApproveTitle": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+"syncApproved": "Appareil approuvé.",
+"syncCodeSent": "Si un compte existe, un code a été envoyé par e-mail.",
+"syncConflictOn": "{kind} · champ « {field} » modifié sur deux appareils",
+"@syncConflictOn": {
+"placeholders": {
+"kind": {
+"type": "String"
+},
+"field": {
+"type": "String"
+}
+}
+},
+"syncConflicts": "Conflits à résoudre",
+"syncConflictsHelp": "Le même texte a été modifié sur deux appareils. Choisissez la version à garder ; elle sera envoyée partout.",
+"syncCopyUri": "Copier le lien otpauth://",
+"syncCreate": "Créer un compte en ligne",
+"syncDeleteRemote": "Supprimer le compte en ligne",
+"syncDeleteRemoteHelp": "Toutes vos données sont effacées du serveur. Les données de cet ordinateur sont conservées.",
+"syncDeletedRemote": "Compte en ligne supprimé. Cet appareil est revenu en mode local.",
+"syncDeviceActive": "couplé",
+"syncDevicePending": "en attente d'approbation",
+"syncDeviceRevoked": "révoqué",
+"syncDevices": "Appareils",
+"syncDevicesHelp": "Un nouvel appareil reçoit les clés seulement après votre approbation.",
+"syncDone": "Synchronisation terminée.",
+"syncEmailCode": "Code reçu par e-mail",
+"syncEmailCodeHelp": "Collez le code du message.",
+"syncForgot": "Mot de passe oublié",
+"syncKeepMine": "Garder la version de cet appareil",
+"syncLast": "Dernière synchronisation : {date}",
+"@syncLast": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"syncLink": "Se connecter et lier cet appareil",
+"syncLinked": "Appareil lié au compte en ligne.",
+"syncLocalMode": "Mode actuel : local uniquement. Vos données ne quittent pas cet ordinateur.",
+"syncNewPassword": "Nouveau mot de passe",
+"syncNow": "Synchroniser",
+"syncOnlinePassword": "Mot de passe du compte en ligne",
+"syncOtherVersion": "Autre appareil",
+"syncPairCheck": "Vérifier le couplage",
+"syncPairCode": "Code de couplage",
+"syncPairHelp": "Sur un appareil déjà couplé, ouvrez Paramètres > Synchronisation > Appareils, choisissez cet appareil et saisissez ce code.",
+"syncPairTitle": "Couplage en attente",
+"syncPasswordReset": "Mot de passe modifié. Reconnectez-vous.",
+"syncPending": "{count, plural, =0{Aucune modification en attente} =1{1 modification en attente d'envoi} other{{count} modifications en attente d'envoi}}",
+"@syncPending": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"syncQuota": "Espace utilisé : {used} sur {total}",
+"@syncQuota": {
+"placeholders": {
+"used": {
+"type": "String"
+},
+"total": {
+"type": "String"
+}
+}
+},
+"syncResend": "Renvoyer le code",
+"syncResetTitle": "Réinitialiser le mot de passe",
+"syncResetWarning": "La réinitialisation rend l'accès au compte, pas aux données : seuls vos appareils déjà couplés détiennent les clés.",
+"syncRevoke": "Révoquer l'appareil",
+"syncRule1": "Chiffrement de bout en bout : le serveur ne peut lire ni votre profil, ni vos notes, ni vos candidatures.",
+"syncRule2": "Serveur auto-hébergé : vous choisissez l'instance (aucune instance officielle n'existe encore).",
+"syncRule3": "Facultatif : sans compte en ligne, l'application fonctionne entièrement en local.",
+"syncSecurity": "Sécurité du compte en ligne",
+"syncSendCode": "Envoyer un code",
+"syncServer": "Adresse du serveur",
+"syncServerHelp": "HTTPS obligatoire. Exemple : https://sync.mon-association.org",
+"syncSkipped": "Élément non appliqué sur cet appareil ({reason}).",
+"@syncSkipped": {
+"placeholders": {
+"reason": {
+"type": "String"
+}
+}
+},
+"syncSyncedMode": "Mode actuel : synchronisé, chiffré de bout en bout ({email})",
+"@syncSyncedMode": {
+"placeholders": {
+"email": {
+"type": "String"
+}
+}
+},
+"syncTakeOther": "Prendre l'autre version",
+"syncThisDevice": "{name} (cet appareil)",
+"@syncThisDevice": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+"syncThisVersion": "Cet appareil",
+"syncTitle": "Synchronisation chiffrée",
+"syncTotp": "Double authentification (TOTP)",
+"syncTotpCode": "Code à 6 chiffres",
+"syncTotpEnable": "Activer",
+"syncTotpHelp": "Un code de votre application d'authentification sera demandé à chaque connexion d'un appareil.",
+"syncTotpOn": "Double authentification activée.",
+"syncTotpOptional": "Code de double authentification (si activée)",
+"syncTotpSetup": "Ajoutez ce secret dans votre application d'authentification, puis saisissez le code qu'elle affiche.",
+"syncUnlink": "Délier cet appareil",
+"syncUnlinkConfirm": "La synchronisation s'arrête sur cet appareil. Ses données restent disponibles en local.",
+"syncVerifyAndLink": "Confirmer et lier cet appareil",
+"syncVerifyTitle": "Confirmer l'adresse e-mail"
+},
+{
+"auditCreate": "Organisation created",
+"auditInvite": "Invitation sent",
+"auditInviteRevoke": "Invitation cancelled",
+"auditJoin": "Member joined",
+"auditKeyShare": "Key handed to a member",
+"auditLeave": "Member left",
+"auditRemove": "Member removed",
+"auditRole": "Role changed",
+"auditRotate": "Key renewed",
+"errSyncCodeInvalid": "Invalid or expired code.",
+"errSyncEmailNotVerified": "Confirm your address first with the code you received by e-mail.",
+"errSyncInviteInvalid": "Invitation invalid, expired or already used.",
+"errSyncInviteOtherEmail": "This invitation is for another address.",
+"errSyncLastOwner": "An organisation must keep at least one owner.",
+"errSyncPairingMismatch": "The code does not match the waiting device. Check the code shown on the new device.",
+"errSyncQuota": "Online account storage is full.",
+"errSyncRateLimited": "Too many attempts. Try again in a minute.",
+"errSyncRegistrationClosed": "This server does not accept new accounts.",
+"errSyncTotpInvalid": "Wrong two-factor code.",
+"errSyncTotpRequired": "Enter the code from your authenticator app.",
+"errSyncUnreachable": "Sync server unreachable. Your changes will be sent later.",
+"errSyncUrlInsecure": "The server must use HTTPS.",
+"errSyncUrlInvalid": "Invalid server address.",
+"navOrgs": "Organisations",
+"orgsAudit": "Activity log",
+"orgsCopyCode": "Copy the code",
+"orgsCreate": "Create an organisation",
+"orgsEmpty": "No organisation",
+"orgsEmptyBody": "Create an organisation or join one with an invitation code.",
+"orgsFingerprint": "fingerprint {code}",
+"@orgsFingerprint": {
+"placeholders": {
+"code": {
+"type": "String"
+}
+}
+},
+"orgsInvite": "Invite",
+"orgsInviteCode": "Invitation code",
+"orgsInviteEmail": "E-mail address (optional)",
+"orgsInviteEmailHelp": "Without an address, you get a code to pass on yourself.",
+"orgsInviteExpires": "Valid until {date}.",
+"@orgsInviteExpires": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"orgsInviteReady": "Invitation ready",
+"orgsInviteSent": "An e-mail was sent to {email}. You can also pass on this code:",
+"@orgsInviteSent": {
+"placeholders": {
+"email": {
+"type": "String"
+}
+}
+},
+"orgsInviteShare": "Pass this code on to the person you invite:",
+"orgsJoin": "Join",
+"orgsJoined": "Organisation joined. Shared items arrive with the next sync.",
+"orgsJoinedOn": "since {date}",
+"@orgsJoinedOn": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"orgsKeyPending": "key pending",
+"orgsKeyVersion": "key no. {version}",
+"@orgsKeyVersion": {
+"placeholders": {
+"version": {
+"type": "int"
+}
+}
+},
+"orgsLeave": "Leave",
+"orgsLeaveConfirm": "You keep a personal copy of the shared workspaces and opportunities. Other members will no longer see your changes.",
+"orgsLeft": "You left the organisation.",
+"orgsMadePersonal": "The item is personal again.",
+"orgsMakePersonal": "Stop sharing (personal)",
+"orgsMembers": "Members",
+"orgsMembersHelp": "Compare a member's key fingerprint with the one shown on their side to make sure nobody stepped in between.",
+"orgsNeedSync": "Sync required",
+"orgsNeedSyncBody": "Organisations go through an end-to-end encrypted sync server. Link this device first.",
+"orgsNoneToShare": "No organisation: create or join one first.",
+"orgsOpenSync": "Open sync settings",
+"orgsRemove": "Remove from the organisation",
+"orgsRole": "Role",
+"orgsShareTitle": "Share with an organisation",
+"orgsShared2": "Shared. Members receive it with the next sync.",
+"orgsSubtitle": "Shared workspaces and opportunities, encrypted with a group key",
+"roleAdmin": "Administrator",
+"roleEditor": "Editor",
+"roleOwner": "Owner",
+"roleViewer": "Viewer",
+"settingsSync": "Sync",
+"syncApprove": "Approve",
+"syncApproveHelp": "Type the code shown on the new device. If it does not match, do not approve.",
+"syncApproveTitle": "Approve “{name}”",
+"@syncApproveTitle": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+"syncApproved": "Device approved.",
+"syncCodeSent": "If an account exists, a code was sent by e-mail.",
+"syncConflictOn": "{kind} · field “{field}” changed on two devices",
+"@syncConflictOn": {
+"placeholders": {
+"kind": {
+"type": "String"
+},
+"field": {
+"type": "String"
+}
+}
+},
+"syncConflicts": "Conflicts to resolve",
+"syncConflictsHelp": "The same text was changed on two devices. Choose the version to keep; it will be sent everywhere.",
+"syncCopyUri": "Copy the otpauth:// link",
+"syncCreate": "Create an online account",
+"syncDeleteRemote": "Delete the online account",
+"syncDeleteRemoteHelp": "All your data is erased from the server. The data on this computer is kept.",
+"syncDeletedRemote": "Online account deleted. This device is back to local mode.",
+"syncDeviceActive": "paired",
+"syncDevicePending": "waiting for approval",
+"syncDeviceRevoked": "revoked",
+"syncDevices": "Devices",
+"syncDevicesHelp": "A new device receives the keys only after you approve it.",
+"syncDone": "Sync complete.",
+"syncEmailCode": "Code received by e-mail",
+"syncEmailCodeHelp": "Paste the code from the message.",
+"syncForgot": "Forgot password",
+"syncKeepMine": "Keep this device's version",
+"syncLast": "Last sync: {date}",
+"@syncLast": {
+"placeholders": {
+"date": {
+"type": "String"
+}
+}
+},
+"syncLink": "Sign in and link this device",
+"syncLinked": "Device linked to the online account.",
+"syncLocalMode": "Current mode: local only. Your data stays on this computer.",
+"syncNewPassword": "New password",
+"syncNow": "Sync now",
+"syncOnlinePassword": "Online account password",
+"syncOtherVersion": "Other device",
+"syncPairCheck": "Check pairing",
+"syncPairCode": "Pairing code",
+"syncPairHelp": "On a paired device, open Settings > Sync > Devices, pick this device and type this code.",
+"syncPairTitle": "Pairing pending",
+"syncPasswordReset": "Password changed. Sign in again.",
+"syncPending": "{count, plural, =0{No pending change} =1{1 change waiting to be sent} other{{count} changes waiting to be sent}}",
+"@syncPending": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"syncQuota": "Storage used: {used} of {total}",
+"@syncQuota": {
+"placeholders": {
+"used": {
+"type": "String"
+},
+"total": {
+"type": "String"
+}
+}
+},
+"syncResend": "Resend the code",
+"syncResetTitle": "Reset the password",
+"syncResetWarning": "Resetting gives back access to the account, not to the data: only your paired devices hold the keys.",
+"syncRevoke": "Revoke the device",
+"syncRule1": "End-to-end encryption: the server cannot read your profile, notes or applications.",
+"syncRule2": "Self-hosted server: you choose the instance (no official instance exists yet).",
+"syncRule3": "Optional: without an online account the app works fully offline.",
+"syncSecurity": "Online account security",
+"syncSendCode": "Send a code",
+"syncServer": "Server address",
+"syncServerHelp": "HTTPS required. Example: https://sync.my-association.org",
+"syncSkipped": "Item not applied on this device ({reason}).",
+"@syncSkipped": {
+"placeholders": {
+"reason": {
+"type": "String"
+}
+}
+},
+"syncSyncedMode": "Current mode: synced, end-to-end encrypted ({email})",
+"@syncSyncedMode": {
+"placeholders": {
+"email": {
+"type": "String"
+}
+}
+},
+"syncTakeOther": "Take the other version",
+"syncThisDevice": "{name} (this device)",
+"@syncThisDevice": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+"syncThisVersion": "This device",
+"syncTitle": "Encrypted sync",
+"syncTotp": "Two-factor authentication (TOTP)",
+"syncTotpCode": "6-digit code",
+"syncTotpEnable": "Turn on",
+"syncTotpHelp": "A code from your authenticator app is asked whenever a device signs in.",
+"syncTotpOn": "Two-factor authentication on.",
+"syncTotpOptional": "Two-factor code (if enabled)",
+"syncTotpSetup": "Add this secret to your authenticator app, then type the code it shows.",
+"syncUnlink": "Unlink this device",
+"syncUnlinkConfirm": "Sync stops on this device. Its data stays available locally.",
+"syncVerifyAndLink": "Confirm and link this device",
+"syncVerifyTitle": "Confirm the e-mail address"
+}
+]

@@ -1,30 +1,61 @@
-from fastapi import APIRouter
-import sys
-import time
+"""Health, version and graceful shutdown."""
+
+from __future__ import annotations
+
 import os
 import signal
-from typing import Dict, Any
+import sys
+import threading
 
-router = APIRouter(tags=["system"])
-START_TIME = time.time()
+from fastapi import APIRouter, Request
+
+from api.deps import StateDep
+from core.version import (
+    AUTHOR,
+    ENGINE_VERSION,
+    LICENSE_SPDX,
+    PRODUCT_NAME,
+    PROJECT_URL,
+    PUBLISHER,
+)
+from persistence.database import head_revision
+
+router = APIRouter(tags=["System"])
+
 
 @router.get("/health")
-async def health_check() -> Dict[str, Any]:
-    return {
-        "status": "healthy",
-        "version": "0.1.0",
-        "uptime_seconds": time.time() - START_TIME
-    }
+def health() -> dict[str, str]:
+    """Liveness probe used by the UI supervisor. Public, reveals nothing sensitive."""
+    return {"status": "ok"}
+
 
 @router.get("/version")
-async def get_version() -> Dict[str, Any]:
+def version(state: StateDep) -> dict[str, object]:
     return {
-        "version": "0.1.0",
-        "python": sys.version,
-        "build_date": "2026-10-02T11:54:06+01:00"
+        "product": PRODUCT_NAME,
+        "engine_version": ENGINE_VERSION,
+        "schema_revision": head_revision(),
+        "publisher": PUBLISHER,
+        "author": AUTHOR,
+        "license": LICENSE_SPDX,
+        "project_url": PROJECT_URL,
+        "python": sys.version.split()[0],
+        "data_dir": str(state.paths.root),
+        "signed_in": state.active is not None,
     }
 
-@router.post("/shutdown")
-async def shutdown() -> Dict[str, str]:
-    os.kill(os.getpid(), signal.SIGTERM)
-    return {"detail": "Shutdown signal sent"}
+
+@router.post("/system/shutdown", status_code=202)
+def shutdown(request: Request, state: StateDep) -> dict[str, str]:
+    """Close the profile cleanly (checkpoint WAL, persist jobs) then stop the process."""
+    state.close_active(reason="shutdown", remember_lock=False)
+    graceful = getattr(request.app.state, "request_shutdown", None)
+
+    def _stop() -> None:
+        if graceful is not None:
+            graceful()
+        else:
+            os.kill(os.getpid(), signal.SIGTERM)
+
+    threading.Timer(0.2, _stop).start()
+    return {"status": "stopping"}

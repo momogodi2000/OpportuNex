@@ -1,0 +1,129 @@
+"""
+FastAPI dependencies: session-token middleware, user resolution, pagination.
+"""
+
+from __future__ import annotations
+
+import hmac
+from typing import Annotated
+from uuid import UUID
+
+import structlog
+from fastapi import Depends, Header, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
+from domain.entities.entities import User
+from persistence.database import get_db_session
+from persistence.repositories.user_repo import UserRepo
+
+log = structlog.get_logger(__name__)
+
+# ── Routes that do NOT require a logged-in user ──────────────────────────────
+_PUBLIC_PATHS = frozenset(
+    [
+        "/api/v1/health",
+        "/api/v1/version",
+        "/api/v1/auth/register",
+        "/api/v1/auth/login",
+        "/api/v1/auth/recover",
+        "/api/v1/auth/local-profiles",
+        "/api/docs",
+        "/api/redoc",
+        "/api/openapi.json",
+    ]
+)
+
+
+class SessionTokenMiddleware(BaseHTTPMiddleware):
+    """
+    Validates the engine session token on every request.
+    Token is set by the Flutter supervisor at launch and passed via HTTP header.
+    Also rejects requests from browser origins to prevent CSRF via LAN.
+    """
+
+    def __init__(self, app, *, session_token: str) -> None:
+        super().__init__(app)
+        self._token = session_token.encode()
+
+    async def dispatch(
+        self, request: Request, call_next: RequestResponseEndpoint
+    ) -> Response:
+        # Block requests that come with an Origin header from external sites
+        origin = request.headers.get("origin", "")
+        if origin and not origin.startswith("http://127.0.0.1"):
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={"code": "ORIGIN_REJECTED", "title": "Forbidden"},
+            )
+
+        # Skip token check for WebSocket upgrade (handled in route)
+        if request.url.path == "/api/v1/events":
+            return await call_next(request)
+
+        auth = request.headers.get("x-engine-token", "")
+        if not hmac.compare_digest(auth.encode(), self._token):
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"code": "INVALID_ENGINE_TOKEN", "title": "Unauthorized"},
+            )
+
+        return await call_next(request)
+
+
+# ── Per-request user resolution ──────────────────────────────────────────────
+
+async def get_current_user(
+    x_user_id: Annotated[str | None, Header()] = None,
+    db = Depends(get_db_session)
+) -> User:
+    """
+    Resolve the logged-in user from the X-User-Id header (set by the Flutter
+    app after authentication). Raises 401 if the user cannot be resolved.
+    """
+    if not x_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "AUTH_REQUIRED", "title": "Authentication required"},
+        )
+    try:
+        uid = UUID(x_user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "INVALID_USER_ID", "title": "Invalid user identifier"},
+        )
+
+    repo = UserRepo(db)
+    user = await repo.get_by_id(str(uid)) # UserRepo expects string
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "USER_NOT_FOUND", "title": "User not found"},
+        )
+    # The application schema handles lock state differently (AuthService).
+    # Assuming user is active for now.
+    return user
+
+
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+# ── Cursor-based pagination ───────────────────────────────────────────────────
+
+class Pagination:
+    """Cursor-based pagination parameters."""
+
+    MAX_LIMIT = 200
+    DEFAULT_LIMIT = 50
+
+    def __init__(
+        self,
+        cursor: str | None = None,
+        limit: int = DEFAULT_LIMIT,
+    ) -> None:
+        self.cursor = cursor
+        self.limit = min(limit, self.MAX_LIMIT)
+
+
+PaginationDep = Annotated[Pagination, Depends(Pagination)]

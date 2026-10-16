@@ -1,89 +1,166 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, EmailStr, validator
-import hmac
-import time
-from typing import Dict, Any, List
+"""Local accounts: profiles, register, sign in/out, lock/unlock, recovery, password, deletion."""
 
-router = APIRouter(tags=["auth"])
+from __future__ import annotations
 
-class RegisterRequest(BaseModel):
-    name: str
+from typing import Annotated, Any, Literal
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, EmailStr, Field
+
+from api.deps import Active, StateDep
+from services.auth_service import AuthService, SignInResult
+
+router = APIRouter(prefix="/auth", tags=["Auth"])
+
+
+def get_auth(state: StateDep) -> AuthService:
+    return AuthService(state)
+
+
+Auth = Annotated[AuthService, Depends(get_auth)]
+
+
+class RegisterIn(BaseModel):
+    display_name: str = Field(min_length=1, max_length=120)
     email: EmailStr
-    password: str
-    confirm_password: str
+    password: str = Field(min_length=1, max_length=256)
+    confirm_password: str = Field(min_length=1, max_length=256)
+    locale: Literal["fr", "en"] = "fr"
+    accept_terms: bool
 
-    @validator('password')
-    def password_complexity(cls, v: str) -> str:
-        if len(v) < 12:
-            raise ValueError("Password must be at least 12 characters")
-        return v
 
-class LoginRequest(BaseModel):
+class LoginIn(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=256)
 
-LOGIN_ATTEMPTS: Dict[str, Dict[str, Any]] = {}
 
-@router.post("/auth/register")
-async def register(req: RegisterRequest) -> Dict[str, Any]:
-    if not hmac.compare_digest(req.password.encode(), req.confirm_password.encode()):
-        raise HTTPException(400, "Passwords do not match")
-    return {"user_id": "uuid", "display_name": req.name, "recovery_phrase": "phrase"}
+class UnlockIn(BaseModel):
+    profile_id: str = Field(min_length=36, max_length=36)
+    password: str = Field(min_length=1, max_length=256)
 
-@router.post("/auth/login")
-async def login(req: LoginRequest) -> Dict[str, Any]:
-    email = req.email
-    now = time.time()
-    
-    if email in LOGIN_ATTEMPTS:
-        attempt_info = LOGIN_ATTEMPTS[email]
-        failures = attempt_info.get("failures", 0)
-        lockout_until = attempt_info.get("lockout_until", 0)
-        
-        if now < lockout_until:
-            raise HTTPException(429, f"Account locked until {lockout_until}")
-            
-    success = False
-    
-    if not success:
-        if email not in LOGIN_ATTEMPTS:
-            LOGIN_ATTEMPTS[email] = {"failures": 1, "lockout_until": 0}
-        else:
-            LOGIN_ATTEMPTS[email]["failures"] += 1
-            f = LOGIN_ATTEMPTS[email]["failures"]
-            if f >= 5:
-                delays = {5: 30, 6: 120, 7: 900, 8: 3600}
-                delay = delays.get(f, 3600 * 24 * 365 * 100)
-                LOGIN_ATTEMPTS[email]["lockout_until"] = now + delay
-        raise HTTPException(401, "Invalid credentials")
-        
-    LOGIN_ATTEMPTS.pop(email, None)
-    return {"user_id": "uuid", "display_name": "name"}
 
-@router.post("/auth/logout")
-async def logout() -> Dict[str, str]:
-    return {"detail": "Logged out"}
+class RecoverIn(BaseModel):
+    email: EmailStr
+    recovery_phrase: str = Field(min_length=10, max_length=400)
+    new_password: str = Field(min_length=1, max_length=256)
+    confirm_password: str = Field(min_length=1, max_length=256)
 
-@router.post("/auth/lock")
-async def lock() -> Dict[str, str]:
-    return {"detail": "Locked"}
 
-@router.post("/auth/unlock")
-async def unlock() -> Dict[str, str]:
-    return {"detail": "Unlocked"}
+class ChangePasswordIn(BaseModel):
+    current_password: str = Field(min_length=1, max_length=256)
+    new_password: str = Field(min_length=1, max_length=256)
+    confirm_password: str = Field(min_length=1, max_length=256)
 
-@router.post("/auth/recover")
-async def recover() -> Dict[str, str]:
-    return {"detail": "Recovered"}
 
-@router.put("/auth/password")
-async def password() -> Dict[str, str]:
-    return {"detail": "Password changed"}
+class DeleteAccountIn(BaseModel):
+    password: str = Field(min_length=1, max_length=256)
+    confirmation: Literal["DELETE"]
 
-@router.delete("/auth/account")
-async def delete_account() -> Dict[str, str]:
-    return {"detail": "Account deleted"}
 
-@router.get("/auth/local-profiles")
-async def local_profiles() -> List[Dict[str, str]]:
-    return []
+class StrengthIn(BaseModel):
+    password: str = Field(max_length=256)
+    hints: list[str] = Field(default_factory=list, max_length=5)
+
+
+class PreferencesIn(BaseModel):
+    display_name: str | None = Field(default=None, min_length=1, max_length=120)
+    preferred_locale: Literal["fr", "en"] | None = None
+    theme: Literal["light", "dark", "system"] | None = None
+    auto_lock_minutes: int | None = Field(default=None, ge=1, le=240)
+
+
+def _signed_in(result: SignInResult) -> dict[str, Any]:
+    body: dict[str, Any] = {"session_token": result.session_token, "user": result.user}
+    if result.recovery_phrase is not None:
+        body["recovery_phrase"] = result.recovery_phrase
+    return body
+
+
+@router.get("/profiles")
+def list_profiles(auth: Auth) -> dict[str, Any]:
+    return {"items": auth.list_profiles()}
+
+
+@router.get("/status")
+def status(state: StateDep) -> dict[str, Any]:
+    if state.active is not None:
+        return {"state": "signed_in", "profile_id": state.active.user_id}
+    if state.locked is not None:
+        return {"state": "locked", "profile_id": state.locked.user_id, "reason": state.locked.reason}
+    return {"state": "signed_out", "has_profiles": bool(state.registry.all())}
+
+
+@router.post("/password-strength")
+def password_strength(body: StrengthIn, auth: Auth) -> dict[str, Any]:
+    return auth.password_strength(body.password, body.hints)
+
+
+@router.post("/register", status_code=201)
+def register(body: RegisterIn, auth: Auth) -> dict[str, Any]:
+    return _signed_in(
+        auth.register(
+            display_name=body.display_name,
+            email=str(body.email),
+            password=body.password,
+            confirm_password=body.confirm_password,
+            locale=body.locale,
+            accept_terms=body.accept_terms,
+        )
+    )
+
+
+@router.post("/login")
+def login(body: LoginIn, auth: Auth) -> dict[str, Any]:
+    return _signed_in(auth.sign_in(email=str(body.email), password=body.password))
+
+
+@router.post("/unlock")
+def unlock(body: UnlockIn, auth: Auth) -> dict[str, Any]:
+    return _signed_in(auth.sign_in(profile_id=body.profile_id, password=body.password))
+
+
+@router.post("/recover")
+def recover(body: RecoverIn, auth: Auth) -> dict[str, Any]:
+    return _signed_in(
+        auth.recover(
+            email=str(body.email),
+            phrase=body.recovery_phrase,
+            new_password=body.new_password,
+            confirm_password=body.confirm_password,
+        )
+    )
+
+
+@router.post("/lock", status_code=204)
+def lock(_active: Active, auth: Auth) -> None:
+    auth.lock()
+
+
+@router.post("/logout", status_code=204)
+def logout(active: Active, auth: Auth) -> None:
+    auth.sign_out(active)
+
+
+@router.get("/me")
+def me(active: Active, auth: Auth) -> dict[str, Any]:
+    return auth.current_user(active)
+
+
+@router.patch("/me")
+def update_me(body: PreferencesIn, active: Active, auth: Auth) -> dict[str, Any]:
+    return auth.update_preferences(active, body.model_dump(exclude_none=True))
+
+
+@router.put("/password", status_code=204)
+def change_password(body: ChangePasswordIn, active: Active, auth: Auth) -> None:
+    auth.change_password(
+        active,
+        current_password=body.current_password,
+        new_password=body.new_password,
+        confirm_password=body.confirm_password,
+    )
+
+
+@router.post("/account/delete", status_code=204)
+def delete_account(body: DeleteAccountIn, active: Active, auth: Auth) -> None:
+    auth.delete_account(active, password=body.password)

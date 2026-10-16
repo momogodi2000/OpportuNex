@@ -1,0 +1,42 @@
+from .all_models import (
+    AIProvider,
+    ApplicationModel,
+    ApplicationSettings,
+    ApplicationStatusHistory,
+    BackgroundJob,
+    BackupRecord,
+    Consent,
+    Country,
+    Currency,
+    EducationRecord,
+    Language,
+    MatchScoreModel,
+    Monitor,
+    NotificationRecord,
+    OpportunityCategory,
+    OpportunityField,
+    OpportunityModel,
+    OpportunitySource,
+    ReminderModel,
+    ResearchWorkspace,
+    SavedOpportunity,
+    SearchQuery,
+    SearchRun,
+    SecurityEvent,
+    Skill,
+    Source,
+    SourceAdapter,
+    SourceScanRun,
+    UserLanguage,
+    UserModel,
+    UserObjective,
+    UserProfile,
+    UserSession,
+    UserSkill,
+    WorkExperience,
+)
+
+__all__ = [
+    name for name, obj in globals().items()
+    if isinstance(obj, type) and hasattr(obj, '__tablename__')
+]

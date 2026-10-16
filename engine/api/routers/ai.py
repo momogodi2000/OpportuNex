@@ -1,80 +1,123 @@
-from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
-import keyring
-import keyring.errors
+"""AI providers, routing, consent and usage (M14); AI is off until the user turns it on (D-15)."""
 
-router = APIRouter(prefix="/ai", tags=["ai"])
+from __future__ import annotations
 
-class AIProviderCreate(BaseModel):
-    name: str
-    provider_type: str
-    model: str
-    api_key_value: str
-    base_url: Optional[str] = None
+import asyncio
+from typing import Any, Literal
 
-class AIProviderUpdate(BaseModel):
-    name: Optional[str] = None
-    provider_type: Optional[str] = None
-    model: Optional[str] = None
-    base_url: Optional[str] = None
+from fastapi import APIRouter
+from pydantic import BaseModel, Field, SecretStr
 
-class APIKeyUpdate(BaseModel):
-    api_key_value: str
+from api.deps import Active, StateDep
+from services.ai_service import AIService
 
-class AIProviderResponse(BaseModel):
-    id: str
-    name: str
-    provider_type: str
-    model: str
-    base_url: Optional[str]
-    keychain_ref: str
+router = APIRouter(prefix="/ai", tags=["AI"])
 
-@router.get("/providers", response_model=List[AIProviderResponse])
-async def list_ai_providers():
-    return []
+Kind = Literal["openai_compatible", "mistral", "groq", "openrouter", "gemini", "anthropic", "ollama", "lmstudio"]
+Purpose = Literal["ai_remote_processing", "profile_to_ai", "cv_parsing_ai"]
 
-@router.post("/providers", response_model=AIProviderResponse)
-async def create_ai_provider(provider: AIProviderCreate):
-    keychain_ref = f"ai_provider_{provider.name}"
-    keyring.set_password("opportunex", keychain_ref, provider.api_key_value)
-    
-    return AIProviderResponse(
-        id="prov_123",
-        name=provider.name,
-        provider_type=provider.provider_type,
-        model=provider.model,
-        base_url=provider.base_url,
-        keychain_ref=keychain_ref
+
+class EnabledIn(BaseModel):
+    enabled: bool
+
+
+class RoutingIn(BaseModel):
+    provider_id: str | None = None
+
+
+class ProviderIn(BaseModel):
+    kind: Kind
+    display_name: str = Field(min_length=1, max_length=80)
+    model: str = Field(min_length=1, max_length=200)
+    base_url: str | None = Field(default=None, max_length=300)
+    # SecretStr keeps the key out of reprs, validation errors and logs.
+    api_key: SecretStr | None = None
+    timeout_seconds: int = Field(default=60, ge=5, le=600)
+    max_retries: int = Field(default=2, ge=0, le=5)
+    daily_call_cap: int | None = Field(default=None, gt=0, le=100000)
+
+
+class ProviderPatch(BaseModel):
+    display_name: str | None = Field(default=None, min_length=1, max_length=80)
+    model: str | None = Field(default=None, min_length=1, max_length=200)
+    base_url: str | None = Field(default=None, max_length=300)
+    api_key: SecretStr | None = None
+    enabled: bool | None = None
+    timeout_seconds: int | None = Field(default=None, ge=5, le=600)
+    max_retries: int | None = Field(default=None, ge=0, le=5)
+    daily_call_cap: int | None = Field(default=None, gt=0, le=100000)
+
+
+class OrderIn(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=20)
+
+
+class ConsentIn(BaseModel):
+    purposes: list[Purpose] = Field(min_length=1, max_length=3)
+
+
+@router.get("/settings")
+def get_settings(active: Active, state: StateDep) -> dict[str, Any]:
+    return AIService(active, state).settings()
+
+
+@router.put("/settings")
+def put_settings(body: EnabledIn, active: Active, state: StateDep) -> dict[str, Any]:
+    return AIService(active, state).set_enabled(body.enabled)
+
+
+@router.put("/routing/{task}")
+def put_routing(task: str, body: RoutingIn, active: Active, state: StateDep) -> dict[str, Any]:
+    return AIService(active, state).set_routing(task, body.provider_id)
+
+
+@router.get("/providers")
+def list_providers(active: Active, state: StateDep) -> dict[str, Any]:
+    return {"items": AIService(active, state).list_items()}
+
+
+@router.post("/providers", status_code=201)
+def create_provider(body: ProviderIn, active: Active, state: StateDep) -> dict[str, Any]:
+    return AIService(active, state).create(
+        kind=body.kind,
+        display_name=body.display_name,
+        model=body.model,
+        base_url=body.base_url,
+        api_key=body.api_key.get_secret_value() if body.api_key else None,
+        timeout_seconds=body.timeout_seconds,
+        max_retries=body.max_retries,
+        daily_call_cap=body.daily_call_cap,
     )
 
-@router.get("/providers/{provider_id}", response_model=AIProviderResponse)
-async def get_ai_provider(provider_id: str):
-    raise HTTPException(status_code=404, detail="Provider not found")
 
-@router.put("/providers/{provider_id}", response_model=AIProviderResponse)
-async def update_ai_provider(provider_id: str, provider: AIProviderUpdate):
-    raise HTTPException(status_code=404, detail="Provider not found")
+@router.put("/providers/order")
+def reorder(body: OrderIn, active: Active, state: StateDep) -> dict[str, Any]:
+    return {"items": AIService(active, state).reorder(body.ids)}
 
-@router.post("/providers/{provider_id}/key")
-async def update_provider_key(provider_id: str, key_update: APIKeyUpdate):
-    keychain_ref = f"ai_provider_{provider_id}"
-    keyring.set_password("opportunex", keychain_ref, key_update.api_key_value)
-    return {"status": "key_updated"}
 
-@router.delete("/providers/{provider_id}")
-async def delete_ai_provider(provider_id: str):
-    keychain_ref = f"ai_provider_{provider_id}"
-    try:
-        keyring.delete_password("opportunex", keychain_ref)
-    except keyring.errors.PasswordDeleteError:
-        pass
-    return {"status": "deleted"}
+@router.patch("/providers/{provider_id}")
+def patch_provider(provider_id: str, body: ProviderPatch, active: Active, state: StateDep) -> dict[str, Any]:
+    values = body.model_dump(exclude_unset=True)
+    if body.api_key is not None:
+        values["api_key"] = body.api_key.get_secret_value()
+    return AIService(active, state).update(provider_id, values)
+
+
+@router.delete("/providers/{provider_id}", status_code=204)
+def delete_provider(provider_id: str, active: Active, state: StateDep) -> None:
+    AIService(active, state).delete(provider_id)
+
 
 @router.post("/providers/{provider_id}/test")
-async def test_ai_provider(provider_id: str):
-    return {"status": "success", "message": "Connection successful"}
+async def test_provider(provider_id: str, active: Active, state: StateDep) -> dict[str, Any]:
+    return await AIService(active, state).test(provider_id)
 
-@router.get("/usage", response_model=Dict[str, Any])
-async def get_ai_usage():
-    return {"tokens_used": {"openai": 1500, "anthropic": 200}}
+
+@router.post("/providers/{provider_id}/consents")
+def grant_consent(provider_id: str, body: ConsentIn, active: Active, state: StateDep) -> dict[str, Any]:
+    return AIService(active, state).grant(provider_id, list(body.purposes))
+
+
+@router.get("/usage")
+async def usage(active: Active, state: StateDep, days: int = 30) -> dict[str, Any]:
+    return await asyncio.to_thread(AIService(active, state).usage, max(1, min(days, 365)))

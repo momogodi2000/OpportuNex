@@ -8,7 +8,7 @@
 PRODUCT_NAME = opportunex
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.protegeqv.opportunex
+PRODUCT_BUNDLE_IDENTIFIER = app.opportunex.Opportunex
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.protegeqv. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 Momo Godi Yvan / ETS Monthe Network. GNU AGPL v3.

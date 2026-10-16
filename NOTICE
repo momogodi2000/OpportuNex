@@ -1,0 +1,27 @@
+Opportunex (technical name: PIO — Plateforme Open Source d'Intelligence des Opportunités)
+Copyright © 2026 Momo Godi Yvan / ETS Monthe Network and Opportunex contributors
+
+Published by ETS Monthe Network. Lead developer and author: Momo Godi Yvan.
+
+This program is free software: you can redistribute it and/or modify it under the
+terms of the GNU Affero General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+See the LICENSE file.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+Network use: if you run a modified version of Opportunex or of the sync server for
+users over a network, section 13 of the licence requires you to offer them the
+corresponding source code.
+
+Licences of other parts of this repository:
+  - Documentation (documentation/, user guide): Creative Commons BY-SA 4.0.
+  - Declarative source connectors (engine/connectors/): Apache License 2.0.
+
+The names "Opportunex" and "PIO" and the Opportunex logo are not licensed under
+the AGPL: see TRADEMARKS.md.
+
+Third-party components and their licences are listed in THIRD_PARTY_NOTICES.md.
+Fonts: Inter, SIL Open Font License 1.1 (apps/desktop/assets/fonts/Inter-OFL.txt).

@@ -1,341 +1,318 @@
-"""
-Database backup service — weekly automated SQLite backups with:
-- SHA-256 integrity checksum
-- gzip compression
-- 6-week retention policy
-- Audit logging of all operations
+"""Encrypted backup and verified restore (EF-18.05, EF-18.06, arch §13.2).
+
+A backup is a ``.opxbak`` ZIP archive containing:
+
+* ``db/pio.db``   — ``VACUUM INTO`` snapshot, still SQLCipher-encrypted with the data key;
+* ``vault/**``    — the vault blobs (already AES-GCM encrypted);
+* ``profile.json``— the registry record (hashes, salts and wrapped keys only) so the profile
+  can be restored on another machine with the user's password;
+* ``manifest.json``— format version, schema revision, engine version and SHA-256 of every
+  member, checked before any restore.
+
+Retention (spec over agent rule C-02): keep the 7 most recent ``scheduled`` backups and the
+3 most recent ``pre_migration`` / ``pre_restore`` ones; ``manual`` backups are kept until the
+user deletes them. Retention works from ``backup_records`` metadata, never file names.
 """
 
 from __future__ import annotations
 
-import gzip
 import hashlib
 import json
 import os
 import shutil
-from datetime import datetime, timedelta
+import tempfile
+import zipfile
+from dataclasses import asdict
 from pathlib import Path
-from typing import Optional
-from uuid import uuid4
+from typing import Any
 
 import structlog
+from sqlalchemy import delete, desc, insert, select, update
 
-from persistence.database import _DB_PATH
+from core.errors import NotFound, ValidationFailed
+from core.ids import uuid7
+from core.timeutil import now_iso, parse_iso, utcnow
+from core.version import ENGINE_VERSION
+from persistence.database import ProfileDatabase, integrity_check, make_engine, vacuum_into
+from persistence.registry import ProfileRecord
 
 log = structlog.get_logger(__name__)
 
-# Backup directory: alongside the database, in a 'backups' subdirectory
-_BACKUP_DIR = _DB_PATH.parent / "backups"
-_RETENTION_COUNT = 6   # Keep 6 most recent backups
+FORMAT_VERSION = 1
+KEEP = {"scheduled": 7, "pre_migration": 3, "pre_restore": 3}
+SCHEDULE_INTERVAL_HOURS = 24
 
 
-class BackupError(Exception):
-    def __init__(self, code: str, message: str) -> None:
-        self.code = code
-        self.message = message
-        super().__init__(message)
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def snapshot_db_file(db_path: Path, target: Path, key: bytes) -> None:
+    """Consistent encrypted copy of a live database (used before migrations)."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        target.unlink()
+    engine = make_engine(db_path, key)
+    try:
+        vacuum_into(engine, target)
+    finally:
+        engine.dispose()
 
 
 class BackupService:
-    """
-    Manages automated and manual SQLite database backups.
-    """
+    def __init__(
+        self, *, db: ProfileDatabase, user_id: str, backups_dir: Path, vault_dir: Path, record: ProfileRecord
+    ) -> None:
+        self.db = db
+        self.user_id = user_id
+        self.dir = backups_dir
+        self.vault_dir = vault_dir
+        self.record = record
 
-    def __init__(self) -> None:
-        _BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-
-    async def create_backup(
-        self,
-        triggered_by: str = "scheduler",  # "scheduler" | "manual"
-    ) -> dict:
-        """
-        Create a full database backup.
-
-        Steps:
-        1. Create backup directory entry
-        2. Copy SQLite database using SQLite's backup API (consistent snapshot)
-        3. Compute SHA-256 checksum
-        4. Compress with gzip
-        5. Store metadata
-        6. Apply retention policy
-        7. Return backup metadata
-
-        Returns:
-            dict with backup metadata (id, file_path, size, checksum, etc.)
-        """
-        backup_id = str(uuid4())
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        raw_backup_path = _BACKUP_DIR / f"opx-backup-{timestamp}-{backup_id[:8]}.db"
-        compressed_path = _BACKUP_DIR / f"opx-backup-{timestamp}-{backup_id[:8]}.db.gz"
-        meta_path = _BACKUP_DIR / f"opx-backup-{timestamp}-{backup_id[:8]}.meta.json"
-
-        log.info("backup_started", backup_id=backup_id, triggered_by=triggered_by)
-        started_at = datetime.utcnow()
-
-        try:
-            # ── Step 1: SQLite online backup ─────────────────────────────
-            if not _DB_PATH.exists():
-                raise BackupError("DB_NOT_FOUND", "Database file does not exist")
-
-            await self._sqlite_backup(_DB_PATH, raw_backup_path)
-            original_size = raw_backup_path.stat().st_size
-
-            # ── Step 2: Compute checksum ──────────────────────────────────
-            checksum = self._compute_sha256(raw_backup_path)
-
-            # ── Step 3: Compress ──────────────────────────────────────────
-            self._compress(raw_backup_path, compressed_path)
-            compressed_size = compressed_path.stat().st_size
-
-            # ── Step 4: Remove uncompressed ───────────────────────────────
-            raw_backup_path.unlink()
-
-            finished_at = datetime.utcnow()
-            duration_s = (finished_at - started_at).total_seconds()
-
-            # ── Step 5: Write metadata ────────────────────────────────────
-            meta = {
-                "backup_id": backup_id,
-                "status": "success",
-                "file_name": compressed_path.name,
-                "file_path": str(compressed_path),
-                "original_size_bytes": original_size,
-                "compressed_size_bytes": compressed_size,
-                "compression_ratio": round(original_size / compressed_size, 2) if compressed_size else 1.0,
-                "checksum_sha256": checksum,
-                "triggered_by": triggered_by,
-                "started_at": started_at.isoformat() + "Z",
-                "finished_at": finished_at.isoformat() + "Z",
-                "duration_seconds": duration_s,
-                "source_db": str(_DB_PATH),
-            }
-            meta_path.write_text(json.dumps(meta, indent=2))
-
-            log.info(
-                "backup_completed",
-                backup_id=backup_id,
-                compressed_size=compressed_size,
-                duration_s=duration_s,
-                checksum=checksum[:16] + "...",
+    # ------------------------------------------------------------------ create
+    def create(self, kind: str) -> dict[str, Any]:
+        if kind not in ("manual", "scheduled", "pre_migration", "pre_restore"):
+            raise ValidationFailed("unknown backup kind", code="backup_kind_invalid")
+        self.dir.mkdir(parents=True, exist_ok=True)
+        backup_id = uuid7()
+        stamp = utcnow().strftime("%Y%m%dT%H%M%SZ")
+        final = self.dir / f"opportunex-{stamp}-{kind}-{backup_id[-8:]}.opxbak"
+        with tempfile.TemporaryDirectory(prefix="opx-bak-") as tmp:
+            tmpdir = Path(tmp)
+            snap = tmpdir / "pio.db"
+            vacuum_into(self.db.engine, snap)
+            members: dict[str, str] = {"db/pio.db": _sha256_file(snap)}
+            partial = final.with_suffix(".partial")
+            with zipfile.ZipFile(partial, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                zf.write(snap, "db/pio.db")
+                if self.vault_dir.exists():
+                    for f in sorted(self.vault_dir.rglob("*.bin")):
+                        arc = "vault/" + f.relative_to(self.vault_dir).as_posix()
+                        zf.write(f, arc)
+                        members[arc] = _sha256_file(f)
+                profile_json = json.dumps(asdict(self.record), indent=2).encode()
+                zf.writestr("profile.json", profile_json)
+                members["profile.json"] = hashlib.sha256(profile_json).hexdigest()
+                manifest = {
+                    "format": FORMAT_VERSION,
+                    "backup_id": backup_id,
+                    "profile_id": self.user_id,
+                    "kind": kind,
+                    "created_at": now_iso(),
+                    "schema_revision": self.db.revision,
+                    "engine_version": ENGINE_VERSION,
+                    "members": members,
+                }
+                zf.writestr("manifest.json", json.dumps(manifest, indent=2))
+            os.replace(partial, final)
+        size = final.stat().st_size
+        digest = _sha256_file(final)
+        T = self.db.tables
+        with self.db.tx() as conn:
+            conn.execute(
+                insert(T.backup_records).values(
+                    id=backup_id,
+                    user_id=self.user_id,
+                    kind=kind,
+                    file_path=final.name,
+                    size_bytes=size,
+                    sha256=digest,
+                    schema_version=self.db.revision,
+                    encrypted=1,
+                    status="ok",
+                )
             )
+        log.info("backup_created", kind=kind, size=size)
+        self.apply_retention()
+        return self.get(backup_id)
 
-            # ── Step 6: Apply retention policy ────────────────────────────
-            self._apply_retention_policy()
+    # ------------------------------------------------------------------- query
+    def list_items(self) -> list[dict[str, Any]]:
+        T = self.db.tables
+        with self.db.read() as conn:
+            rows = (
+                conn.execute(
+                    select(T.backup_records)
+                    .where(T.backup_records.c.user_id == self.user_id, T.backup_records.c.status != "deleted")
+                    .order_by(desc(T.backup_records.c.created_at), desc(T.backup_records.c.id))
+                )
+                .mappings()
+                .all()
+            )
+        return [self._present(dict(r)) for r in rows]
 
-            return meta
+    def get(self, backup_id: str) -> dict[str, Any]:
+        T = self.db.tables
+        with self.db.read() as conn:
+            row = (
+                conn.execute(
+                    select(T.backup_records).where(
+                        T.backup_records.c.id == backup_id, T.backup_records.c.user_id == self.user_id
+                    )
+                )
+                .mappings()
+                .first()
+            )
+        if row is None:
+            raise NotFound("backup not found", code="backup_not_found")
+        return self._present(dict(row))
 
-        except Exception as e:
-            # Clean up partial files
-            for p in [raw_backup_path, compressed_path, meta_path]:
-                if p.exists():
-                    p.unlink(missing_ok=True)
+    def _present(self, row: dict[str, Any]) -> dict[str, Any]:
+        row["available"] = (self.dir / row["file_path"]).is_file()
+        return row
 
-            log.error("backup_failed", backup_id=backup_id, error=str(e))
-            raise BackupError("BACKUP_FAILED", str(e)) from e
+    def last_scheduled_at(self) -> str | None:
+        T = self.db.tables
+        with self.db.read() as conn:
+            return conn.execute(
+                select(T.backup_records.c.created_at)
+                .where(
+                    T.backup_records.c.user_id == self.user_id,
+                    T.backup_records.c.kind == "scheduled",
+                    T.backup_records.c.status == "ok",
+                )
+                .order_by(desc(T.backup_records.c.created_at))
+                .limit(1)
+            ).scalar_one_or_none()
 
-    async def _sqlite_backup(self, source: Path, dest: Path) -> None:
-        """
-        Create a consistent SQLite backup using the Python sqlite3 backup API.
-        This is safe for WAL-mode databases.
-        """
-        import sqlite3
-        import asyncio
+    def scheduled_backup_due(self) -> bool:
+        last = parse_iso(self.last_scheduled_at())
+        return last is None or (utcnow() - last).total_seconds() >= SCHEDULE_INTERVAL_HOURS * 3600
 
-        def _do_backup() -> None:
-            src_conn = sqlite3.connect(str(source))
-            dst_conn = sqlite3.connect(str(dest))
+    # ------------------------------------------------------------------ verify
+    def _archive_path(self, backup_id: str) -> Path:
+        row = self.get(backup_id)
+        path = (self.dir / row["file_path"]).resolve()
+        if not path.is_relative_to(self.dir.resolve()) or not path.is_file():
+            raise NotFound("backup file missing", code="backup_file_missing")
+        return path
+
+    @staticmethod
+    def read_manifest(archive: Path) -> dict[str, Any]:
+        try:
+            with zipfile.ZipFile(archive) as zf:
+                manifest = json.loads(zf.read("manifest.json"))
+                if manifest.get("format") != FORMAT_VERSION:
+                    raise ValidationFailed("unsupported backup format", code="backup_format_unsupported")
+                for name, digest in manifest["members"].items():
+                    if not _safe_member(name):
+                        raise ValidationFailed("unsafe path in backup", code="backup_corrupted")
+                    if hashlib.sha256(zf.read(name)).hexdigest() != digest:
+                        raise ValidationFailed("checksum mismatch", code="backup_corrupted")
+                return manifest
+        except (zipfile.BadZipFile, KeyError, json.JSONDecodeError) as exc:
+            raise ValidationFailed("backup archive is corrupted", code="backup_corrupted") from exc
+
+    def verify(self, backup_id: str, key: bytes) -> dict[str, Any]:
+        archive = self._archive_path(backup_id)
+        manifest = self.read_manifest(archive)
+        if manifest["profile_id"] != self.user_id:
+            raise ValidationFailed("backup belongs to another profile", code="backup_wrong_profile")
+        with tempfile.TemporaryDirectory(prefix="opx-verify-") as tmp:
+            db_file = Path(tmp) / "pio.db"
+            with zipfile.ZipFile(archive) as zf:
+                db_file.write_bytes(zf.read("db/pio.db"))
+            engine = make_engine(db_file, key)
             try:
-                src_conn.backup(dst_conn, pages=100)
+                integrity_check(engine)
             finally:
-                src_conn.close()
-                dst_conn.close()
+                engine.dispose()
+        return {"backup_id": backup_id, "valid": True, "schema_revision": manifest["schema_revision"]}
 
-        await asyncio.to_thread(_do_backup)
+    # --------------------------------------------------------------- retention
+    def apply_retention(self) -> int:
+        T = self.db.tables
+        removed = 0
+        for kind, keep in KEEP.items():
+            with self.db.read() as conn:
+                stale = conn.execute(
+                    select(T.backup_records.c.id, T.backup_records.c.file_path)
+                    .where(
+                        T.backup_records.c.user_id == self.user_id,
+                        T.backup_records.c.kind == kind,
+                        T.backup_records.c.status.in_(("ok", "restored")),
+                    )
+                    .order_by(desc(T.backup_records.c.created_at), desc(T.backup_records.c.id))
+                    .offset(keep)
+                ).all()
+            for backup_id, file_name in stale:
+                self._delete_file(file_name)
+                with self.db.tx() as conn:
+                    conn.execute(
+                        update(T.backup_records).where(T.backup_records.c.id == backup_id).values(status="deleted")
+                    )
+                removed += 1
+        return removed
 
-    def _compute_sha256(self, path: Path) -> str:
-        """Compute SHA-256 checksum of a file."""
-        h = hashlib.sha256()
-        with open(path, "rb") as f:
-            for chunk in iter(lambda: f.read(65536), b""):
-                h.update(chunk)
-        return h.hexdigest()
+    def delete(self, backup_id: str) -> None:
+        row = self.get(backup_id)
+        self._delete_file(row["file_path"])
+        T = self.db.tables
+        with self.db.tx() as conn:
+            conn.execute(delete(T.backup_records).where(T.backup_records.c.id == backup_id))
 
-    def _compress(self, source: Path, dest: Path) -> None:
-        """Compress a file using gzip."""
-        with open(source, "rb") as f_in:
-            with gzip.open(dest, "wb", compresslevel=9) as f_out:
-                shutil.copyfileobj(f_in, f_out)
+    def _delete_file(self, file_name: str) -> None:
+        path = (self.dir / file_name).resolve()
+        if path.is_relative_to(self.dir.resolve()) and path.is_file():
+            path.unlink()
 
-    def _apply_retention_policy(self) -> None:
-        """
-        Keep only the 6 most recent successful backups.
-        Deletes older backups and their metadata files.
-        """
-        meta_files = sorted(
-            _BACKUP_DIR.glob("*.meta.json"),
-            key=lambda p: p.stat().st_mtime,
-            reverse=True,
-        )
 
-        to_delete = meta_files[_RETENTION_COUNT:]
-        for meta_path in to_delete:
-            try:
-                meta = json.loads(meta_path.read_text())
-                backup_file = Path(meta.get("file_path", ""))
-                if backup_file.exists():
-                    backup_file.unlink()
-                meta_path.unlink()
-                log.info("backup_deleted_retention", file=meta.get("file_name"))
-            except Exception as e:
-                log.warning("retention_cleanup_error", path=str(meta_path), error=str(e))
+def _safe_member(name: str) -> bool:
+    p = Path(name)
+    return (
+        not p.is_absolute()
+        and ".." not in p.parts
+        and (name in ("db/pio.db", "profile.json") or name.startswith("vault/"))
+    )
 
-    def list_backups(self) -> list[dict]:
-        """List all backups with their metadata, sorted by date (newest first)."""
-        backups = []
-        for meta_path in sorted(
-            _BACKUP_DIR.glob("*.meta.json"),
-            key=lambda p: p.stat().st_mtime,
-            reverse=True,
-        ):
-            try:
-                meta = json.loads(meta_path.read_text())
-                # Verify the backup file still exists
-                file_path = Path(meta.get("file_path", ""))
-                meta["file_exists"] = file_path.exists()
-                backups.append(meta)
-            except Exception:
-                pass
-        return backups
 
-    def verify_backup(self, backup_id: str) -> dict:
-        """
-        Verify backup integrity by recomputing the checksum.
-        Returns {valid: bool, stored_checksum, computed_checksum}.
-        """
-        meta_files = list(_BACKUP_DIR.glob(f"*{backup_id[:8]}*.meta.json"))
-        if not meta_files:
-            raise BackupError("BACKUP_NOT_FOUND", f"Backup {backup_id} not found")
+def extract_restore_payload(archive: Path, workdir: Path) -> dict[str, Any]:
+    """Validate and unpack an archive into ``workdir`` (db/ and vault/). Returns the manifest."""
+    manifest = BackupService.read_manifest(archive)
+    with zipfile.ZipFile(archive) as zf:
+        for name in manifest["members"]:
+            target = (workdir / name).resolve()
+            if not target.is_relative_to(workdir.resolve()):
+                raise ValidationFailed("unsafe path in backup", code="backup_corrupted")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(zf.read(name))
+    return manifest
 
-        meta = json.loads(meta_files[0].read_text())
-        file_path = Path(meta["file_path"])
 
-        if not file_path.exists():
-            return {"valid": False, "error": "Backup file not found on disk"}
+def swap_in_restored(profile_dir: Path, workdir: Path) -> Path:
+    """Atomically replace db/ and vault/ of a closed profile. Returns the rollback folder."""
+    rollback = profile_dir / f".rollback-{uuid7()[-8:]}"
+    rollback.mkdir()
+    for part in ("db", "vault"):
+        current = profile_dir / part
+        if current.exists():
+            os.replace(current, rollback / part)
+    try:
+        (profile_dir / "db").mkdir()
+        os.replace(workdir / "db" / "pio.db", profile_dir / "db" / "pio.db")
+        restored_vault = workdir / "vault"
+        if restored_vault.exists():
+            os.replace(restored_vault, profile_dir / "vault")
+    except Exception:
+        rollback_restore(profile_dir, rollback)
+        raise
+    return rollback
 
-        # Decompress temporarily and verify
-        stored_checksum = meta.get("checksum_sha256", "")
-        try:
-            import tempfile
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".db") as tmp:
-                with gzip.open(file_path, "rb") as gz:
-                    shutil.copyfileobj(gz, tmp)
-                tmp_path = Path(tmp.name)
-            computed = self._compute_sha256(tmp_path)
-            tmp_path.unlink(missing_ok=True)
-        except Exception as e:
-            return {"valid": False, "error": str(e)}
 
-        valid = stored_checksum == computed
-        log.info(
-            "backup_verified",
-            backup_id=backup_id,
-            valid=valid,
-        )
-        return {
-            "valid": valid,
-            "stored_checksum": stored_checksum,
-            "computed_checksum": computed,
-        }
+def rollback_restore(profile_dir: Path, rollback: Path) -> None:
+    for part in ("db", "vault"):
+        restored = profile_dir / part
+        if restored.exists():
+            shutil.rmtree(restored)
+        saved = rollback / part
+        if saved.exists():
+            os.replace(saved, restored)
+    shutil.rmtree(rollback, ignore_errors=True)
 
-    async def restore_backup(
-        self,
-        backup_id: str,
-        user_id: str,
-        confirmed: bool = False,
-    ) -> dict:
-        """
-        Restore the database from a backup.
 
-        Safety steps:
-        1. Verify user authorization (super admin only)
-        2. Require explicit confirmation
-        3. Verify backup integrity
-        4. Create safety snapshot of current database
-        5. Restore
-        6. Verify restored database can be opened
-        7. Record result
-        """
-        if not confirmed:
-            raise BackupError(
-                "CONFIRMATION_REQUIRED",
-                "Explicit confirmation required for database restoration",
-            )
-
-        # Find backup metadata
-        meta_files = list(_BACKUP_DIR.glob(f"*{backup_id[:8]}*.meta.json"))
-        if not meta_files:
-            raise BackupError("BACKUP_NOT_FOUND", f"Backup {backup_id} not found")
-
-        meta = json.loads(meta_files[0].read_text())
-        file_path = Path(meta["file_path"])
-
-        if not file_path.exists():
-            raise BackupError("BACKUP_FILE_MISSING", "Backup file not found on disk")
-
-        # Verify integrity before restoring
-        verify_result = self.verify_backup(backup_id)
-        if not verify_result.get("valid"):
-            raise BackupError(
-                "BACKUP_INTEGRITY_FAILED",
-                "Backup checksum verification failed — cannot restore a corrupted backup",
-            )
-
-        # Create safety snapshot of current DB
-        safety_path = _BACKUP_DIR / f"safety-snapshot-{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.db"
-        try:
-            await self._sqlite_backup(_DB_PATH, safety_path)
-            log.info("safety_snapshot_created", path=str(safety_path))
-        except Exception as e:
-            raise BackupError("SAFETY_SNAPSHOT_FAILED", f"Could not create safety snapshot: {e}") from e
-
-        # Restore
-        try:
-            import tempfile
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".db") as tmp:
-                with gzip.open(file_path, "rb") as gz:
-                    shutil.copyfileobj(gz, tmp)
-                tmp_path = Path(tmp.name)
-
-            # Verify the restored file can be opened as a SQLite database
-            import sqlite3
-            try:
-                conn = sqlite3.connect(str(tmp_path))
-                conn.execute("PRAGMA integrity_check")
-                conn.close()
-            except Exception as e:
-                tmp_path.unlink(missing_ok=True)
-                raise BackupError("RESTORE_INTEGRITY_CHECK_FAILED", str(e)) from e
-
-            # Replace the live database
-            shutil.copy2(str(tmp_path), str(_DB_PATH))
-            tmp_path.unlink(missing_ok=True)
-
-            log.info("restore_completed", backup_id=backup_id, user_id=user_id)
-
-            return {
-                "success": True,
-                "backup_id": backup_id,
-                "safety_snapshot": str(safety_path),
-                "restored_at": datetime.utcnow().isoformat() + "Z",
-            }
-
-        except BackupError:
-            raise
-        except Exception as e:
-            # Attempt rollback using safety snapshot
-            try:
-                shutil.copy2(str(safety_path), str(_DB_PATH))
-                log.warning("restore_rolled_back", reason=str(e))
-            except Exception as rollback_err:
-                log.error("rollback_failed", error=str(rollback_err))
-            raise BackupError("RESTORE_FAILED", str(e)) from e
+def discard_rollback(rollback: Path) -> None:
+    shutil.rmtree(rollback, ignore_errors=True)
