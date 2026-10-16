@@ -11,9 +11,12 @@ import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
 import 'core/platform/app_paths.dart';
+import 'core/platform/autostart.dart';
 import 'features/shell/desktop_integration.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
+  // Started by the session autostart entry: stay in the tray until the user opens the window.
+  final minimized = args.contains(Autostart.flag);
   WidgetsFlutterBinding.ensureInitialized();
   _setupLogging();
   _registerFontLicense();
@@ -29,11 +32,16 @@ Future<void> main() async {
     ),
     () async {
       await windowManager.setPreventClose(true);
-      await windowManager.show();
-      await windowManager.focus();
+      if (!minimized) {
+        await windowManager.show();
+        await windowManager.focus();
+      }
     },
   );
-  await DesktopIntegration(container).start();
+  final desktop = DesktopIntegration(container);
+  await desktop.start();
+  // Without a tray icon a hidden window could not be reopened: show it.
+  if (minimized && !desktop.trayReady) await windowManager.show();
 
   runApp(UncontrolledProviderScope(container: container, child: const OpportunexApp()));
 }

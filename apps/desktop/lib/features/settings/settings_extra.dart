@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import '../../core/api/api_client.dart';
 import '../../core/api/json.dart';
 import '../../core/format.dart';
+import '../../core/platform/autostart.dart';
 import '../../core/prefs/ui_prefs.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
@@ -19,6 +20,9 @@ import '../../l10n/app_localizations.dart';
 final privacyProvider = FutureProvider.autoDispose<Json>((ref) => requireApi(ref).getJson('/privacy'));
 final networkProvider = FutureProvider.autoDispose<Json>((ref) => requireApi(ref).getJson('/settings/network'));
 final weightsProvider = FutureProvider.autoDispose<Json>((ref) => requireApi(ref).getJson('/matching/weights'));
+final trackingSettingsProvider =
+    FutureProvider.autoDispose<Json>((ref) => requireApi(ref).getJson('/settings/tracking'));
+final autostartProvider = FutureProvider.autoDispose<bool>((ref) => Autostart().isEnabled());
 final notifPrefsProvider =
     FutureProvider.autoDispose<List<Json>>((ref) async => items(await requireApi(ref).getJson('/notifications/preferences')));
 
@@ -269,6 +273,39 @@ class PreferencesTab extends ConsumerWidget {
               },
             ),
           ),
+        ]),
+      ),
+      SectionCard(
+        title: l.prefTracking,
+        child: Column(children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.prefAutoArchive),
+            subtitle: Text(l.prefAutoArchiveHelp),
+            trailing: DropdownButton<int>(
+              value: ref.watch(trackingSettingsProvider).valueOrNull?.integer('auto_archive_days') ?? 60,
+              items: [
+                for (final d in const [0, 30, 60, 90, 180, 365])
+                  DropdownMenuItem(value: d, child: Text(d == 0 ? l.prefNever : l.prefDays(d))),
+              ],
+              onChanged: (v) async {
+                if (v == null) return;
+                await run(() => api.putJson('/settings/tracking', body: {'auto_archive_days': v}));
+                ref.invalidate(trackingSettingsProvider);
+              },
+            ),
+          ),
+          if (Autostart().supported)
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l.prefAutostart),
+              subtitle: Text(l.prefAutostartHelp),
+              value: ref.watch(autostartProvider).valueOrNull ?? false,
+              onChanged: (v) async {
+                await run(() => Autostart().setEnabled(v));
+                ref.invalidate(autostartProvider);
+              },
+            ),
         ]),
       ),
       if (weights != null)

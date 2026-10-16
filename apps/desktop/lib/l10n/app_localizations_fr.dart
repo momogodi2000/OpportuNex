@@ -2334,7 +2334,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trackInterest => 'Intérêt';
 
   @override
-  String get trackInterested => 'Intéressé(e)';
+  String get trackInterested => 'Intéressante';
 
   @override
   String get trackList => 'Liste';
@@ -2805,4 +2805,182 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsAi => 'IA';
+
+  @override
+  String get compareGone => 'Disparues';
+
+  @override
+  String get compareModified => 'Modifiées';
+
+  @override
+  String get compareNew => 'Nouvelles';
+
+  @override
+  String get compareSame => 'Aucune différence entre les deux exécutions.';
+
+  @override
+  String dashDaysShort(int days) {
+    return 'J-$days';
+  }
+
+  @override
+  String get freqDaily => 'tous les jours';
+
+  @override
+  String freqEveryDays(int days) {
+    return 'tous les $days jours';
+  }
+
+  @override
+  String freqEveryHours(int hours) {
+    return 'toutes les $hours h';
+  }
+
+  @override
+  String get freqMonthly => 'tous les mois';
+
+  @override
+  String get freqWeekly => 'chaque semaine';
+
+  @override
+  String get historyCompare => 'Comparer avec l\'exécution précédente';
+
+  @override
+  String get monHistory => 'Historique';
+
+  @override
+  String get monHistoryEmpty => 'Aucune exécution pour l\'instant.';
+
+  @override
+  String monHistoryLine(String date, int created, int updated) {
+    return '$date · $created nouvelles · $updated modifiées';
+  }
+
+  @override
+  String get paletteEmpty => 'Aucune commande ne correspond.';
+
+  @override
+  String paletteGoTo(String section) {
+    return 'Aller à : $section';
+  }
+
+  @override
+  String get paletteHint => 'Tapez une commande ou une page…';
+
+  @override
+  String get paletteTheme => 'Changer de thème (clair, sombre, système)';
+
+  @override
+  String get prefAutoArchive => 'Archiver les candidatures closes';
+
+  @override
+  String get prefAutoArchiveHelp =>
+      'Acceptées, refusées, retirées ou expirées, sans activité depuis ce délai.';
+
+  @override
+  String get prefAutostart => 'Lancer Opportunex à l\'ouverture de session';
+
+  @override
+  String get prefAutostartHelp =>
+      'L\'application démarre réduite dans la zone de notification pour exécuter vos veilles.';
+
+  @override
+  String prefDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'après $days jours',
+      one: 'après 1 jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get prefNever => 'jamais';
+
+  @override
+  String get prefTracking => 'Suivi et démarrage';
+
+  @override
+  String runUnavailableCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sources à consulter manuellement',
+      one: '1 source à consulter manuellement',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shortcutClose => 'Fermer une fenêtre de dialogue';
+
+  @override
+  String get shortcutHelp => 'Afficher cette aide';
+
+  @override
+  String get shortcutPalette => 'Palette de commandes';
+
+  @override
+  String get shortcutSearch => 'Nouvelle recherche';
+
+  @override
+  String get shortcutSections => 'Aller à une section du menu';
+
+  @override
+  String get shortcutsTitle => 'Raccourcis clavier';
+
+  @override
+  String get srcCategories => 'Catégories couvertes';
+
+  @override
+  String get srcFrequency => 'Fréquence d\'analyse';
+
+  @override
+  String get srcFrequencyHelp =>
+      'Jamais plus d\'une fois par heure ; les délais de politesse et robots.txt restent appliqués.';
+
+  @override
+  String get srcSettings => 'Fréquence et catégories';
+
+  @override
+  String strEducation(String level) {
+    return 'Niveau d\'études atteint : $level';
+  }
+
+  @override
+  String strExperience(String years) {
+    return 'Expérience suffisante (au moins $years ans demandés)';
+  }
+
+  @override
+  String get strLanguages => 'Langues demandées maîtrisées';
+
+  @override
+  String strLocation(String country) {
+    return 'Pays recherché : $country';
+  }
+
+  @override
+  String strObjective(String objective) {
+    return 'Correspond à votre objectif : $objective';
+  }
+
+  @override
+  String get strRemote => 'Télétravail possible';
+
+  @override
+  String strSkills(String skills) {
+    return 'Compétences : $skills';
+  }
+
+  @override
+  String a11yToggle(String name) {
+    return 'Activer ou désactiver : $name';
+  }
+
+  @override
+  String a11ySelect(String title) {
+    return 'Sélectionner : $title';
+  }
 }

@@ -2790,4 +2790,183 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsAi => 'AI';
+
+  @override
+  String get compareGone => 'Gone';
+
+  @override
+  String get compareModified => 'Modified';
+
+  @override
+  String get compareNew => 'New';
+
+  @override
+  String get compareSame => 'No difference between the two runs.';
+
+  @override
+  String dashDaysShort(int days) {
+    return 'D-$days';
+  }
+
+  @override
+  String get freqDaily => 'daily';
+
+  @override
+  String freqEveryDays(int days) {
+    return 'every $days days';
+  }
+
+  @override
+  String freqEveryHours(int hours) {
+    return 'every $hours h';
+  }
+
+  @override
+  String get freqMonthly => 'monthly';
+
+  @override
+  String get freqWeekly => 'weekly';
+
+  @override
+  String get historyCompare => 'Compare with the previous run';
+
+  @override
+  String get monHistory => 'History';
+
+  @override
+  String get monHistoryEmpty => 'No runs yet.';
+
+  @override
+  String monHistoryLine(String date, int created, int updated) {
+    return '$date · $created new · $updated changed';
+  }
+
+  @override
+  String get paletteEmpty => 'No matching command.';
+
+  @override
+  String paletteGoTo(String section) {
+    return 'Go to: $section';
+  }
+
+  @override
+  String get paletteHint => 'Type a command or a page…';
+
+  @override
+  String get paletteTheme => 'Switch theme (light, dark, system)';
+
+  @override
+  String get prefAutoArchive => 'Archive closed applications';
+
+  @override
+  String get prefAutoArchiveHelp =>
+      'Accepted, rejected, withdrawn or expired, with no activity for this long.';
+
+  @override
+  String get prefAutostart =>
+      'Start Opportunex when you sign in to the computer';
+
+  @override
+  String get prefAutostartHelp =>
+      'The app starts minimised in the notification area to run your monitors.';
+
+  @override
+  String prefDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'after $days days',
+      one: 'after 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get prefNever => 'never';
+
+  @override
+  String get prefTracking => 'Tracking and start-up';
+
+  @override
+  String runUnavailableCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sources to check manually',
+      one: '1 source to check manually',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shortcutClose => 'Close a dialog';
+
+  @override
+  String get shortcutHelp => 'Show this help';
+
+  @override
+  String get shortcutPalette => 'Command palette';
+
+  @override
+  String get shortcutSearch => 'New search';
+
+  @override
+  String get shortcutSections => 'Go to a menu section';
+
+  @override
+  String get shortcutsTitle => 'Keyboard shortcuts';
+
+  @override
+  String get srcCategories => 'Categories covered';
+
+  @override
+  String get srcFrequency => 'Scan frequency';
+
+  @override
+  String get srcFrequencyHelp =>
+      'Never more than once an hour; politeness delays and robots.txt still apply.';
+
+  @override
+  String get srcSettings => 'Frequency and categories';
+
+  @override
+  String strEducation(String level) {
+    return 'Education level met: $level';
+  }
+
+  @override
+  String strExperience(String years) {
+    return 'Enough experience (at least $years years required)';
+  }
+
+  @override
+  String get strLanguages => 'Required languages mastered';
+
+  @override
+  String strLocation(String country) {
+    return 'Wanted country: $country';
+  }
+
+  @override
+  String strObjective(String objective) {
+    return 'Matches your objective: $objective';
+  }
+
+  @override
+  String get strRemote => 'Remote work possible';
+
+  @override
+  String strSkills(String skills) {
+    return 'Skills: $skills';
+  }
+
+  @override
+  String a11yToggle(String name) {
+    return 'Turn on or off: $name';
+  }
+
+  @override
+  String a11ySelect(String title) {
+    return 'Select: $title';
+  }
 }

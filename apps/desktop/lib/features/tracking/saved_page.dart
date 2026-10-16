@@ -157,11 +157,25 @@ class _SavedListState extends ConsumerState<_SavedList> {
   }
 }
 
-class BoardView extends ConsumerWidget {
+class BoardView extends ConsumerStatefulWidget {
   const BoardView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BoardView> createState() => _BoardViewState();
+}
+
+class _BoardViewState extends ConsumerState<BoardView> {
+  // Eleven status columns rarely fit: the horizontal scrollbar stays visible (desktop has no swipe).
+  final _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AsyncView<Json>(
       value: ref.watch(boardProvider),
@@ -169,7 +183,10 @@ class BoardView extends ConsumerWidget {
       data: (board) {
         final transitions = board.obj('transitions');
         return Scrollbar(
+          controller: _scroll,
+          thumbVisibility: true,
           child: SingleChildScrollView(
+            controller: _scroll,
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.all(Space.xl),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -334,7 +351,8 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
                     _ => Icons.event,
                   }),
                   title: Text(e.string('title')),
-                  subtitle: Text('${Fmt.dateTime(context, e.str('date'))} · ${_typeLabel(l, e.string('type'))}'),
+                  subtitle: Text('${e.string('type').endsWith('deadline') ? Fmt.date(context, e.str('date')) : Fmt.dateTime(context, e.str('date'))}'
+                      ' · ${_typeLabel(l, e.string('type'))}'),
                   onTap: () => context.push('/saved/${e.string('saved_id')}'),
                 ),
               ),

@@ -763,8 +763,37 @@ class TrackingService:
         lines.append("END:VCALENDAR")
         return "\r\n".join(lines) + "\r\n"
 
-    def auto_archive(self, after_days: int = 60) -> int:
-        """EF-12.12: archive closed applications after a delay."""
+    ARCHIVE_KEY = "tracking.auto_archive_days"
+    ARCHIVE_DEFAULT = 60
+
+    def auto_archive_days(self) -> int:
+        """Delay before closed applications are archived; 0 turns the sweep off (EF-12.12)."""
+        T = self.T
+        with self.active.db.read() as conn:
+            raw = conn.execute(
+                select(T.application_settings.c.value).where(T.application_settings.c.key == self.ARCHIVE_KEY)
+            ).scalar()
+        return int(raw) if raw is not None and str(raw).isdigit() else self.ARCHIVE_DEFAULT
+
+    def set_auto_archive_days(self, days: int) -> int:
+        if not 0 <= days <= 3650:
+            raise ValidationFailed("between 0 and 3650 days", code="archive_delay_invalid")
+        T = self.T
+        with self.active.db.tx() as conn:
+            conn.execute(delete(T.application_settings).where(T.application_settings.c.key == self.ARCHIVE_KEY))
+            conn.execute(
+                insert(T.application_settings).values(
+                    key=self.ARCHIVE_KEY, value=str(days), value_type="integer", description="0 = never"
+                )
+            )
+        return days
+
+    def auto_archive(self, after_days: int | None = None) -> int:
+        """EF-12.12: archive closed applications after the user's delay (default 60 days, 0 = off)."""
+        if after_days is None:
+            after_days = self.auto_archive_days()
+        if after_days <= 0:
+            return 0
         T = self.T
         limit = (date.today() - timedelta(days=after_days)).isoformat()
         with self.active.db.tx() as conn:

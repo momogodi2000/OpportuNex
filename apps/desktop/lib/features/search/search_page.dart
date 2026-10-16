@@ -236,11 +236,14 @@ class _RunPanel extends ConsumerWidget {
           ]),
           if (failed.isNotEmpty || (!state.isRunning && links.isNotEmpty)) ...[
             const Divider(height: Space.xl),
-            Text(l.runUnavailableTitle, style: context.text.labelLarge),
-            const SizedBox(height: Space.xs),
-            Text(l.runUnavailableBody, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
-            const SizedBox(height: Space.sm),
-            Wrap(spacing: Space.sm, runSpacing: Space.xs, children: [
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: const EdgeInsets.only(bottom: Space.sm),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              initiallyExpanded: failed.isNotEmpty,
+              title: Text(l.runUnavailableCount([...failed, ...links].length), style: context.text.labelLarge),
+              subtitle: Text(l.runUnavailableBody, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
+              children: [Wrap(spacing: Space.sm, runSpacing: Space.xs, children: [
               for (final src in [...failed, ...links])
                 if (src.str('official_search_url') != null)
                   ActionChip(
@@ -248,7 +251,8 @@ class _RunPanel extends ConsumerWidget {
                     label: Text(src.string('name')),
                     onPressed: () => launchUrl(Uri.parse(src.string('official_search_url'))),
                   ),
-            ]),
+            ])],
+            ),
           ],
         ]),
       ),

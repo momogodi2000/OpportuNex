@@ -139,16 +139,21 @@ class OpportunityCard extends StatelessWidget {
             if (onSelect != null)
               Padding(
                 padding: const EdgeInsets.only(right: Space.sm),
-                child: Checkbox(value: selected, onChanged: (v) => onSelect!(v ?? false)),
+                child: Semantics(
+                  label: l.a11ySelect(data.string('title')),
+                  child: Checkbox(value: selected, onChanged: (v) => onSelect!(v ?? false)),
+                ),
               ),
-            ScoreGauge(score: data.integer('score')),
-            const SizedBox(width: Space.lg),
+            if (data.integer('score') != null) ...[
+              ScoreGauge(score: data.integer('score')),
+              const SizedBox(width: Space.lg),
+            ],
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(data.string('title'), style: context.text.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: Space.xs),
                 Wrap(spacing: Space.md, runSpacing: Space.xs, children: [
-                  _Meta(Icons.apartment, data.str('organization_name') ?? l.commonNotSpecified),
+                  if (data.str('organization_name') != null) _Meta(Icons.apartment, data.string('organization_name')),
                   _Meta(Icons.category_outlined, categoryLabel(l, data.str('category'))),
                   if (data.str('country_code') != null) _Meta(Icons.place_outlined, data.string('country_code')),
                   _Meta(Icons.event, daysLeft == null

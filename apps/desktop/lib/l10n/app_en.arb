@@ -1255,5 +1255,154 @@
   "genWithAi": "Draft with AI",
   "genWithAiHelp": "From your anonymised profile; additions not in the profile are flagged.",
   "provUnverifiable": "Unverifiable",
-  "settingsAi": "AI"
+  "settingsAi": "AI",
+  "compareGone": "Gone",
+  "compareModified": "Modified",
+  "compareNew": "New",
+  "compareSame": "No difference between the two runs.",
+  "dashDaysShort": "D-{days}",
+  "@dashDaysShort": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freqDaily": "daily",
+  "freqEveryDays": "every {days} days",
+  "@freqEveryDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "freqEveryHours": "every {hours} h",
+  "@freqEveryHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "freqMonthly": "monthly",
+  "freqWeekly": "weekly",
+  "historyCompare": "Compare with the previous run",
+  "monHistory": "History",
+  "monHistoryEmpty": "No runs yet.",
+  "monHistoryLine": "{date} · {created} new · {updated} changed",
+  "@monHistoryLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "created": {
+        "type": "int"
+      },
+      "updated": {
+        "type": "int"
+      }
+    }
+  },
+  "paletteEmpty": "No matching command.",
+  "paletteGoTo": "Go to: {section}",
+  "@paletteGoTo": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "paletteHint": "Type a command or a page…",
+  "paletteTheme": "Switch theme (light, dark, system)",
+  "prefAutoArchive": "Archive closed applications",
+  "prefAutoArchiveHelp": "Accepted, rejected, withdrawn or expired, with no activity for this long.",
+  "prefAutostart": "Start Opportunex when you sign in to the computer",
+  "prefAutostartHelp": "The app starts minimised in the notification area to run your monitors.",
+  "prefDays": "{days, plural, =1{after 1 day} other{after {days} days}}",
+  "@prefDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "prefNever": "never",
+  "prefTracking": "Tracking and start-up",
+  "runUnavailableCount": "{count, plural, =1{1 source to check manually} other{{count} sources to check manually}}",
+  "@runUnavailableCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shortcutClose": "Close a dialog",
+  "shortcutHelp": "Show this help",
+  "shortcutPalette": "Command palette",
+  "shortcutSearch": "New search",
+  "shortcutSections": "Go to a menu section",
+  "shortcutsTitle": "Keyboard shortcuts",
+  "srcCategories": "Categories covered",
+  "srcFrequency": "Scan frequency",
+  "srcFrequencyHelp": "Never more than once an hour; politeness delays and robots.txt still apply.",
+  "srcSettings": "Frequency and categories",
+  "strEducation": "Education level met: {level}",
+  "@strEducation": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "strExperience": "Enough experience (at least {years} years required)",
+  "@strExperience": {
+    "placeholders": {
+      "years": {
+        "type": "String"
+      }
+    }
+  },
+  "strLanguages": "Required languages mastered",
+  "strLocation": "Wanted country: {country}",
+  "@strLocation": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "strObjective": "Matches your objective: {objective}",
+  "@strObjective": {
+    "placeholders": {
+      "objective": {
+        "type": "String"
+      }
+    }
+  },
+  "strRemote": "Remote work possible",
+  "strSkills": "Skills: {skills}",
+  "@strSkills": {
+    "placeholders": {
+      "skills": {
+        "type": "String"
+      }
+    }
+  },
+  "a11yToggle": "Turn on or off: {name}",
+  "@a11yToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "a11ySelect": "Select: {title}",
+  "@a11ySelect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  }
 }

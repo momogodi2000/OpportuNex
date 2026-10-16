@@ -4,7 +4,7 @@ import io
 import json
 import time
 import zipfile
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 
@@ -31,9 +31,15 @@ def test_dashboard_empty_then_populated(client: EngineClient, site: FixtureSite)
 
 def test_schedule_rules() -> None:
     base = datetime(2026, 10, 15, 9, 0, tzinfo=UTC)
-    assert next_run("daily", "08:00", base) == datetime(2026, 10, 16, 8, 0, tzinfo=UTC)
-    assert next_run("weekly", "mon 07:30", base).weekday() == 0
+    assert next_run("daily", "08:00", base, UTC) == datetime(2026, 10, 16, 8, 0, tzinfo=UTC)
+    assert next_run("weekly", "mon 07:30", base, UTC).weekday() == 0
     assert next_run("custom_cron", "every 48h", base) == datetime(2026, 10, 17, 9, 0, tzinfo=UTC)
+    # Regression: "08:00" is the user's local time, not UTC (Douala is UTC+1).
+    douala = timezone(timedelta(hours=1))
+    assert next_run("daily", "08:00", base, douala) == datetime(2026, 10, 16, 7, 0, tzinfo=UTC)
+    assert next_run("daily", "11:00", base, douala) == datetime(2026, 10, 15, 10, 0, tzinfo=UTC)
+    monday = next_run("weekly", "lun 07:30", base, douala)
+    assert monday.astimezone(douala).weekday() == 0 and monday.astimezone(douala).hour == 7
     from core.errors import ValidationFailed
 
     with pytest.raises(ValidationFailed):
@@ -174,6 +180,31 @@ def test_privacy_dashboard_consents_and_erase(client: EngineClient, site: Fixtur
     assert r["unsaved_opportunities"] == 3
     after = client.get("/privacy").json()["stored"]
     assert after["opportunities"] == 0 and after["search_history"] == 0 and after["profile"]["skills"] == 0
+
+
+def test_auto_archive_delay_is_configurable(client: EngineClient, site: FixtureSite) -> None:
+    from sqlalchemy import update
+
+    from services.tracking_service import TrackingService
+
+    opp = collect(client, site)[0]
+    saved = client.post("/saved", json={"opportunity_id": opp["id"]}).json()
+    app_id = saved["application"]["id"]
+    client.post(f"/applications/{app_id}/status", json={"status": "withdrawn"})
+    active = client.state.active
+    with active.db.tx() as conn:
+        conn.execute(
+            update(active.tables.applications)
+            .where(active.tables.applications.c.id == app_id)
+            .values(updated_at="2000-01-01T00:00:00Z")
+        )
+    assert client.get("/settings/tracking").json() == {"auto_archive_days": 60}
+    assert client.put("/settings/tracking", json={"auto_archive_days": -1}).status_code == 422
+    client.put("/settings/tracking", json={"auto_archive_days": 0})
+    assert TrackingService(active).auto_archive() == 0  # 0 turns the sweep off
+    client.put("/settings/tracking", json={"auto_archive_days": 30})
+    assert TrackingService(active).auto_archive() == 1
+    assert client.get(f"/saved/{saved['id']}").json()["archived"] is True
 
 
 def test_network_settings(client: EngineClient) -> None:

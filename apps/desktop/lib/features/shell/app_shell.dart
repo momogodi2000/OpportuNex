@@ -10,10 +10,11 @@ import '../../core/widgets/brand.dart';
 import '../../l10n/app_localizations.dart';
 import '../auth/auth_controller.dart';
 import '../auth/auth_models.dart';
+import 'command_palette.dart';
 import 'nav_items.dart';
 
-/// Desktop shell: collapsible sidebar + content. Keyboard shortcuts: Ctrl+L locks the
-/// profile, Ctrl+1..9 jumps to a section.
+/// Desktop shell: collapsible sidebar + content. Keyboard shortcuts (EF-18.13): Ctrl+K command
+/// palette, Ctrl+F search, Ctrl+1..9 sections, Ctrl+L lock, F1 or Ctrl+/ shortcut list.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child, required this.location});
 
@@ -31,9 +32,38 @@ class AppShell extends ConsumerWidget {
     final collapsed = prefs.sidebarCollapsed || narrow;
     final selected = items.indexWhere((i) => location.startsWith(i.path));
 
+    void palette() => showCommandPalette(context, [
+          for (final (i, item) in items.indexed)
+            PaletteCommand(l.paletteGoTo(item.label), item.icon, () => context.go(item.path),
+                shortcut: i < 9 ? 'Ctrl+${i + 1}' : null),
+          PaletteCommand(l.dashNewSearch, Icons.travel_explore, () => context.go('/search'), shortcut: 'Ctrl+F'),
+          PaletteCommand(l.monCreate, Icons.add_alert_outlined, () => context.go('/monitors')),
+          PaletteCommand(l.srcAdd, Icons.add_link, () => context.go('/sources')),
+          PaletteCommand(l.cvImport, Icons.upload_file, () => context.go('/profile/cv')),
+          PaletteCommand(l.wsCreate, Icons.create_new_folder_outlined, () => context.go('/workspaces')),
+          PaletteCommand(l.paletteTheme, Icons.contrast, () {
+            final next = switch (prefs.themeMode) {
+              ThemeMode.light => ThemeMode.dark,
+              ThemeMode.dark => ThemeMode.system,
+              ThemeMode.system => ThemeMode.light,
+            };
+            ref.read(uiPrefsProvider.notifier).setTheme(next);
+          }, keywords: 'theme sombre dark clair light'),
+          PaletteCommand(l.settingsPrivacy, Icons.privacy_tip_outlined, () => context.go('/settings?tab=2')),
+          PaletteCommand(l.settingsAi, Icons.auto_awesome, () => context.go('/settings?tab=3')),
+          PaletteCommand(l.settingsBackups, Icons.backup_outlined, () => context.go('/settings?tab=4')),
+          PaletteCommand(l.shortcutsTitle, Icons.keyboard_outlined, () => showShortcutsHelp(context), shortcut: 'F1'),
+          PaletteCommand(l.authLock, Icons.lock_outline, () => ref.read(authControllerProvider.notifier).lock(),
+              shortcut: 'Ctrl+L'),
+        ]);
+
     final shortcuts = <ShortcutActivator, VoidCallback>{
       const SingleActivator(LogicalKeyboardKey.keyL, control: true): () =>
           ref.read(authControllerProvider.notifier).lock(),
+      const SingleActivator(LogicalKeyboardKey.keyK, control: true): palette,
+      const SingleActivator(LogicalKeyboardKey.keyF, control: true): () => context.go('/search'),
+      const SingleActivator(LogicalKeyboardKey.f1): () => showShortcutsHelp(context),
+      const SingleActivator(LogicalKeyboardKey.slash, control: true): () => showShortcutsHelp(context),
       for (var i = 0; i < items.length && i < 9; i++)
         SingleActivator(LogicalKeyboardKey(LogicalKeyboardKey.digit1.keyId + i), control: true): () =>
             context.go(items[i].path),
@@ -165,11 +195,13 @@ class _ProfileTile extends ConsumerWidget {
       onSelected: (v) => switch (v) {
         'lock' => auth.lock(),
         'logout' => auth.logout(),
+        'shortcuts' => showShortcutsHelp(context),
         _ => context.go('/settings'),
       },
       itemBuilder: (_) => [
         PopupMenuItem(value: 'settings', child: ListTile(leading: const Icon(Icons.settings_outlined), title: Text(l.navSettings))),
         PopupMenuItem(value: 'lock', child: ListTile(leading: const Icon(Icons.lock_outline), title: Text(l.authLock), subtitle: const Text('Ctrl+L'))),
+        PopupMenuItem(value: 'shortcuts', child: ListTile(leading: const Icon(Icons.keyboard_outlined), title: Text(l.shortcutsTitle), subtitle: const Text('F1'))),
         PopupMenuItem(value: 'logout', child: ListTile(leading: const Icon(Icons.logout), title: Text(l.authSignOut))),
       ],
       child: Padding(

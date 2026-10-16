@@ -4307,7 +4307,7 @@ abstract class AppLocalizations {
   /// No description provided for @trackInterested.
   ///
   /// In fr, this message translates to:
-  /// **'Intéressé(e)'**
+  /// **'Intéressante'**
   String get trackInterested;
 
   /// No description provided for @trackList.
@@ -5131,6 +5131,276 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'IA'**
   String get settingsAi;
+
+  /// No description provided for @compareGone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disparues'**
+  String get compareGone;
+
+  /// No description provided for @compareModified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifiées'**
+  String get compareModified;
+
+  /// No description provided for @compareNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelles'**
+  String get compareNew;
+
+  /// No description provided for @compareSame.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune différence entre les deux exécutions.'**
+  String get compareSame;
+
+  /// No description provided for @dashDaysShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'J-{days}'**
+  String dashDaysShort(int days);
+
+  /// No description provided for @freqDaily.
+  ///
+  /// In fr, this message translates to:
+  /// **'tous les jours'**
+  String get freqDaily;
+
+  /// No description provided for @freqEveryDays.
+  ///
+  /// In fr, this message translates to:
+  /// **'tous les {days} jours'**
+  String freqEveryDays(int days);
+
+  /// No description provided for @freqEveryHours.
+  ///
+  /// In fr, this message translates to:
+  /// **'toutes les {hours} h'**
+  String freqEveryHours(int hours);
+
+  /// No description provided for @freqMonthly.
+  ///
+  /// In fr, this message translates to:
+  /// **'tous les mois'**
+  String get freqMonthly;
+
+  /// No description provided for @freqWeekly.
+  ///
+  /// In fr, this message translates to:
+  /// **'chaque semaine'**
+  String get freqWeekly;
+
+  /// No description provided for @historyCompare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comparer avec l\'exécution précédente'**
+  String get historyCompare;
+
+  /// No description provided for @monHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique'**
+  String get monHistory;
+
+  /// No description provided for @monHistoryEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune exécution pour l\'instant.'**
+  String get monHistoryEmpty;
+
+  /// No description provided for @monHistoryLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date} · {created} nouvelles · {updated} modifiées'**
+  String monHistoryLine(String date, int created, int updated);
+
+  /// No description provided for @paletteEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande ne correspond.'**
+  String get paletteEmpty;
+
+  /// No description provided for @paletteGoTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aller à : {section}'**
+  String paletteGoTo(String section);
+
+  /// No description provided for @paletteHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tapez une commande ou une page…'**
+  String get paletteHint;
+
+  /// No description provided for @paletteTheme.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer de thème (clair, sombre, système)'**
+  String get paletteTheme;
+
+  /// No description provided for @prefAutoArchive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Archiver les candidatures closes'**
+  String get prefAutoArchive;
+
+  /// No description provided for @prefAutoArchiveHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Acceptées, refusées, retirées ou expirées, sans activité depuis ce délai.'**
+  String get prefAutoArchiveHelp;
+
+  /// No description provided for @prefAutostart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lancer Opportunex à l\'ouverture de session'**
+  String get prefAutostart;
+
+  /// No description provided for @prefAutostartHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'application démarre réduite dans la zone de notification pour exécuter vos veilles.'**
+  String get prefAutostartHelp;
+
+  /// No description provided for @prefDays.
+  ///
+  /// In fr, this message translates to:
+  /// **'{days, plural, =1{après 1 jour} other{après {days} jours}}'**
+  String prefDays(int days);
+
+  /// No description provided for @prefNever.
+  ///
+  /// In fr, this message translates to:
+  /// **'jamais'**
+  String get prefNever;
+
+  /// No description provided for @prefTracking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi et démarrage'**
+  String get prefTracking;
+
+  /// No description provided for @runUnavailableCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 source à consulter manuellement} other{{count} sources à consulter manuellement}}'**
+  String runUnavailableCount(int count);
+
+  /// No description provided for @shortcutClose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer une fenêtre de dialogue'**
+  String get shortcutClose;
+
+  /// No description provided for @shortcutHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher cette aide'**
+  String get shortcutHelp;
+
+  /// No description provided for @shortcutPalette.
+  ///
+  /// In fr, this message translates to:
+  /// **'Palette de commandes'**
+  String get shortcutPalette;
+
+  /// No description provided for @shortcutSearch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle recherche'**
+  String get shortcutSearch;
+
+  /// No description provided for @shortcutSections.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aller à une section du menu'**
+  String get shortcutSections;
+
+  /// No description provided for @shortcutsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raccourcis clavier'**
+  String get shortcutsTitle;
+
+  /// No description provided for @srcCategories.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catégories couvertes'**
+  String get srcCategories;
+
+  /// No description provided for @srcFrequency.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fréquence d\'analyse'**
+  String get srcFrequency;
+
+  /// No description provided for @srcFrequencyHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jamais plus d\'une fois par heure ; les délais de politesse et robots.txt restent appliqués.'**
+  String get srcFrequencyHelp;
+
+  /// No description provided for @srcSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fréquence et catégories'**
+  String get srcSettings;
+
+  /// No description provided for @strEducation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Niveau d\'études atteint : {level}'**
+  String strEducation(String level);
+
+  /// No description provided for @strExperience.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expérience suffisante (au moins {years} ans demandés)'**
+  String strExperience(String years);
+
+  /// No description provided for @strLanguages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langues demandées maîtrisées'**
+  String get strLanguages;
+
+  /// No description provided for @strLocation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pays recherché : {country}'**
+  String strLocation(String country);
+
+  /// No description provided for @strObjective.
+  ///
+  /// In fr, this message translates to:
+  /// **'Correspond à votre objectif : {objective}'**
+  String strObjective(String objective);
+
+  /// No description provided for @strRemote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Télétravail possible'**
+  String get strRemote;
+
+  /// No description provided for @strSkills.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compétences : {skills}'**
+  String strSkills(String skills);
+
+  /// No description provided for @a11yToggle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer ou désactiver : {name}'**
+  String a11yToggle(String name);
+
+  /// No description provided for @a11ySelect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionner : {title}'**
+  String a11ySelect(String title);
 }
 
 class _AppLocalizationsDelegate

@@ -19,6 +19,23 @@ abstract final class Fmt {
     return DateFormat('dd/MM/yyyy HH:mm', _locale(context)).format(d.toLocal());
   }
 
+  /// Partial dates kept by the profile: `2019`, `2019-07` or a full date.
+  static String month(BuildContext context, String iso) {
+    if (RegExp(r'^\d{4}$').hasMatch(iso)) return iso;
+    final m = RegExp(r'^(\d{4})-(\d{2})$').firstMatch(iso);
+    if (m != null) return DateFormat('MM/yyyy', _locale(context)).format(DateTime(int.parse(m[1]!), int.parse(m[2]!)));
+    return date(context, iso);
+  }
+
+  /// Plain values from the engine: whole numbers lose their `.0`, others use the locale's separators.
+  static String number(BuildContext context, Object? v) {
+    if (v is num) {
+      final f = NumberFormat.decimalPattern(_locale(context));
+      return f.format(v == v.truncate() ? v.toInt() : v);
+    }
+    return '$v';
+  }
+
   static const _zeroDecimal = {'XAF', 'XOF'};
 
   static String money(BuildContext context, int? minorMin, int? minorMax, String? currency) {

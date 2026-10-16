@@ -203,6 +203,41 @@ Not done in this phase, by design or for lack of a resource:
 - The real providers were not called. The adapters are tested against a local server reproducing their wire formats (`tests/fixtures/fake_ai.py`).
 - The OS keychain backend is a thin `keyring` wrapper that the automated tests do not exercise, because they use an in-memory store so they never write to Windows Credential Manager.
 
+### Phase 5 — UI/UX polish and accessibility
+Method: a **screenshot tour** (`apps/desktop/integration_test/ui_tour_test.dart`). It runs the real app against the real engine and a local publisher. It fills the profile, collects 5 opportunities, tracks applications and creates a monitor, a workspace and a draft. It then saves 99 PNGs of every page: light, dark, the minimum window size (960×640), 150 % text and English. It records every layout error and runs Flutter's accessibility guidelines (labelled tap targets, measured text contrast) on each page in both themes. I reviewed the screenshots and fixed what they showed.
+
+Defects found and fixed:
+- **Monitors ran at the wrong hour (engine).** "Every day at 08:00" was computed in UTC and showed as 09:00 in Douala. Schedules now use the user's local time, daylight saving included. Regression test in `test_schedule_rules`.
+- **Matching strengths were raw codes.** "master", "3", "CM", "employment" now read as sentences ("Niveau d'études atteint : Master"…). Education levels in the gaps are also readable.
+- **Dashboard.** The six counters wrapped onto two rows at 1440 px; they now fill one row (3 or 2 per row on narrower windows). The deadline badge now reads "J-5" with a tooltip instead of a bare number.
+- **Cards and lists.**
+  - Cards no longer print "Non précisé" for an unknown organisation, or an empty score gauge outside search results.
+  - The profile shows "4" instead of "4.0", and dates as "09/2017".
+  - Calendar deadlines are dates, without a fake "00:00".
+- **Application page.**
+  - Status actions follow the lifecycle (Entretien → Acceptée → Refusée → Retirée → Archivée) instead of alphabetical order.
+  - "0 sur 0 terminés" is hidden on an empty checklist.
+  - The interest segment no longer wraps.
+- **Navigation and search.** The Kanban board now shows a permanent horizontal scrollbar (11 columns). The 13 manual-link sources in the search summary are collapsed behind their count.
+- **Accessibility.**
+  - On/off switches (sources, monitors, AI providers) and the comparison checkboxes now have labels for screen readers.
+  - A bare "—" value now reads "Non précisé".
+  - Score-breakdown and property labels use flexible columns, so words no longer break at large text sizes.
+- **Test tooling.** The tour itself was briefly wrong about the light theme (the profile theme "system" followed the dark OS); it now forces each theme.
+
+Added (gaps from the traceability matrix):
+- Command palette (Ctrl+K) with accent-insensitive search and keyboard navigation; Ctrl+F; F1 / Ctrl+/ shortcut help, also in the user menu (EF-18.13).
+- Source frequency and categories dialog (EF-06.03/04).
+- Monitor run history (EF-13.07).
+- Comparison with the previous run of a search; the engine now returns the previous run (EF-15.04).
+- Configurable auto-archive delay, engine setting `tracking.auto_archive_days` with 0 = off (EF-12.12).
+- Optional launch at session start, minimised to the tray (EF-13.09). The app shows its window anyway when no tray is available.
+
+Accessibility evidence:
+- `test/core/contrast_test.dart` checks 15 text/background pairs in each theme (30 checks) against WCAG AA 4.5:1; all pass.
+- In the tour, every tap target on every page is labelled, in both themes, with no layout error at 150 % text or at 960×640.
+- The text-contrast guideline still reports 3 findings in light mode: the selected query in the search box, the "Soumise" chip, and the short value "CM". I checked them against the screenshots: they are sampling artifacts (selection highlight, chip border, anti-aliasing on short text), not low-contrast text.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -235,6 +270,23 @@ Phase 4 (same machine, 2026-10-16):
 | 2026-10-16 | `engine: ruff check . · mypy .` | Clean · Clean (87 files) |
 | 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **24 passed** (adds the consent dialog: allow and retry, continue without AI) |
 | 2026-10-16 | `desktop: flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (17 s)**; also checks that AI is off and that no provider exists on a fresh profile |
+
+Phase 5 (2026-10-16):
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-10-16 | `engine: pytest -q --cov` | **121 passed**, 88 % coverage; ruff and mypy clean |
+| 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **58 passed** (adds 30 contrast checks, palette, shortcut help, autostart commands) |
+| 2026-10-16 | `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (17 s)** |
+| 2026-10-16 | `flutter test integration_test/ui_tour_test.dart -d windows` | **1 passed (4 min 45 s)**: 99 screenshots, 0 layout problems, 0 unlabelled tap targets, 3 contrast findings reviewed as sampling artifacts |
+
+Traceability after phase 5 (176 requirements):
+- 14 operational end to end.
+- 20 operational engine-internal features.
+- 102 with the engine tested and the screen delivered.
+- 8 implemented without an automated test.
+- 9 partial.
+- 23 absent: 14 sync/organisations (phase 6) and 9 others.
 
 Traceability after phase 4 (176 requirements):
 - 13 operational end to end.

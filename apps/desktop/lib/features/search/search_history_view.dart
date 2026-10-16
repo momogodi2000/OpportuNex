@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../../core/api/api_client.dart' show Json;
 import '../../core/api/json.dart';
 import '../../core/format.dart';
 import '../../core/theme/app_theme.dart';
@@ -57,6 +60,15 @@ class SearchHistoryView extends ConsumerWidget {
                 if (q.objOrNull('last_run') != null)
                   IconButton(tooltip: l.historyOpen, icon: const Icon(Icons.visibility_outlined),
                       onPressed: () => onOpenRun(q.obj('last_run').string('id'))),
+                if (q.objOrNull('previous_run') != null && q.objOrNull('last_run') != null)
+                  IconButton(
+                    tooltip: l.historyCompare,
+                    icon: const Icon(Icons.compare_arrows),
+                    onPressed: () => showDialog<void>(
+                      context: context,
+                      builder: (_) => _Compare(a: q.obj('previous_run').string('id'), b: q.obj('last_run').string('id')),
+                    ),
+                  ),
                 IconButton(tooltip: l.historyRerun, icon: const Icon(Icons.replay), onPressed: () => onRerun(q.string('id'))),
                 IconButton(
                   tooltip: q.flag('is_saved') ? l.historyUnsave : l.historySave,
@@ -99,5 +111,54 @@ class SearchHistoryView extends ConsumerWidget {
         ],
       ),
     ).whenComplete(c.dispose);
+  }
+}
+
+/// New, disappeared and modified results between two runs of the same search (EF-15.04).
+class _Compare extends ConsumerWidget {
+  const _Compare({required this.a, required this.b});
+  final String a;
+  final String b;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l.historyCompare),
+      content: SizedBox(
+        width: 640,
+        height: 440,
+        child: FutureBuilder<Json>(
+          future: ref.read(searchRepositoryProvider).compare(a, b),
+          builder: (context, snap) {
+            if (snap.hasError) return ErrorState(error: snap.error!);
+            if (!snap.hasData) return const LoadingState();
+            final d = snap.data!;
+            final groups = [
+              (l.compareNew, Icons.fiber_new_outlined, d.list('new')),
+              (l.compareModified, Icons.edit_note, d.list('modified')),
+              (l.compareGone, Icons.remove_circle_outline, d.list('disappeared')),
+            ];
+            if (groups.every((g) => g.$3.isEmpty)) return Center(child: Text(l.compareSame));
+            return ListView(children: [
+              for (final (label, icon, list) in groups) ...[
+                ListTile(leading: Icon(icon), title: Text('$label (${list.length})', style: context.text.titleSmall)),
+                for (final o in list)
+                  ListTile(
+                    dense: true,
+                    contentPadding: const EdgeInsets.only(left: Space.xxxl),
+                    title: Text(o.string('title')),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/opportunities/${o.string('id')}');
+                    },
+                  ),
+              ],
+            ]);
+          },
+        ),
+      ),
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(l.commonClose))],
+    );
   }
 }

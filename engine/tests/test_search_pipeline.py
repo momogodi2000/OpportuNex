@@ -21,6 +21,11 @@ def test_custom_source_discovery_and_validation(client: EngineClient, site: Fixt
     catalog = next(s for s in sources if not s["custom"] and s["access_method"] == "manual_link")
     assert client.patch(f"/sources/{catalog['id']}", json={"enabled": True}).json()["code"] == "source_manual_link"
     assert client.delete(f"/sources/{catalog['id']}").status_code == 403
+    # EF-06.03/04: frequency (never below one hour) and categories, as edited from the Sources page.
+    assert client.patch(f"/sources/{body['id']}", json={"min_interval_minutes": 30}).status_code == 422
+    client.patch(f"/sources/{body['id']}", json={"min_interval_minutes": 2880, "categories": ["scholarship", "tender"]})
+    edited = next(s for s in client.get("/sources").json()["items"] if s["id"] == body["id"])
+    assert edited["min_interval_minutes"] == 2880 and set(edited["categories"]) == {"scholarship", "tender"}
     assert client.delete(f"/sources/{body['id']}").status_code == 204
 
 
@@ -82,6 +87,9 @@ def test_full_search_pipeline(client: EngineClient, site: FixtureSite) -> None:
     assert local["total"] >= 2
     history = client.get("/search/history").json()["items"]
     assert history[0]["last_run"]["results_count"] == 3
+    # The previous run is exposed so the UI can offer the comparison (EF-15.04).
+    assert history[0]["last_run"]["id"] == run2["run"]["id"]
+    assert history[0]["previous_run"]["id"] == run["run"]["id"]
 
 
 def test_cross_site_repost_is_deduplicated(client: EngineClient, site: FixtureSite) -> None:

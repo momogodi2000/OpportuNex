@@ -136,10 +136,13 @@ class _Counters extends StatelessWidget {
       (Icons.edit_note, l.dashInProgress, c.integer('in_progress') ?? 0, '/saved?tab=1'),
       (Icons.send_outlined, l.dashSubmitted, c.integer('submitted') ?? 0, '/saved?tab=1'),
     ];
-    return Wrap(spacing: Space.md, runSpacing: Space.md, children: [
+    return LayoutBuilder(builder: (context, box) {
+      final perRow = box.maxWidth >= 1000 ? 6 : (box.maxWidth >= 560 ? 3 : 2);
+      final width = (box.maxWidth - Space.md * (perRow - 1)) / perRow;
+      return Wrap(spacing: Space.md, runSpacing: Space.md, children: [
       for (final (icon, label, value, route) in tiles)
         SizedBox(
-          width: 180,
+          width: width,
           child: Card(
             child: InkWell(
               onTap: () => context.go(route),
@@ -150,13 +153,15 @@ class _Counters extends StatelessWidget {
                   Icon(icon, color: context.colors.primary),
                   const SizedBox(height: Space.sm),
                   Text('$value', style: context.text.headlineSmall),
-                  Text(label, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
+                  Text(label, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                      maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
             ),
           ),
         ),
-    ]);
+      ]);
+    });
   }
 }
 
@@ -184,9 +189,13 @@ class _Deadlines extends StatelessWidget {
           for (final i in items)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: CircleAvatar(
-                backgroundColor: (i.integer('days_left') ?? 99) <= 7 ? context.status.warning : context.colors.surfaceContainer,
-                child: Text('${i.integer('days_left')}', style: context.text.labelLarge),
+              leading: Tooltip(
+                message: l.daysLeft(i.integer('days_left') ?? 0),
+                child: CircleAvatar(
+                  backgroundColor: (i.integer('days_left') ?? 99) <= 7 ? context.status.warning : context.colors.surfaceContainer,
+                  foregroundColor: (i.integer('days_left') ?? 99) <= 7 ? context.status.onWarning : context.colors.onSurface,
+                  child: Text(l.dashDaysShort(i.integer('days_left') ?? 0), style: context.text.labelMedium),
+                ),
               ),
               title: Text(i.string('title'), maxLines: 1, overflow: TextOverflow.ellipsis),
               subtitle: Text([Fmt.date(context, i.str('effective_deadline')),

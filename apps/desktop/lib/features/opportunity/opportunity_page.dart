@@ -336,8 +336,15 @@ class _Kv extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: Space.xs),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(width: 160, child: Text(k, style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant))),
-          Expanded(child: SelectableText(v.isEmpty ? AppLocalizations.of(context).commonNotSpecified : v)),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(right: Space.md),
+              child: Text(k, style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant)),
+            ),
+          ),
+          // A bare dash is silent for screen readers: say "not specified".
+          Expanded(flex: 5, child: SelectableText(v.isEmpty || v == '—' ? AppLocalizations.of(context).commonNotSpecified : v)),
         ]),
       );
 }
@@ -420,8 +427,12 @@ class _Relevance extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: Space.xs),
           child: Row(children: [
-            SizedBox(width: 120, child: Text(names[e.key] ?? e.key, style: context.text.bodySmall)),
+            // Flexible label column: large text sizes must not break words (accessibility).
+            Expanded(flex: 2, child: Text(names[e.key] ?? e.key, style: context.text.bodySmall, softWrap: false,
+                overflow: TextOverflow.fade)),
+            const SizedBox(width: Space.sm),
             Expanded(
+              flex: 3,
               child: LinearProgressIndicator(
                 value: ((e.value as Map<String, dynamic>)['score'] as num).toDouble(),
                 minHeight: 6,
@@ -436,7 +447,7 @@ class _Relevance extends StatelessWidget {
       if (r.strings('strengths').isNotEmpty) ...[
         const SizedBox(height: Space.sm),
         Text(l.oppStrengths, style: context.text.labelLarge),
-        for (final s in r.strings('strengths')) Text('• ${_humanize(s)}', style: context.text.bodySmall),
+        for (final s in r.strings('strengths')) Text('• ${strengthLabel(l, s)}', style: context.text.bodySmall),
       ],
     ]);
   }
@@ -447,6 +458,36 @@ String _eligibility(AppLocalizations l, String v) => switch (v) {
       'unlikely' => l.eligUnlikely,
       'not_eligible' => l.eligNot,
       _ => l.eligUncertain,
+    };
+
+/// Matching strengths (`kind:value`) in plain words (EF-08.03).
+String strengthLabel(AppLocalizations l, String code) {
+  final kind = code.split(':').first;
+  final value = _humanize(code);
+  return switch (kind) {
+    'skills_match' || 'skills_mentioned' => l.strSkills(value),
+    'education_ok' => l.strEducation(educationLevelLabel(l, value)),
+    'experience_ok' => l.strExperience(value),
+    'remote' => l.strRemote,
+    'location' => l.strLocation(value),
+    'languages_ok' => l.strLanguages,
+    'objective' => l.strObjective(categoryLabel(l, value)),
+    _ => value,
+  };
+}
+
+String educationLevelLabel(AppLocalizations l, String code) => switch (code) {
+      'none' => l.edNone,
+      'primary' => l.edPrimary,
+      'secondary' => l.edSecondary,
+      'bac' => l.edBac,
+      'bac_plus_2' => l.edBac2,
+      'bachelor' => l.edBachelor,
+      'master' => l.edMaster,
+      'doctorate' => l.edDoctorate,
+      'postdoc' => l.edPostdoc,
+      'vocational' => l.edVocational,
+      _ => code,
     };
 
 String _humanize(String code) {
@@ -482,7 +523,7 @@ class _Gaps extends StatelessWidget {
     final value = _humanize(code);
     return switch (key) {
       'skills_missing' => l.gapSkills(value),
-      'education_required' => l.gapEducation(value),
+      'education_required' => l.gapEducation(educationLevelLabel(l, value)),
       'experience_required' => l.gapExperience(value),
       'language_required' || 'posting_language' => l.gapLanguage(value),
       'location' => l.gapLocation(value),

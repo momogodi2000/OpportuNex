@@ -12,6 +12,7 @@ import '../../core/widgets/layout.dart';
 import '../../core/widgets/opportunity_widgets.dart';
 import '../../core/widgets/states.dart';
 import '../../l10n/app_localizations.dart';
+import '../search/search_repository.dart';
 
 final sourcesProvider = FutureProvider.autoDispose<List<Json>>((ref) async => items(await requireApi(ref).getJson('/sources')));
 
@@ -124,6 +125,7 @@ class _SourcesPageState extends ConsumerState<SourcesPage> {
                     subtitle: Text([
                       s.string('domain'),
                       _method(l, s.string('access_method')),
+                      if (s.str('access_method') != 'manual_link') frequencyLabel(l, s.integer('min_interval_minutes') ?? 1440),
                       l.srcReliability((((s.number('reliability_score') ?? 0.5) * 100).round())),
                       if (s.str('last_success_at') != null) l.srcLastSuccess(Fmt.dateTime(context, s.str('last_success_at'))),
                       if (s.str('last_error') != null) l.srcLastError(s.string('last_error')),
@@ -134,7 +136,19 @@ class _SourcesPageState extends ConsumerState<SourcesPage> {
                         IconButton(tooltip: l.oppOfficialLink, icon: const Icon(Icons.open_in_new),
                             onPressed: () => launchUrl(Uri.parse(s.string('official_search_url')))),
                       if (s.str('access_method') != 'manual_link')
-                        Switch(value: s.flag('enabled'), onChanged: (v) => patch(s.string('id'), {'enabled': v})),
+                        IconButton(
+                          tooltip: l.srcSettings,
+                          icon: const Icon(Icons.tune),
+                          onPressed: () async {
+                            final body = await showDialog<Json>(context: context, builder: (_) => _SourceSettings(source: s));
+                            if (body != null) await patch(s.string('id'), body);
+                          },
+                        ),
+                      if (s.str('access_method') != 'manual_link')
+                        Semantics(
+                          label: l.a11yToggle(s.string('name')),
+                          child: Switch(value: s.flag('enabled'), onChanged: (v) => patch(s.string('id'), {'enabled': v})),
+                        ),
                       if (s.flag('custom'))
                         IconButton(
                           tooltip: l.commonDelete,
@@ -167,4 +181,70 @@ class _SourcesPageState extends ConsumerState<SourcesPage> {
         'manual_link' => l.srcLinkOnly,
         _ => m,
       };
+}
+
+const _frequencies = [1440, 2880, 4320, 10080, 43200];
+
+String frequencyLabel(AppLocalizations l, int minutes) => switch (minutes) {
+      1440 => l.freqDaily,
+      10080 => l.freqWeekly,
+      43200 => l.freqMonthly,
+      _ when minutes % 1440 == 0 => l.freqEveryDays(minutes ~/ 1440),
+      _ => l.freqEveryHours((minutes / 60).round()),
+    };
+
+/// Scan frequency (never more often than the catalogue allows: once an hour at most) and categories.
+class _SourceSettings extends ConsumerStatefulWidget {
+  const _SourceSettings({required this.source});
+  final Json source;
+
+  @override
+  ConsumerState<_SourceSettings> createState() => _SourceSettingsState();
+}
+
+class _SourceSettingsState extends ConsumerState<_SourceSettings> {
+  late int _minutes = widget.source.integer('min_interval_minutes') ?? 1440;
+  late final Set<String> _cats = {...widget.source.strings('categories').map((c) => c.split('.').first)};
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final cats = (ref.watch(refCategoriesProvider).valueOrNull ?? const <Json>[])
+        .map((c) => c.string('code'))
+        .where((c) => !c.contains('.'))
+        .toList();
+    final options = {..._frequencies, _minutes}.toList()..sort();
+    return AlertDialog(
+      title: Text(widget.source.string('name')),
+      content: SizedBox(
+        width: 520,
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          DropdownButtonFormField<int>(
+            initialValue: _minutes,
+            decoration: InputDecoration(labelText: l.srcFrequency, helperText: l.srcFrequencyHelp),
+            items: [for (final m in options) DropdownMenuItem(value: m, child: Text(frequencyLabel(l, m)))],
+            onChanged: (v) => setState(() => _minutes = v ?? _minutes),
+          ),
+          const SizedBox(height: Space.lg),
+          Text(l.srcCategories, style: context.text.labelLarge),
+          const SizedBox(height: Space.sm),
+          Wrap(spacing: Space.xs, runSpacing: Space.xs, children: [
+            for (final c in cats)
+              FilterChip(
+                label: Text(categoryLabel(l, c)),
+                selected: _cats.contains(c),
+                onSelected: (v) => setState(() => v ? _cats.add(c) : _cats.remove(c)),
+              ),
+          ]),
+        ]),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l.commonCancel)),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, <String, dynamic>{'min_interval_minutes': _minutes, 'categories': _cats.toList()}),
+          child: Text(l.commonSave),
+        ),
+      ],
+    );
+  }
 }

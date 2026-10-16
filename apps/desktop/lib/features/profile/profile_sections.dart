@@ -80,7 +80,8 @@ class GeneralSection extends ConsumerWidget {
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 SizedBox(width: 200, child: Text(f.label, style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant))),
                 Expanded(child: Text(f.kind == FieldKind.choice ? (f.options['${g[f.key]}'] ?? '${g[f.key]}')
-                    : f.kind == FieldKind.toggle ? ((g[f.key] == 1 || g[f.key] == true) ? l.commonYes : l.commonNo) : '${g[f.key]}')),
+                    : f.kind == FieldKind.toggle ? ((g[f.key] == 1 || g[f.key] == true) ? l.commonYes : l.commonNo)
+                    : Fmt.number(context, g[f.key]))),
               ]),
             ),
       ]),
@@ -145,7 +146,8 @@ String _period(BuildContext context, Json item, String startKey, String endKey, 
   final end = item.str(endKey);
   final ongoing = ongoingKey != null && item.flag(ongoingKey);
   if (start == null && end == null) return '';
-  return '${start ?? '…'} – ${ongoing ? l.pfOngoing : (end ?? '…')}';
+  String show(String? v) => v == null ? '…' : Fmt.month(context, v);
+  return '${show(start)} – ${ongoing ? l.pfOngoing : show(end)}';
 }
 
 CollectionSection educationSection(BuildContext context, Json profile) {

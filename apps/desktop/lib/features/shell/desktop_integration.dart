@@ -24,6 +24,7 @@ class DesktopIntegration with TrayListener, WindowListener {
 
   final ProviderContainer container;
   bool _trayReady = false;
+  bool get trayReady => _trayReady;
   bool _quitting = false;
   bool _hintShown = false;
 

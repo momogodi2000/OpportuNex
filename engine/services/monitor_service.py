@@ -8,7 +8,7 @@ app is open or minimised to the tray — the UI says so).
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, tzinfo
 from typing import Any
 
 import structlog
@@ -51,21 +51,30 @@ DAYS = {
 }
 
 
-def next_run(kind: str, expr: str, after: datetime) -> datetime:
-    """daily 'HH:MM' · weekly 'DOW HH:MM' · custom_cron 'every Nh' (N >= 24) — times in UTC."""
+def next_run(kind: str, expr: str, after: datetime, tz: tzinfo | None = None) -> datetime:
+    """daily 'HH:MM' · weekly 'DOW HH:MM' · custom_cron 'every Nh' (N >= 24).
+
+    Times are the user's wall-clock time: the engine runs on the user's computer, so ``tz`` defaults to
+    the operating system's zone (daylight saving included). The result is returned in UTC.
+    """
+    local = after.astimezone(tz).replace(tzinfo=None) if tz else after.astimezone().replace(tzinfo=None)
+
+    def to_utc(naive: datetime) -> datetime:
+        return (naive.replace(tzinfo=tz) if tz else naive.astimezone()).astimezone(UTC)
+
     if kind == "daily":
         h, m = (int(x) for x in expr.split(":"))
-        candidate = after.replace(hour=h, minute=m, second=0, microsecond=0)
-        return candidate if candidate > after else candidate + timedelta(days=1)
+        candidate = local.replace(hour=h, minute=m, second=0, microsecond=0)
+        return to_utc(candidate if candidate > local else candidate + timedelta(days=1))
     if kind == "weekly":
         dow, hm = expr.split()
         h, m = (int(x) for x in hm.split(":"))
-        days_ahead = (DAYS[dow.lower()[:3]] - after.weekday()) % 7
-        candidate = (after + timedelta(days=days_ahead)).replace(hour=h, minute=m, second=0, microsecond=0)
-        return candidate if candidate > after else candidate + timedelta(days=7)
+        days_ahead = (DAYS[dow.lower()[:3]] - local.weekday()) % 7
+        candidate = (local + timedelta(days=days_ahead)).replace(hour=h, minute=m, second=0, microsecond=0)
+        return to_utc(candidate if candidate > local else candidate + timedelta(days=7))
     if kind == "custom_cron":
         hours = int(expr.lower().replace("every", "").replace("h", "").strip())
-        return after + timedelta(hours=hours)
+        return after.astimezone(UTC) + timedelta(hours=hours)
     raise ValueError(kind)
 
 

@@ -31,6 +31,12 @@ class MonitorsPage extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(Space.xxl, Space.xl, Space.xxl, 0),
           child: Row(children: [
             Expanded(child: Text(l.navMonitors, style: context.text.headlineSmall)),
+            OutlinedButton.icon(
+              onPressed: () => showDialog<void>(context: context, builder: (_) => const _History()),
+              icon: const Icon(Icons.history),
+              label: Text(l.monHistory),
+            ),
+            const SizedBox(width: Space.sm),
             FilledButton.icon(
               onPressed: () => _create(context, ref),
               icon: const Icon(Icons.add_alert_outlined),
@@ -101,10 +107,12 @@ class _MonitorList extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(Space.lg),
                 child: Row(children: [
-                  Switch(
+                  Semantics(
+                    label: l.a11yToggle(m.string('name')),
+                    child: Switch(
                     value: m.flag('enabled'),
                     onChanged: (v) => run(() => api.patchJson('/monitors/${m.string('id')}', body: {'enabled': v})),
-                  ),
+                  )),
                   const SizedBox(width: Space.md),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -299,6 +307,56 @@ class NotificationsView extends ConsumerWidget {
             ),
           ),
       ]),
+    );
+  }
+}
+
+final monitorHistoryProvider =
+    FutureProvider.autoDispose<List<Json>>((ref) async => items(await requireApi(ref).getJson('/monitors/history')));
+
+/// Every monitor run, newest first (EF-13.07).
+class _History extends ConsumerWidget {
+  const _History();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l.monHistory),
+      content: SizedBox(
+        width: 640,
+        height: 420,
+        child: AsyncView<List<Json>>(
+          value: ref.watch(monitorHistoryProvider),
+          onRetry: () => ref.invalidate(monitorHistoryProvider),
+          isEmpty: (list) => list.isEmpty,
+          empty: EmptyState(icon: Icons.history, title: l.monHistoryEmpty),
+          data: (runs) => ListView(children: [
+            for (final r in runs)
+              ListTile(
+                leading: Icon(switch (r.string('status')) {
+                  'completed' => Icons.check_circle_outline,
+                  'failed' => Icons.error_outline,
+                  _ => Icons.timelapse,
+                }, color: r.string('status') == 'failed' ? context.colors.error : null),
+                title: Text(r.string('name')),
+                subtitle: Text(l.monHistoryLine(Fmt.dateTime(context, r.str('started_at')), r.integer('new_items') ?? 0,
+                    r.integer('updated_items') ?? 0)),
+                trailing: r.str('search_run_id') == null
+                    ? null
+                    : IconButton(
+                        tooltip: l.historyOpen,
+                        icon: const Icon(Icons.visibility_outlined),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          context.go('/search?run=${r.string('search_run_id')}');
+                        },
+                      ),
+              ),
+          ]),
+        ),
+      ),
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(l.commonClose))],
     );
   }
 }

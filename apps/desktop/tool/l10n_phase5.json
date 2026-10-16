@@ -1,0 +1,306 @@
+[
+{
+"compareGone": "Disparues",
+"compareModified": "Modifiées",
+"compareNew": "Nouvelles",
+"compareSame": "Aucune différence entre les deux exécutions.",
+"dashDaysShort": "J-{days}",
+"@dashDaysShort": {
+"placeholders": {
+"days": {
+"type": "int"
+}
+}
+},
+"freqDaily": "tous les jours",
+"freqEveryDays": "tous les {days} jours",
+"@freqEveryDays": {
+"placeholders": {
+"days": {
+"type": "int"
+}
+}
+},
+"freqEveryHours": "toutes les {hours} h",
+"@freqEveryHours": {
+"placeholders": {
+"hours": {
+"type": "int"
+}
+}
+},
+"freqMonthly": "tous les mois",
+"freqWeekly": "chaque semaine",
+"historyCompare": "Comparer avec l'exécution précédente",
+"monHistory": "Historique",
+"monHistoryEmpty": "Aucune exécution pour l'instant.",
+"monHistoryLine": "{date} · {created} nouvelles · {updated} modifiées",
+"@monHistoryLine": {
+"placeholders": {
+"date": {
+"type": "String"
+},
+"created": {
+"type": "int"
+},
+"updated": {
+"type": "int"
+}
+}
+},
+"paletteEmpty": "Aucune commande ne correspond.",
+"paletteGoTo": "Aller à : {section}",
+"@paletteGoTo": {
+"placeholders": {
+"section": {
+"type": "String"
+}
+}
+},
+"paletteHint": "Tapez une commande ou une page…",
+"paletteTheme": "Changer de thème (clair, sombre, système)",
+"prefAutoArchive": "Archiver les candidatures closes",
+"prefAutoArchiveHelp": "Acceptées, refusées, retirées ou expirées, sans activité depuis ce délai.",
+"prefAutostart": "Lancer Opportunex à l'ouverture de session",
+"prefAutostartHelp": "L'application démarre réduite dans la zone de notification pour exécuter vos veilles.",
+"prefDays": "{days, plural, =1{après 1 jour} other{après {days} jours}}",
+"@prefDays": {
+"placeholders": {
+"days": {
+"type": "int"
+}
+}
+},
+"prefNever": "jamais",
+"prefTracking": "Suivi et démarrage",
+"runUnavailableCount": "{count, plural, =1{1 source à consulter manuellement} other{{count} sources à consulter manuellement}}",
+"@runUnavailableCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"shortcutClose": "Fermer une fenêtre de dialogue",
+"shortcutHelp": "Afficher cette aide",
+"shortcutPalette": "Palette de commandes",
+"shortcutSearch": "Nouvelle recherche",
+"shortcutSections": "Aller à une section du menu",
+"shortcutsTitle": "Raccourcis clavier",
+"srcCategories": "Catégories couvertes",
+"srcFrequency": "Fréquence d'analyse",
+"srcFrequencyHelp": "Jamais plus d'une fois par heure ; les délais de politesse et robots.txt restent appliqués.",
+"srcSettings": "Fréquence et catégories",
+"strEducation": "Niveau d'études atteint : {level}",
+"@strEducation": {
+"placeholders": {
+"level": {
+"type": "String"
+}
+}
+},
+"strExperience": "Expérience suffisante (au moins {years} ans demandés)",
+"@strExperience": {
+"placeholders": {
+"years": {
+"type": "String"
+}
+}
+},
+"strLanguages": "Langues demandées maîtrisées",
+"strLocation": "Pays recherché : {country}",
+"@strLocation": {
+"placeholders": {
+"country": {
+"type": "String"
+}
+}
+},
+"strObjective": "Correspond à votre objectif : {objective}",
+"@strObjective": {
+"placeholders": {
+"objective": {
+"type": "String"
+}
+}
+},
+"strRemote": "Télétravail possible",
+"strSkills": "Compétences : {skills}",
+"@strSkills": {
+"placeholders": {
+"skills": {
+"type": "String"
+}
+}
+},
+"trackInterested": "Intéressante",
+"a11yToggle": "Activer ou désactiver : {name}",
+"@a11yToggle": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+"a11ySelect": "Sélectionner : {title}",
+"@a11ySelect": {
+"placeholders": {
+"title": {
+"type": "String"
+}
+}
+}
+},
+{
+"compareGone": "Gone",
+"compareModified": "Modified",
+"compareNew": "New",
+"compareSame": "No difference between the two runs.",
+"dashDaysShort": "D-{days}",
+"@dashDaysShort": {
+"placeholders": {
+"days": {
+"type": "int"
+}
+}
+},
+"freqDaily": "daily",
+"freqEveryDays": "every {days} days",
+"@freqEveryDays": {
+"placeholders": {
+"days": {
+"type": "int"
+}
+}
+},
+"freqEveryHours": "every {hours} h",
+"@freqEveryHours": {
+"placeholders": {
+"hours": {
+"type": "int"
+}
+}
+},
+"freqMonthly": "monthly",
+"freqWeekly": "weekly",
+"historyCompare": "Compare with the previous run",
+"monHistory": "History",
+"monHistoryEmpty": "No runs yet.",
+"monHistoryLine": "{date} · {created} new · {updated} changed",
+"@monHistoryLine": {
+"placeholders": {
+"date": {
+"type": "String"
+},
+"created": {
+"type": "int"
+},
+"updated": {
+"type": "int"
+}
+}
+},
+"paletteEmpty": "No matching command.",
+"paletteGoTo": "Go to: {section}",
+"@paletteGoTo": {
+"placeholders": {
+"section": {
+"type": "String"
+}
+}
+},
+"paletteHint": "Type a command or a page…",
+"paletteTheme": "Switch theme (light, dark, system)",
+"prefAutoArchive": "Archive closed applications",
+"prefAutoArchiveHelp": "Accepted, rejected, withdrawn or expired, with no activity for this long.",
+"prefAutostart": "Start Opportunex when you sign in to the computer",
+"prefAutostartHelp": "The app starts minimised in the notification area to run your monitors.",
+"prefDays": "{days, plural, =1{after 1 day} other{after {days} days}}",
+"@prefDays": {
+"placeholders": {
+"days": {
+"type": "int"
+}
+}
+},
+"prefNever": "never",
+"prefTracking": "Tracking and start-up",
+"runUnavailableCount": "{count, plural, =1{1 source to check manually} other{{count} sources to check manually}}",
+"@runUnavailableCount": {
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+"shortcutClose": "Close a dialog",
+"shortcutHelp": "Show this help",
+"shortcutPalette": "Command palette",
+"shortcutSearch": "New search",
+"shortcutSections": "Go to a menu section",
+"shortcutsTitle": "Keyboard shortcuts",
+"srcCategories": "Categories covered",
+"srcFrequency": "Scan frequency",
+"srcFrequencyHelp": "Never more than once an hour; politeness delays and robots.txt still apply.",
+"srcSettings": "Frequency and categories",
+"strEducation": "Education level met: {level}",
+"@strEducation": {
+"placeholders": {
+"level": {
+"type": "String"
+}
+}
+},
+"strExperience": "Enough experience (at least {years} years required)",
+"@strExperience": {
+"placeholders": {
+"years": {
+"type": "String"
+}
+}
+},
+"strLanguages": "Required languages mastered",
+"strLocation": "Wanted country: {country}",
+"@strLocation": {
+"placeholders": {
+"country": {
+"type": "String"
+}
+}
+},
+"strObjective": "Matches your objective: {objective}",
+"@strObjective": {
+"placeholders": {
+"objective": {
+"type": "String"
+}
+}
+},
+"strRemote": "Remote work possible",
+"strSkills": "Skills: {skills}",
+"@strSkills": {
+"placeholders": {
+"skills": {
+"type": "String"
+}
+}
+},
+"trackInterested": "Interested",
+"a11yToggle": "Turn on or off: {name}",
+"@a11yToggle": {
+"placeholders": {
+"name": {
+"type": "String"
+}
+}
+},
+"a11ySelect": "Select: {title}",
+"@a11ySelect": {
+"placeholders": {
+"title": {
+"type": "String"
+}
+}
+}
+}
+]

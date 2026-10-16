@@ -201,7 +201,10 @@ class _ProviderTile extends ConsumerWidget {
       trailing: Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
         IconButton(tooltip: l.aiMoveUp, icon: const Icon(Icons.arrow_upward), onPressed: first ? null : () => onMove(-1)),
         IconButton(tooltip: l.aiMoveDown, icon: const Icon(Icons.arrow_downward), onPressed: last ? null : () => onMove(1)),
-        Switch(value: p.flag('enabled'), onChanged: (v) => run(() => repo.update(id, {'enabled': v}))),
+        Semantics(
+          label: l.a11yToggle(p.string('display_name')),
+          child: Switch(value: p.flag('enabled'), onChanged: (v) => run(() => repo.update(id, {'enabled': v}))),
+        ),
         PopupMenuButton<String>(
           onSelected: (v) async {
             switch (v) {

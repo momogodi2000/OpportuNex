@@ -791,17 +791,18 @@ class SearchService:
         with self.active.db.read() as conn:
             rows = [dict(r) for r in conn.execute(stmt).mappings()]
             for r in rows:
-                last = (
-                    conn.execute(
+                # The two latest runs: the previous one lets the user compare reruns (EF-15.04).
+                latest = [
+                    dict(x)
+                    for x in conn.execute(
                         select(T.search_runs.c.id, T.search_runs.c.status, T.search_runs.c.results_count)
                         .where(T.search_runs.c.query_id == r["id"])
-                        .order_by(desc(T.search_runs.c.created_at))
-                        .limit(1)
-                    )
-                    .mappings()
-                    .first()
-                )
-                r["last_run"] = dict(last) if last else None
+                        .order_by(desc(T.search_runs.c.created_at), desc(T.search_runs.c.id))
+                        .limit(2)
+                    ).mappings()
+                ]
+                r["last_run"] = latest[0] if latest else None
+                r["previous_run"] = latest[1] if len(latest) > 1 else None
                 r["is_saved"] = bool(r["is_saved"])
         return rows
 

@@ -16,6 +16,7 @@ from services.dashboard_service import DashboardService
 from services.export_service import ExportService
 from services.monitor_service import MonitorService, NotificationService
 from services.privacy_service import ERASABLE, PrivacyService
+from services.tracking_service import TrackingService
 from services.workspace_service import WorkspaceService
 
 router = APIRouter(tags=["Insights"])
@@ -249,6 +250,10 @@ class EraseIn(BaseModel):
     confirmation: Literal["ERASE"]
 
 
+class TrackingSettingsIn(BaseModel):
+    auto_archive_days: int = Field(ge=0, le=3650)
+
+
 class NetworkIn(BaseModel):
     proxy_url: str | None = Field(default=None, max_length=300)
     data_saver: bool = False
@@ -288,3 +293,13 @@ def network(active: Active) -> dict[str, Any]:
 @router.put("/settings/network")
 def set_network(body: NetworkIn, active: Active) -> dict[str, Any]:
     return PrivacyService(active).set_network(body.proxy_url, body.data_saver, body.max_mb_per_search)
+
+
+@router.get("/settings/tracking")
+def tracking_settings(active: Active) -> dict[str, Any]:
+    return {"auto_archive_days": TrackingService(active).auto_archive_days()}
+
+
+@router.put("/settings/tracking")
+def set_tracking_settings(body: TrackingSettingsIn, active: Active) -> dict[str, Any]:
+    return {"auto_archive_days": TrackingService(active).set_auto_archive_days(body.auto_archive_days)}

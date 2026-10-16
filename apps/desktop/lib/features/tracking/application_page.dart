@@ -149,6 +149,10 @@ class _Body extends ConsumerWidget {
   }
 }
 
+/// Next steps are offered in lifecycle order; closing states come last (EF-12.04).
+const _lifecycle = ['discovered', 'to_review', 'preparing', 'ready', 'submitted', 'interview', 'accepted', 'rejected',
+  'withdrawn', 'expired', 'archived'];
+
 class _StatusBar extends StatelessWidget {
   const _StatusBar({required this.status, required this.allowed, required this.onTransition});
   final String status;
@@ -165,7 +169,7 @@ class _StatusBar extends StatelessWidget {
           label: Text(applicationStatusLabel(l, status), style: context.text.titleSmall),
         ),
         const Icon(Icons.arrow_forward, size: 18),
-        for (final t in allowed)
+        for (final t in [..._lifecycle.where(allowed.contains), ...allowed.where((s) => !_lifecycle.contains(s))])
           OutlinedButton.icon(onPressed: () => onTransition(t), icon: Icon(applicationStatusIcon(t), size: 18),
               label: Text(applicationStatusLabel(l, t))),
       ]),
@@ -187,6 +191,7 @@ class _Settings extends StatelessWidget {
         Text(l.trackPriority, style: context.text.labelLarge),
         const SizedBox(height: Space.xs),
         SegmentedButton<String>(
+          showSelectedIcon: false,
           segments: [for (final p in const ['high', 'medium', 'low']) ButtonSegment(value: p, label: Text(priorityLabel(l, p)))],
           selected: {saved.string('priority', 'medium')},
           onSelectionChanged: (s) => onPatch({'priority': s.first}),
@@ -195,6 +200,7 @@ class _Settings extends StatelessWidget {
         Text(l.trackInterest, style: context.text.labelLarge),
         const SizedBox(height: Space.xs),
         SegmentedButton<String>(
+          showSelectedIcon: false,
           segments: [
             ButtonSegment(value: 'interested', label: Text(l.trackInterested)),
             ButtonSegment(value: 'undecided', label: Text(l.trackUndecided)),
@@ -291,7 +297,7 @@ class _Checklist extends ConsumerWidget {
     final done = items.where((i) => i.flag('is_done')).length;
     return SectionCard(
       title: l.trackChecklist,
-      subtitle: l.trackChecklistProgress(done, items.length),
+      subtitle: items.isEmpty ? null : l.trackChecklistProgress(done, items.length),
       trailing: IconButton(
         tooltip: l.trackAddItem,
         icon: const Icon(Icons.add),
