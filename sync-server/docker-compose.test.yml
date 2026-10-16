@@ -1,0 +1,27 @@
+# Local verification of the image against PostgreSQL (no Caddy, plain HTTP on 127.0.0.1:18080).
+#   docker compose -f docker-compose.test.yml up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: opportunex_sync
+      POSTGRES_USER: opportunex
+      POSTGRES_PASSWORD: test-only-password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opportunex -d opportunex_sync"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    build: .
+    image: opportunex-sync:1.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      OPX_SYNC_DATABASE_URL: postgresql+psycopg://opportunex:test-only-password@db:5432/opportunex_sync
+      OPX_SYNC_PUBLIC_URL: http://127.0.0.1:18080
+      OPX_SYNC_ARGON2_MEMORY_KIB: "8192"
+      OPX_SYNC_ARGON2_ITERATIONS: "1"
+    ports:
+      - "127.0.0.1:18080:8080"

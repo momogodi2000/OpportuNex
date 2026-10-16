@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import date
@@ -25,6 +26,7 @@ from api.routers import (
     reference,
     search,
     sources,
+    sync,
     system,
     tracking,
 )
@@ -43,6 +45,7 @@ PREFIX = "/api/v1"
 AUTO_LOCK_TICK_SECONDS = 30.0
 BACKUP_CHECK_SECONDS = 600.0
 SCHEDULER_TICK_SECONDS = 60.0
+SYNC_INTERVAL_SECONDS = 300
 
 PROBLEM = "application/problem+json"
 
@@ -83,6 +86,7 @@ def create_app(settings: Settings, engine_token: str) -> FastAPI:
             from services.tracking_service import TrackingService
 
             last_daily = ""
+            last_sync = 0.0
             while True:
                 await asyncio.sleep(SCHEDULER_TICK_SECONDS)
                 active = state.active
@@ -94,6 +98,12 @@ def create_app(settings: Settings, engine_token: str) -> FastAPI:
                         await monitors.run(m["id"])
                     await asyncio.to_thread(monitors.due_reminders)
                     await asyncio.to_thread(monitors.source_failure_alerts)
+                    # End-to-end encrypted sync every 5 minutes while linked (silent when offline).
+                    if time.monotonic() - last_sync >= SYNC_INTERVAL_SECONDS:
+                        from sync.service import run_if_linked
+
+                        last_sync = time.monotonic()
+                        await run_if_linked(active, state)
                     today = date.today().isoformat()
                     if last_daily != today:
                         tracking = TrackingService(active)
@@ -178,6 +188,7 @@ def create_app(settings: Settings, engine_token: str) -> FastAPI:
     app.include_router(tracking.router, prefix=PREFIX)
     app.include_router(insights.router, prefix=PREFIX)
     app.include_router(ai.router, prefix=PREFIX)
+    app.include_router(sync.router, prefix=PREFIX)
 
     @app.websocket(f"{PREFIX}/events")
     async def events_ws(websocket: WebSocket) -> None:

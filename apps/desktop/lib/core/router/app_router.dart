@@ -22,6 +22,7 @@ import '../../features/shell/app_shell.dart';
 import '../../features/shell/nav_items.dart';
 import '../../features/sources/sources_page.dart';
 import '../../features/startup/startup_page.dart';
+import '../../features/sync/orgs_page.dart';
 import '../../features/tracking/application_page.dart';
 import '../../features/tracking/saved_page.dart';
 import '../../features/workspaces/workspaces_page.dart';
@@ -102,6 +103,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/monitors', pageBuilder: (_, s) => NoTransitionPage(key: s.pageKey, child: const MonitorsPage())),
           GoRoute(path: '/workspaces', pageBuilder: (_, s) => NoTransitionPage(key: s.pageKey, child: const WorkspacesPage())),
           GoRoute(path: '/workspaces/:id', builder: (_, s) => WorkspacePage(id: s.pathParameters['id']!)),
+          GoRoute(path: '/orgs', pageBuilder: (_, s) => NoTransitionPage(key: s.pageKey, child: const OrgsPage())),
+          GoRoute(path: '/orgs/:id', builder: (_, s) => OrgPage(id: s.pathParameters['id']!)),
           GoRoute(path: '/sources', pageBuilder: (_, s) => NoTransitionPage(key: s.pageKey, child: const SourcesPage())),
           GoRoute(path: '/profile', pageBuilder: (_, s) => NoTransitionPage(key: s.pageKey, child: const ProfilePage())),
           GoRoute(path: '/profile/cv', builder: (_, _) => const CvImportPage()),

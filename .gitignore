@@ -39,3 +39,8 @@ desktop.ini
 
 # --- Agent-internal working files (not part of the product) ---------------
 /Voici une version*.md
+
+# Sync server runtime data (never commit)
+sync-server/data/
+sync-server/backups/
+sync-server/.env

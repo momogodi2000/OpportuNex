@@ -106,6 +106,10 @@ void main() {
     final aiSwitch = tester.widget<SwitchListTile>(find.widgetWithText(SwitchListTile, "Activer les fonctions d'IA"));
     expect(aiSwitch.value, isFalse);
 
+    // Sync is optional: a fresh profile is local only (EF-01.12).
+    await tester.tap(find.widgetWithText(Tab, 'Synchronisation'));
+    await waitFor(tester, find.textContaining('Mode actuel : local uniquement'));
+
     // Lock with Ctrl+L, then unlock with the password: back on the dashboard.
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
     await tester.sendKeyEvent(LogicalKeyboardKey.keyL);

@@ -15,6 +15,7 @@ import '../../core/widgets/opportunity_widgets.dart';
 import '../../core/widgets/states.dart';
 import '../../l10n/app_localizations.dart';
 import '../search/search_controller.dart';
+import '../sync/orgs_page.dart';
 
 final workspacesProvider = FutureProvider.autoDispose.family<List<Json>, bool>(
     (ref, archived) async => items(await requireApi(ref).getJson('/workspaces', query: {'archived': archived})));
@@ -189,7 +190,10 @@ class _WorkspacePageState extends ConsumerState<WorkspacePage> {
             ),
           PopupMenuButton<String>(
             onSelected: (v) async {
-              if (v == 'delete') {
+              if (v == 'share') {
+                await shareWithOrg(context, ref, 'workspace', widget.id, w.str('organization_id'));
+                ref.invalidate(workspaceProvider(widget.id));
+              } else if (v == 'delete') {
                 final ok = await confirmAction(context, title: l.commonDelete, message: w.string('name'),
                     confirmLabel: l.commonDelete, destructive: true);
                 if (!ok) return;
@@ -201,6 +205,7 @@ class _WorkspacePageState extends ConsumerState<WorkspacePage> {
               }
             },
             itemBuilder: (_) => [
+              PopupMenuItem(value: 'share', child: Text(l.orgsShareTitle)),
               PopupMenuItem(value: 'archive', child: Text(w.flag('archived') ? l.trackUnarchive : l.trackArchive)),
               PopupMenuItem(value: 'delete', child: Text(l.commonDelete)),
             ],

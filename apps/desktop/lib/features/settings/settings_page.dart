@@ -16,6 +16,7 @@ import '../../l10n/app_localizations.dart';
 import '../ai/ai_settings_tab.dart';
 import '../auth/auth_controller.dart';
 import '../auth/auth_models.dart';
+import '../sync/sync_settings_tab.dart';
 import 'about_section.dart';
 import 'maintenance_repository.dart';
 import 'settings_extra.dart';
@@ -28,8 +29,8 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     return DefaultTabController(
-      length: 7,
-      initialIndex: initialTab.clamp(0, 6),
+      length: 8,
+      initialIndex: initialTab.clamp(0, 7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -47,6 +48,7 @@ class SettingsPage extends ConsumerWidget {
                 Tab(text: l.settingsPreferences),
                 Tab(text: l.settingsPrivacy),
                 Tab(text: l.settingsAi),
+                Tab(text: l.settingsSync),
                 Tab(text: l.settingsBackups),
                 Tab(text: l.settingsMaintenance),
                 Tab(text: l.settingsAbout),
@@ -60,6 +62,7 @@ class SettingsPage extends ConsumerWidget {
               PreferencesTab(),
               PrivacyTab(),
               AiSettingsTab(),
+              SyncSettingsTab(),
               _BackupsTab(),
               _MaintenanceTab(),
               AboutSection(),

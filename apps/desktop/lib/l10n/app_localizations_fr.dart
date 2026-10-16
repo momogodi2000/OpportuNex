@@ -2983,4 +2983,461 @@ class AppLocalizationsFr extends AppLocalizations {
   String a11ySelect(String title) {
     return 'Sélectionner : $title';
   }
+
+  @override
+  String get auditCreate => 'Organisation créée';
+
+  @override
+  String get auditInvite => 'Invitation envoyée';
+
+  @override
+  String get auditInviteRevoke => 'Invitation annulée';
+
+  @override
+  String get auditJoin => 'Membre arrivé';
+
+  @override
+  String get auditKeyShare => 'Clé transmise à un membre';
+
+  @override
+  String get auditLeave => 'Membre parti';
+
+  @override
+  String get auditRemove => 'Membre retiré';
+
+  @override
+  String get auditRole => 'Rôle modifié';
+
+  @override
+  String get auditRotate => 'Clé renouvelée';
+
+  @override
+  String get errSyncCodeInvalid => 'Code invalide ou expiré.';
+
+  @override
+  String get errSyncEmailNotVerified =>
+      'Confirmez d\'abord votre adresse avec le code reçu par e-mail.';
+
+  @override
+  String get errSyncInviteInvalid =>
+      'Invitation invalide, expirée ou déjà utilisée.';
+
+  @override
+  String get errSyncInviteOtherEmail =>
+      'Cette invitation est destinée à une autre adresse.';
+
+  @override
+  String get errSyncLastOwner =>
+      'Une organisation doit garder au moins un propriétaire.';
+
+  @override
+  String get errSyncPairingMismatch =>
+      'Le code ne correspond pas à l\'appareil en attente. Vérifiez le code affiché sur le nouvel appareil.';
+
+  @override
+  String get errSyncQuota => 'Espace du compte en ligne épuisé.';
+
+  @override
+  String get errSyncRateLimited =>
+      'Trop de tentatives. Réessayez dans une minute.';
+
+  @override
+  String get errSyncRegistrationClosed =>
+      'Ce serveur n\'accepte pas de nouveaux comptes.';
+
+  @override
+  String get errSyncTotpInvalid => 'Code de double authentification incorrect.';
+
+  @override
+  String get errSyncTotpRequired =>
+      'Saisissez le code de votre application d\'authentification.';
+
+  @override
+  String get errSyncUnreachable =>
+      'Serveur de synchronisation injoignable. Vos modifications seront envoyées plus tard.';
+
+  @override
+  String get errSyncUrlInsecure => 'Le serveur doit utiliser HTTPS.';
+
+  @override
+  String get errSyncUrlInvalid => 'Adresse de serveur invalide.';
+
+  @override
+  String get navOrgs => 'Organisations';
+
+  @override
+  String get orgsAudit => 'Journal d\'activité';
+
+  @override
+  String get orgsCopyCode => 'Copier le code';
+
+  @override
+  String get orgsCreate => 'Créer une organisation';
+
+  @override
+  String get orgsEmpty => 'Aucune organisation';
+
+  @override
+  String get orgsEmptyBody =>
+      'Créez une organisation ou rejoignez-en une avec un code d\'invitation.';
+
+  @override
+  String orgsFingerprint(String code) {
+    return 'empreinte $code';
+  }
+
+  @override
+  String get orgsInvite => 'Inviter';
+
+  @override
+  String get orgsInviteCode => 'Code d\'invitation';
+
+  @override
+  String get orgsInviteEmail => 'Adresse e-mail (facultatif)';
+
+  @override
+  String get orgsInviteEmailHelp =>
+      'Sans adresse, un code à transmettre vous-même est créé.';
+
+  @override
+  String orgsInviteExpires(String date) {
+    return 'Valable jusqu\'au $date.';
+  }
+
+  @override
+  String get orgsInviteReady => 'Invitation prête';
+
+  @override
+  String orgsInviteSent(String email) {
+    return 'Un e-mail a été envoyé à $email. Vous pouvez aussi transmettre ce code :';
+  }
+
+  @override
+  String get orgsInviteShare => 'Transmettez ce code à la personne invitée :';
+
+  @override
+  String get orgsJoin => 'Rejoindre';
+
+  @override
+  String get orgsJoined =>
+      'Organisation rejointe. Les éléments partagés arrivent à la prochaine synchronisation.';
+
+  @override
+  String orgsJoinedOn(String date) {
+    return 'depuis le $date';
+  }
+
+  @override
+  String get orgsKeyPending => 'clé en attente';
+
+  @override
+  String orgsKeyVersion(int version) {
+    return 'clé n° $version';
+  }
+
+  @override
+  String get orgsLeave => 'Quitter';
+
+  @override
+  String get orgsLeaveConfirm =>
+      'Vous gardez une copie personnelle des espaces et opportunités partagés. Les autres membres ne verront plus vos modifications.';
+
+  @override
+  String get orgsLeft => 'Vous avez quitté l\'organisation.';
+
+  @override
+  String get orgsMadePersonal => 'L\'élément est redevenu personnel.';
+
+  @override
+  String get orgsMakePersonal => 'Ne plus partager (personnel)';
+
+  @override
+  String get orgsMembers => 'Membres';
+
+  @override
+  String get orgsMembersHelp =>
+      'Comparez l\'empreinte de clé d\'un membre avec celle affichée chez lui pour vérifier qu\'aucun intermédiaire ne s\'est glissé.';
+
+  @override
+  String get orgsNeedSync => 'Synchronisation requise';
+
+  @override
+  String get orgsNeedSyncBody =>
+      'Les organisations passent par un serveur de synchronisation chiffré de bout en bout. Liez d\'abord cet appareil.';
+
+  @override
+  String get orgsNoneToShare =>
+      'Aucune organisation : créez-en une ou rejoignez-en une d\'abord.';
+
+  @override
+  String get orgsOpenSync => 'Ouvrir les réglages de synchronisation';
+
+  @override
+  String get orgsRemove => 'Retirer de l\'organisation';
+
+  @override
+  String get orgsRole => 'Rôle';
+
+  @override
+  String get orgsShareTitle => 'Partager avec une organisation';
+
+  @override
+  String get orgsShared2 =>
+      'Partagé. Les membres le recevront à la prochaine synchronisation.';
+
+  @override
+  String get orgsSubtitle =>
+      'Espaces et opportunités partagés, chiffrés avec une clé commune';
+
+  @override
+  String get roleAdmin => 'Administrateur';
+
+  @override
+  String get roleEditor => 'Éditeur';
+
+  @override
+  String get roleOwner => 'Propriétaire';
+
+  @override
+  String get roleViewer => 'Lecteur';
+
+  @override
+  String get settingsSync => 'Synchronisation';
+
+  @override
+  String get syncApprove => 'Approuver';
+
+  @override
+  String get syncApproveHelp =>
+      'Saisissez le code affiché sur le nouvel appareil. S\'il ne correspond pas, n\'approuvez pas.';
+
+  @override
+  String syncApproveTitle(String name) {
+    return 'Approuver « $name »';
+  }
+
+  @override
+  String get syncApproved => 'Appareil approuvé.';
+
+  @override
+  String get syncCodeSent =>
+      'Si un compte existe, un code a été envoyé par e-mail.';
+
+  @override
+  String syncConflictOn(String kind, String field) {
+    return '$kind · champ « $field » modifié sur deux appareils';
+  }
+
+  @override
+  String get syncConflicts => 'Conflits à résoudre';
+
+  @override
+  String get syncConflictsHelp =>
+      'Le même texte a été modifié sur deux appareils. Choisissez la version à garder ; elle sera envoyée partout.';
+
+  @override
+  String get syncCopyUri => 'Copier le lien otpauth://';
+
+  @override
+  String get syncCreate => 'Créer un compte en ligne';
+
+  @override
+  String get syncDeleteRemote => 'Supprimer le compte en ligne';
+
+  @override
+  String get syncDeleteRemoteHelp =>
+      'Toutes vos données sont effacées du serveur. Les données de cet ordinateur sont conservées.';
+
+  @override
+  String get syncDeletedRemote =>
+      'Compte en ligne supprimé. Cet appareil est revenu en mode local.';
+
+  @override
+  String get syncDeviceActive => 'couplé';
+
+  @override
+  String get syncDevicePending => 'en attente d\'approbation';
+
+  @override
+  String get syncDeviceRevoked => 'révoqué';
+
+  @override
+  String get syncDevices => 'Appareils';
+
+  @override
+  String get syncDevicesHelp =>
+      'Un nouvel appareil reçoit les clés seulement après votre approbation.';
+
+  @override
+  String get syncDone => 'Synchronisation terminée.';
+
+  @override
+  String get syncEmailCode => 'Code reçu par e-mail';
+
+  @override
+  String get syncEmailCodeHelp => 'Collez le code du message.';
+
+  @override
+  String get syncForgot => 'Mot de passe oublié';
+
+  @override
+  String get syncKeepMine => 'Garder la version de cet appareil';
+
+  @override
+  String syncLast(String date) {
+    return 'Dernière synchronisation : $date';
+  }
+
+  @override
+  String get syncLink => 'Se connecter et lier cet appareil';
+
+  @override
+  String get syncLinked => 'Appareil lié au compte en ligne.';
+
+  @override
+  String get syncLocalMode =>
+      'Mode actuel : local uniquement. Vos données ne quittent pas cet ordinateur.';
+
+  @override
+  String get syncNewPassword => 'Nouveau mot de passe';
+
+  @override
+  String get syncNow => 'Synchroniser';
+
+  @override
+  String get syncOnlinePassword => 'Mot de passe du compte en ligne';
+
+  @override
+  String get syncOtherVersion => 'Autre appareil';
+
+  @override
+  String get syncPairCheck => 'Vérifier le couplage';
+
+  @override
+  String get syncPairCode => 'Code de couplage';
+
+  @override
+  String get syncPairHelp =>
+      'Sur un appareil déjà couplé, ouvrez Paramètres > Synchronisation > Appareils, choisissez cet appareil et saisissez ce code.';
+
+  @override
+  String get syncPairTitle => 'Couplage en attente';
+
+  @override
+  String get syncPasswordReset => 'Mot de passe modifié. Reconnectez-vous.';
+
+  @override
+  String syncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count modifications en attente d\'envoi',
+      one: '1 modification en attente d\'envoi',
+      zero: 'Aucune modification en attente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncQuota(String used, String total) {
+    return 'Espace utilisé : $used sur $total';
+  }
+
+  @override
+  String get syncResend => 'Renvoyer le code';
+
+  @override
+  String get syncResetTitle => 'Réinitialiser le mot de passe';
+
+  @override
+  String get syncResetWarning =>
+      'La réinitialisation rend l\'accès au compte, pas aux données : seuls vos appareils déjà couplés détiennent les clés.';
+
+  @override
+  String get syncRevoke => 'Révoquer l\'appareil';
+
+  @override
+  String get syncRule1 =>
+      'Chiffrement de bout en bout : le serveur ne peut lire ni votre profil, ni vos notes, ni vos candidatures.';
+
+  @override
+  String get syncRule2 =>
+      'Serveur auto-hébergé : vous choisissez l\'instance (aucune instance officielle n\'existe encore).';
+
+  @override
+  String get syncRule3 =>
+      'Facultatif : sans compte en ligne, l\'application fonctionne entièrement en local.';
+
+  @override
+  String get syncSecurity => 'Sécurité du compte en ligne';
+
+  @override
+  String get syncSendCode => 'Envoyer un code';
+
+  @override
+  String get syncServer => 'Adresse du serveur';
+
+  @override
+  String get syncServerHelp =>
+      'HTTPS obligatoire. Exemple : https://sync.mon-association.org';
+
+  @override
+  String syncSkipped(String reason) {
+    return 'Élément non appliqué sur cet appareil ($reason).';
+  }
+
+  @override
+  String syncSyncedMode(String email) {
+    return 'Mode actuel : synchronisé, chiffré de bout en bout ($email)';
+  }
+
+  @override
+  String get syncTakeOther => 'Prendre l\'autre version';
+
+  @override
+  String syncThisDevice(String name) {
+    return '$name (cet appareil)';
+  }
+
+  @override
+  String get syncThisVersion => 'Cet appareil';
+
+  @override
+  String get syncTitle => 'Synchronisation chiffrée';
+
+  @override
+  String get syncTotp => 'Double authentification (TOTP)';
+
+  @override
+  String get syncTotpCode => 'Code à 6 chiffres';
+
+  @override
+  String get syncTotpEnable => 'Activer';
+
+  @override
+  String get syncTotpHelp =>
+      'Un code de votre application d\'authentification sera demandé à chaque connexion d\'un appareil.';
+
+  @override
+  String get syncTotpOn => 'Double authentification activée.';
+
+  @override
+  String get syncTotpOptional => 'Code de double authentification (si activée)';
+
+  @override
+  String get syncTotpSetup =>
+      'Ajoutez ce secret dans votre application d\'authentification, puis saisissez le code qu\'elle affiche.';
+
+  @override
+  String get syncUnlink => 'Délier cet appareil';
+
+  @override
+  String get syncUnlinkConfirm =>
+      'La synchronisation s\'arrête sur cet appareil. Ses données restent disponibles en local.';
+
+  @override
+  String get syncVerifyAndLink => 'Confirmer et lier cet appareil';
+
+  @override
+  String get syncVerifyTitle => 'Confirmer l\'adresse e-mail';
 }

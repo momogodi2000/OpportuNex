@@ -238,6 +238,42 @@ Accessibility evidence:
 - In the tour, every tap target on every page is labelled, in both themes, with no layout error at 150 % text or at 960×640.
 - The text-contrast guideline still reports 3 findings in light mode: the selected query in the search box, the "Soumise" chip, and the short value "CM". I checked them against the screenshots: they are sampling artifacts (selection highlight, chip border, anti-aliasing on short text), not low-contrast text.
 
+### Phase 6 — Organisations and end-to-end encrypted sync (M17, EF-01.09-12)
+Scope follows D-09; the design decisions are D-29 to D-35 in `documentation/DECISIONS.md`.
+
+**Sync server** (`sync-server/`, new, AGPL v3). FastAPI with SQLAlchemy, on SQLite for development and tests or PostgreSQL in production. It stores account metadata, device public keys, sealed key envelopes and ciphertext records.
+
+| Area | What it does |
+| --- | --- |
+| Accounts | E-mail verified by code or link, Argon2id password, optional TOTP (RFC 6238), password reset by e-mail that does **not** give access to data, lockout after 5 failures, rate limit on authentication, remote account deletion |
+| Devices | First device active; later ones wait for approval; approval stores the sync key sealed to the device; revocation |
+| Records | Push/pull by scope (`user` or `org:<id>`), idempotent by operation id, ordered cursor, per-account quota, size limits |
+| Organisations | Roles owner/admin/editor/viewer enforced on writes, invitations by e-mail or code, key envelopes per member and version, rotation required after a departure, audit log |
+| Operations | `/v1/health`, Prometheus `/metrics`, Dockerfile, Compose (API + PostgreSQL 16 + Caddy TLS 1.3 + daily dump kept 7 days), README FR/EN, `.env.example` |
+
+**Engine** (`engine/sync/`, migration `0004_sync`):
+- **Encryption.** XChaCha20-Poly1305 with scope and operation id as associated data, so the server cannot move or relabel a record. Keys are handed over in X25519 sealed boxes.
+- **Pairing code.** A 12-digit code derived from the new device's key; the approving device refuses a code that does not match the key it is about to trust.
+- **Change capture.** 82 triggers record every write on the synchronised tables, only while sync is linked and never while a remote change is being applied.
+- **Merge.** Three-way, field by field, against the last synchronised version. When the same text field is changed on two devices, it is kept for a manual choice.
+- **References.** Opportunities are referenced by URL and recreated locally; children whose integer keys differ between devices travel as lists inside their parent.
+- **Organisations.** Keys are received, handed to new members and rotated; a viewer's refused edit is undone locally; leaving keeps personal copies.
+- **Schedule.** A round runs every 5 minutes while linked.
+
+**Desktop:** Settings > Synchronisation (create or link an account, confirm the e-mail, reset the password, pairing code and device approval, conflicts, TOTP, remote deletion, unlink). Organisations page (create, join, invite, roles, remove, leave, activity log). "Share with an organisation" on workspaces. Readable messages for the server's error codes.
+
+Found and fixed while doing it:
+- **Failed logins were not counted.** The failed-login counter on the server was rolled back by the very error that reported the failure, so lockout never triggered. The counter is now committed separately; caught by a test.
+- **Plain error messages showed as "unknown error".** `showError` turned plain messages into "unknown error", so the AI "unavailable" message added in phase 4 was never shown.
+- **Applications gained duplicate history entries.** The schema's own status-history triggers duplicated history when a synchronised application was written; the history is now rebuilt as a union.
+- **The sidebar kept saying "Mode local" after linking.** The desktop now refreshes the account after any sync action.
+- **The package list omitted `sync`.** The engine's `pyproject.toml` did not package the new `sync` package; added.
+
+Not verified in this session:
+- The Docker image was **not built**. Docker Desktop fails to start on this machine: its backend crashes on a stale socket at `%LOCALAPPDATA%\Docker\run\dockerInference`. So the PostgreSQL path and Caddy configuration are untested; the server was tested on SQLite.
+- No official instance exists (D-35).
+- SMTP delivery was not tested against a real mail server; the logged-message fallback was used.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -279,6 +315,25 @@ Phase 5 (2026-10-16):
 | 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **58 passed** (adds 30 contrast checks, palette, shortcut help, autostart commands) |
 | 2026-10-16 | `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (17 s)** |
 | 2026-10-16 | `flutter test integration_test/ui_tour_test.dart -d windows` | **1 passed (4 min 45 s)**: 99 screenshots, 0 layout problems, 0 unlabelled tap targets, 3 contrast findings reviewed as sampling artifacts |
+
+Phase 6 (2026-10-16):
+
+| Date | Command | Result |
+| --- | --- | --- |
+| 2026-10-16 | `engine: pytest -q --cov` | **127 passed**, 89 % coverage; `sync/` 88–93 %; ruff and mypy clean |
+| 2026-10-16 | `sync-server: pytest -q` | **8 passed**; ruff and mypy clean |
+| 2026-10-16 | `desktop: flutter analyze · flutter test` | No issues · **58 passed** |
+| 2026-10-16 | `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (18 s)**, now also checks local mode on a fresh profile |
+| 2026-10-16 | `flutter test integration_test/ui_tour_test.dart -d windows` | **1 passed (5 min 18 s)** with a real local sync server; 0 layout problems, 0 unlabelled controls, 4 contrast findings reviewed as sampling artifacts |
+| — | `docker build` / `docker compose up` | **Not run**: Docker Desktop does not start on this machine |
+
+Traceability after phase 6 (176 requirements):
+- 15 operational end to end.
+- 20 operational engine-internal features.
+- 114 with the engine tested and the screen delivered.
+- 9 implemented without an automated test.
+- 9 partial.
+- 9 absent: EF-05.04, 05.05, 06.05, 06.06, 06.07, 08.07, 13.10, 17.10, 18.11.
 
 Traceability after phase 5 (176 requirements):
 - 14 operational end to end.

@@ -41,11 +41,27 @@ def test_fresh_database_has_every_schema_object(tmp_path: Path) -> None:
         assert expected_tables <= reflected
         assert expected_views <= reflected
         with db.read() as conn:
-            triggers = conn.exec_driver_sql("SELECT count(*) FROM sqlite_master WHERE type='trigger'").scalar()
-            assert triggers == len(re.findall(r"CREATE TRIGGER", sql))
+            baseline = conn.exec_driver_sql(
+                "SELECT count(*) FROM sqlite_master WHERE type='trigger' AND name NOT LIKE 'trg_sync_%'"
+            ).scalar()
+            assert baseline == len(re.findall(r"CREATE TRIGGER", sql))
+            # Migration 0004: three change-capture triggers per captured table, plus saved searches and orgs.
+            import importlib.util
+
+            path = Path(__file__).parents[1] / "persistence" / "migrations" / "versions" / "0004_sync.py"
+            spec = importlib.util.spec_from_file_location("migration_0004", path)
+            assert spec is not None and spec.loader is not None
+            _sync_capture = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(_sync_capture)
+
+            capture = conn.exec_driver_sql(
+                "SELECT count(*) FROM sqlite_master WHERE type='trigger' AND name LIKE 'trg_sync_%'"
+            ).scalar()
+            assert capture == 3 * len(_sync_capture.CAPTURE) + 4
+            assert {"sync_shadow", "sync_cursors", "sync_keys", "sync_guard"} <= reflected
             assert conn.exec_driver_sql("PRAGMA foreign_keys").scalar() == 1
             assert conn.exec_driver_sql("PRAGMA journal_mode").scalar() == "wal"
-            assert conn.exec_driver_sql("PRAGMA user_version").scalar() == 101
+            assert conn.exec_driver_sql("PRAGMA user_version").scalar() == 102
         assert db.revision == head_revision()
     finally:
         db.close()

@@ -5401,6 +5401,786 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Sélectionner : {title}'**
   String a11ySelect(String title);
+
+  /// No description provided for @auditCreate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Organisation créée'**
+  String get auditCreate;
+
+  /// No description provided for @auditInvite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Invitation envoyée'**
+  String get auditInvite;
+
+  /// No description provided for @auditInviteRevoke.
+  ///
+  /// In fr, this message translates to:
+  /// **'Invitation annulée'**
+  String get auditInviteRevoke;
+
+  /// No description provided for @auditJoin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membre arrivé'**
+  String get auditJoin;
+
+  /// No description provided for @auditKeyShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé transmise à un membre'**
+  String get auditKeyShare;
+
+  /// No description provided for @auditLeave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membre parti'**
+  String get auditLeave;
+
+  /// No description provided for @auditRemove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membre retiré'**
+  String get auditRemove;
+
+  /// No description provided for @auditRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rôle modifié'**
+  String get auditRole;
+
+  /// No description provided for @auditRotate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé renouvelée'**
+  String get auditRotate;
+
+  /// No description provided for @errSyncCodeInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code invalide ou expiré.'**
+  String get errSyncCodeInvalid;
+
+  /// No description provided for @errSyncEmailNotVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmez d\'abord votre adresse avec le code reçu par e-mail.'**
+  String get errSyncEmailNotVerified;
+
+  /// No description provided for @errSyncInviteInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Invitation invalide, expirée ou déjà utilisée.'**
+  String get errSyncInviteInvalid;
+
+  /// No description provided for @errSyncInviteOtherEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette invitation est destinée à une autre adresse.'**
+  String get errSyncInviteOtherEmail;
+
+  /// No description provided for @errSyncLastOwner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une organisation doit garder au moins un propriétaire.'**
+  String get errSyncLastOwner;
+
+  /// No description provided for @errSyncPairingMismatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le code ne correspond pas à l\'appareil en attente. Vérifiez le code affiché sur le nouvel appareil.'**
+  String get errSyncPairingMismatch;
+
+  /// No description provided for @errSyncQuota.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace du compte en ligne épuisé.'**
+  String get errSyncQuota;
+
+  /// No description provided for @errSyncRateLimited.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trop de tentatives. Réessayez dans une minute.'**
+  String get errSyncRateLimited;
+
+  /// No description provided for @errSyncRegistrationClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce serveur n\'accepte pas de nouveaux comptes.'**
+  String get errSyncRegistrationClosed;
+
+  /// No description provided for @errSyncTotpInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code de double authentification incorrect.'**
+  String get errSyncTotpInvalid;
+
+  /// No description provided for @errSyncTotpRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisissez le code de votre application d\'authentification.'**
+  String get errSyncTotpRequired;
+
+  /// No description provided for @errSyncUnreachable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveur de synchronisation injoignable. Vos modifications seront envoyées plus tard.'**
+  String get errSyncUnreachable;
+
+  /// No description provided for @errSyncUrlInsecure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le serveur doit utiliser HTTPS.'**
+  String get errSyncUrlInsecure;
+
+  /// No description provided for @errSyncUrlInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse de serveur invalide.'**
+  String get errSyncUrlInvalid;
+
+  /// No description provided for @navOrgs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Organisations'**
+  String get navOrgs;
+
+  /// No description provided for @orgsAudit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal d\'activité'**
+  String get orgsAudit;
+
+  /// No description provided for @orgsCopyCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier le code'**
+  String get orgsCopyCode;
+
+  /// No description provided for @orgsCreate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer une organisation'**
+  String get orgsCreate;
+
+  /// No description provided for @orgsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune organisation'**
+  String get orgsEmpty;
+
+  /// No description provided for @orgsEmptyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créez une organisation ou rejoignez-en une avec un code d\'invitation.'**
+  String get orgsEmptyBody;
+
+  /// No description provided for @orgsFingerprint.
+  ///
+  /// In fr, this message translates to:
+  /// **'empreinte {code}'**
+  String orgsFingerprint(String code);
+
+  /// No description provided for @orgsInvite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inviter'**
+  String get orgsInvite;
+
+  /// No description provided for @orgsInviteCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code d\'invitation'**
+  String get orgsInviteCode;
+
+  /// No description provided for @orgsInviteEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse e-mail (facultatif)'**
+  String get orgsInviteEmail;
+
+  /// No description provided for @orgsInviteEmailHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sans adresse, un code à transmettre vous-même est créé.'**
+  String get orgsInviteEmailHelp;
+
+  /// No description provided for @orgsInviteExpires.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valable jusqu\'au {date}.'**
+  String orgsInviteExpires(String date);
+
+  /// No description provided for @orgsInviteReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Invitation prête'**
+  String get orgsInviteReady;
+
+  /// No description provided for @orgsInviteSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un e-mail a été envoyé à {email}. Vous pouvez aussi transmettre ce code :'**
+  String orgsInviteSent(String email);
+
+  /// No description provided for @orgsInviteShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Transmettez ce code à la personne invitée :'**
+  String get orgsInviteShare;
+
+  /// No description provided for @orgsJoin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejoindre'**
+  String get orgsJoin;
+
+  /// No description provided for @orgsJoined.
+  ///
+  /// In fr, this message translates to:
+  /// **'Organisation rejointe. Les éléments partagés arrivent à la prochaine synchronisation.'**
+  String get orgsJoined;
+
+  /// No description provided for @orgsJoinedOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'depuis le {date}'**
+  String orgsJoinedOn(String date);
+
+  /// No description provided for @orgsKeyPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'clé en attente'**
+  String get orgsKeyPending;
+
+  /// No description provided for @orgsKeyVersion.
+  ///
+  /// In fr, this message translates to:
+  /// **'clé n° {version}'**
+  String orgsKeyVersion(int version);
+
+  /// No description provided for @orgsLeave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quitter'**
+  String get orgsLeave;
+
+  /// No description provided for @orgsLeaveConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous gardez une copie personnelle des espaces et opportunités partagés. Les autres membres ne verront plus vos modifications.'**
+  String get orgsLeaveConfirm;
+
+  /// No description provided for @orgsLeft.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez quitté l\'organisation.'**
+  String get orgsLeft;
+
+  /// No description provided for @orgsMadePersonal.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'élément est redevenu personnel.'**
+  String get orgsMadePersonal;
+
+  /// No description provided for @orgsMakePersonal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ne plus partager (personnel)'**
+  String get orgsMakePersonal;
+
+  /// No description provided for @orgsMembers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membres'**
+  String get orgsMembers;
+
+  /// No description provided for @orgsMembersHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comparez l\'empreinte de clé d\'un membre avec celle affichée chez lui pour vérifier qu\'aucun intermédiaire ne s\'est glissé.'**
+  String get orgsMembersHelp;
+
+  /// No description provided for @orgsNeedSync.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisation requise'**
+  String get orgsNeedSync;
+
+  /// No description provided for @orgsNeedSyncBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les organisations passent par un serveur de synchronisation chiffré de bout en bout. Liez d\'abord cet appareil.'**
+  String get orgsNeedSyncBody;
+
+  /// No description provided for @orgsNoneToShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune organisation : créez-en une ou rejoignez-en une d\'abord.'**
+  String get orgsNoneToShare;
+
+  /// No description provided for @orgsOpenSync.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir les réglages de synchronisation'**
+  String get orgsOpenSync;
+
+  /// No description provided for @orgsRemove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer de l\'organisation'**
+  String get orgsRemove;
+
+  /// No description provided for @orgsRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rôle'**
+  String get orgsRole;
+
+  /// No description provided for @orgsShareTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partager avec une organisation'**
+  String get orgsShareTitle;
+
+  /// No description provided for @orgsShared2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partagé. Les membres le recevront à la prochaine synchronisation.'**
+  String get orgsShared2;
+
+  /// No description provided for @orgsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espaces et opportunités partagés, chiffrés avec une clé commune'**
+  String get orgsSubtitle;
+
+  /// No description provided for @roleAdmin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Administrateur'**
+  String get roleAdmin;
+
+  /// No description provided for @roleEditor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Éditeur'**
+  String get roleEditor;
+
+  /// No description provided for @roleOwner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Propriétaire'**
+  String get roleOwner;
+
+  /// No description provided for @roleViewer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecteur'**
+  String get roleViewer;
+
+  /// No description provided for @settingsSync.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisation'**
+  String get settingsSync;
+
+  /// No description provided for @syncApprove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approuver'**
+  String get syncApprove;
+
+  /// No description provided for @syncApproveHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisissez le code affiché sur le nouvel appareil. S\'il ne correspond pas, n\'approuvez pas.'**
+  String get syncApproveHelp;
+
+  /// No description provided for @syncApproveTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approuver « {name} »'**
+  String syncApproveTitle(String name);
+
+  /// No description provided for @syncApproved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appareil approuvé.'**
+  String get syncApproved;
+
+  /// No description provided for @syncCodeSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si un compte existe, un code a été envoyé par e-mail.'**
+  String get syncCodeSent;
+
+  /// No description provided for @syncConflictOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'{kind} · champ « {field} » modifié sur deux appareils'**
+  String syncConflictOn(String kind, String field);
+
+  /// No description provided for @syncConflicts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conflits à résoudre'**
+  String get syncConflicts;
+
+  /// No description provided for @syncConflictsHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le même texte a été modifié sur deux appareils. Choisissez la version à garder ; elle sera envoyée partout.'**
+  String get syncConflictsHelp;
+
+  /// No description provided for @syncCopyUri.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier le lien otpauth://'**
+  String get syncCopyUri;
+
+  /// No description provided for @syncCreate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un compte en ligne'**
+  String get syncCreate;
+
+  /// No description provided for @syncDeleteRemote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte en ligne'**
+  String get syncDeleteRemote;
+
+  /// No description provided for @syncDeleteRemoteHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes vos données sont effacées du serveur. Les données de cet ordinateur sont conservées.'**
+  String get syncDeleteRemoteHelp;
+
+  /// No description provided for @syncDeletedRemote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte en ligne supprimé. Cet appareil est revenu en mode local.'**
+  String get syncDeletedRemote;
+
+  /// No description provided for @syncDeviceActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'couplé'**
+  String get syncDeviceActive;
+
+  /// No description provided for @syncDevicePending.
+  ///
+  /// In fr, this message translates to:
+  /// **'en attente d\'approbation'**
+  String get syncDevicePending;
+
+  /// No description provided for @syncDeviceRevoked.
+  ///
+  /// In fr, this message translates to:
+  /// **'révoqué'**
+  String get syncDeviceRevoked;
+
+  /// No description provided for @syncDevices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appareils'**
+  String get syncDevices;
+
+  /// No description provided for @syncDevicesHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un nouvel appareil reçoit les clés seulement après votre approbation.'**
+  String get syncDevicesHelp;
+
+  /// No description provided for @syncDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisation terminée.'**
+  String get syncDone;
+
+  /// No description provided for @syncEmailCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code reçu par e-mail'**
+  String get syncEmailCode;
+
+  /// No description provided for @syncEmailCodeHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Collez le code du message.'**
+  String get syncEmailCodeHelp;
+
+  /// No description provided for @syncForgot.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe oublié'**
+  String get syncForgot;
+
+  /// No description provided for @syncKeepMine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garder la version de cet appareil'**
+  String get syncKeepMine;
+
+  /// No description provided for @syncLast.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière synchronisation : {date}'**
+  String syncLast(String date);
+
+  /// No description provided for @syncLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter et lier cet appareil'**
+  String get syncLink;
+
+  /// No description provided for @syncLinked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appareil lié au compte en ligne.'**
+  String get syncLinked;
+
+  /// No description provided for @syncLocalMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode actuel : local uniquement. Vos données ne quittent pas cet ordinateur.'**
+  String get syncLocalMode;
+
+  /// No description provided for @syncNewPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau mot de passe'**
+  String get syncNewPassword;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchroniser'**
+  String get syncNow;
+
+  /// No description provided for @syncOnlinePassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe du compte en ligne'**
+  String get syncOnlinePassword;
+
+  /// No description provided for @syncOtherVersion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre appareil'**
+  String get syncOtherVersion;
+
+  /// No description provided for @syncPairCheck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier le couplage'**
+  String get syncPairCheck;
+
+  /// No description provided for @syncPairCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code de couplage'**
+  String get syncPairCode;
+
+  /// No description provided for @syncPairHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur un appareil déjà couplé, ouvrez Paramètres > Synchronisation > Appareils, choisissez cet appareil et saisissez ce code.'**
+  String get syncPairHelp;
+
+  /// No description provided for @syncPairTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couplage en attente'**
+  String get syncPairTitle;
+
+  /// No description provided for @syncPasswordReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe modifié. Reconnectez-vous.'**
+  String get syncPasswordReset;
+
+  /// No description provided for @syncPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aucune modification en attente} =1{1 modification en attente d\'envoi} other{{count} modifications en attente d\'envoi}}'**
+  String syncPending(int count);
+
+  /// No description provided for @syncQuota.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace utilisé : {used} sur {total}'**
+  String syncQuota(String used, String total);
+
+  /// No description provided for @syncResend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renvoyer le code'**
+  String get syncResend;
+
+  /// No description provided for @syncResetTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser le mot de passe'**
+  String get syncResetTitle;
+
+  /// No description provided for @syncResetWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'La réinitialisation rend l\'accès au compte, pas aux données : seuls vos appareils déjà couplés détiennent les clés.'**
+  String get syncResetWarning;
+
+  /// No description provided for @syncRevoke.
+  ///
+  /// In fr, this message translates to:
+  /// **'Révoquer l\'appareil'**
+  String get syncRevoke;
+
+  /// No description provided for @syncRule1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chiffrement de bout en bout : le serveur ne peut lire ni votre profil, ni vos notes, ni vos candidatures.'**
+  String get syncRule1;
+
+  /// No description provided for @syncRule2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveur auto-hébergé : vous choisissez l\'instance (aucune instance officielle n\'existe encore).'**
+  String get syncRule2;
+
+  /// No description provided for @syncRule3.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facultatif : sans compte en ligne, l\'application fonctionne entièrement en local.'**
+  String get syncRule3;
+
+  /// No description provided for @syncSecurity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sécurité du compte en ligne'**
+  String get syncSecurity;
+
+  /// No description provided for @syncSendCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer un code'**
+  String get syncSendCode;
+
+  /// No description provided for @syncServer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse du serveur'**
+  String get syncServer;
+
+  /// No description provided for @syncServerHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'HTTPS obligatoire. Exemple : https://sync.mon-association.org'**
+  String get syncServerHelp;
+
+  /// No description provided for @syncSkipped.
+  ///
+  /// In fr, this message translates to:
+  /// **'Élément non appliqué sur cet appareil ({reason}).'**
+  String syncSkipped(String reason);
+
+  /// No description provided for @syncSyncedMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode actuel : synchronisé, chiffré de bout en bout ({email})'**
+  String syncSyncedMode(String email);
+
+  /// No description provided for @syncTakeOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre l\'autre version'**
+  String get syncTakeOther;
+
+  /// No description provided for @syncThisDevice.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} (cet appareil)'**
+  String syncThisDevice(String name);
+
+  /// No description provided for @syncThisVersion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet appareil'**
+  String get syncThisVersion;
+
+  /// No description provided for @syncTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisation chiffrée'**
+  String get syncTitle;
+
+  /// No description provided for @syncTotp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Double authentification (TOTP)'**
+  String get syncTotp;
+
+  /// No description provided for @syncTotpCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code à 6 chiffres'**
+  String get syncTotpCode;
+
+  /// No description provided for @syncTotpEnable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer'**
+  String get syncTotpEnable;
+
+  /// No description provided for @syncTotpHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un code de votre application d\'authentification sera demandé à chaque connexion d\'un appareil.'**
+  String get syncTotpHelp;
+
+  /// No description provided for @syncTotpOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Double authentification activée.'**
+  String get syncTotpOn;
+
+  /// No description provided for @syncTotpOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code de double authentification (si activée)'**
+  String get syncTotpOptional;
+
+  /// No description provided for @syncTotpSetup.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez ce secret dans votre application d\'authentification, puis saisissez le code qu\'elle affiche.'**
+  String get syncTotpSetup;
+
+  /// No description provided for @syncUnlink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délier cet appareil'**
+  String get syncUnlink;
+
+  /// No description provided for @syncUnlinkConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'La synchronisation s\'arrête sur cet appareil. Ses données restent disponibles en local.'**
+  String get syncUnlinkConfirm;
+
+  /// No description provided for @syncVerifyAndLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer et lier cet appareil'**
+  String get syncVerifyAndLink;
+
+  /// No description provided for @syncVerifyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer l\'adresse e-mail'**
+  String get syncVerifyTitle;
 }
 
 class _AppLocalizationsDelegate

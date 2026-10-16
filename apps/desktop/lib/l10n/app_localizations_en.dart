@@ -2969,4 +2969,457 @@ class AppLocalizationsEn extends AppLocalizations {
   String a11ySelect(String title) {
     return 'Select: $title';
   }
+
+  @override
+  String get auditCreate => 'Organisation created';
+
+  @override
+  String get auditInvite => 'Invitation sent';
+
+  @override
+  String get auditInviteRevoke => 'Invitation cancelled';
+
+  @override
+  String get auditJoin => 'Member joined';
+
+  @override
+  String get auditKeyShare => 'Key handed to a member';
+
+  @override
+  String get auditLeave => 'Member left';
+
+  @override
+  String get auditRemove => 'Member removed';
+
+  @override
+  String get auditRole => 'Role changed';
+
+  @override
+  String get auditRotate => 'Key renewed';
+
+  @override
+  String get errSyncCodeInvalid => 'Invalid or expired code.';
+
+  @override
+  String get errSyncEmailNotVerified =>
+      'Confirm your address first with the code you received by e-mail.';
+
+  @override
+  String get errSyncInviteInvalid =>
+      'Invitation invalid, expired or already used.';
+
+  @override
+  String get errSyncInviteOtherEmail =>
+      'This invitation is for another address.';
+
+  @override
+  String get errSyncLastOwner =>
+      'An organisation must keep at least one owner.';
+
+  @override
+  String get errSyncPairingMismatch =>
+      'The code does not match the waiting device. Check the code shown on the new device.';
+
+  @override
+  String get errSyncQuota => 'Online account storage is full.';
+
+  @override
+  String get errSyncRateLimited => 'Too many attempts. Try again in a minute.';
+
+  @override
+  String get errSyncRegistrationClosed =>
+      'This server does not accept new accounts.';
+
+  @override
+  String get errSyncTotpInvalid => 'Wrong two-factor code.';
+
+  @override
+  String get errSyncTotpRequired =>
+      'Enter the code from your authenticator app.';
+
+  @override
+  String get errSyncUnreachable =>
+      'Sync server unreachable. Your changes will be sent later.';
+
+  @override
+  String get errSyncUrlInsecure => 'The server must use HTTPS.';
+
+  @override
+  String get errSyncUrlInvalid => 'Invalid server address.';
+
+  @override
+  String get navOrgs => 'Organisations';
+
+  @override
+  String get orgsAudit => 'Activity log';
+
+  @override
+  String get orgsCopyCode => 'Copy the code';
+
+  @override
+  String get orgsCreate => 'Create an organisation';
+
+  @override
+  String get orgsEmpty => 'No organisation';
+
+  @override
+  String get orgsEmptyBody =>
+      'Create an organisation or join one with an invitation code.';
+
+  @override
+  String orgsFingerprint(String code) {
+    return 'fingerprint $code';
+  }
+
+  @override
+  String get orgsInvite => 'Invite';
+
+  @override
+  String get orgsInviteCode => 'Invitation code';
+
+  @override
+  String get orgsInviteEmail => 'E-mail address (optional)';
+
+  @override
+  String get orgsInviteEmailHelp =>
+      'Without an address, you get a code to pass on yourself.';
+
+  @override
+  String orgsInviteExpires(String date) {
+    return 'Valid until $date.';
+  }
+
+  @override
+  String get orgsInviteReady => 'Invitation ready';
+
+  @override
+  String orgsInviteSent(String email) {
+    return 'An e-mail was sent to $email. You can also pass on this code:';
+  }
+
+  @override
+  String get orgsInviteShare => 'Pass this code on to the person you invite:';
+
+  @override
+  String get orgsJoin => 'Join';
+
+  @override
+  String get orgsJoined =>
+      'Organisation joined. Shared items arrive with the next sync.';
+
+  @override
+  String orgsJoinedOn(String date) {
+    return 'since $date';
+  }
+
+  @override
+  String get orgsKeyPending => 'key pending';
+
+  @override
+  String orgsKeyVersion(int version) {
+    return 'key no. $version';
+  }
+
+  @override
+  String get orgsLeave => 'Leave';
+
+  @override
+  String get orgsLeaveConfirm =>
+      'You keep a personal copy of the shared workspaces and opportunities. Other members will no longer see your changes.';
+
+  @override
+  String get orgsLeft => 'You left the organisation.';
+
+  @override
+  String get orgsMadePersonal => 'The item is personal again.';
+
+  @override
+  String get orgsMakePersonal => 'Stop sharing (personal)';
+
+  @override
+  String get orgsMembers => 'Members';
+
+  @override
+  String get orgsMembersHelp =>
+      'Compare a member\'s key fingerprint with the one shown on their side to make sure nobody stepped in between.';
+
+  @override
+  String get orgsNeedSync => 'Sync required';
+
+  @override
+  String get orgsNeedSyncBody =>
+      'Organisations go through an end-to-end encrypted sync server. Link this device first.';
+
+  @override
+  String get orgsNoneToShare => 'No organisation: create or join one first.';
+
+  @override
+  String get orgsOpenSync => 'Open sync settings';
+
+  @override
+  String get orgsRemove => 'Remove from the organisation';
+
+  @override
+  String get orgsRole => 'Role';
+
+  @override
+  String get orgsShareTitle => 'Share with an organisation';
+
+  @override
+  String get orgsShared2 => 'Shared. Members receive it with the next sync.';
+
+  @override
+  String get orgsSubtitle =>
+      'Shared workspaces and opportunities, encrypted with a group key';
+
+  @override
+  String get roleAdmin => 'Administrator';
+
+  @override
+  String get roleEditor => 'Editor';
+
+  @override
+  String get roleOwner => 'Owner';
+
+  @override
+  String get roleViewer => 'Viewer';
+
+  @override
+  String get settingsSync => 'Sync';
+
+  @override
+  String get syncApprove => 'Approve';
+
+  @override
+  String get syncApproveHelp =>
+      'Type the code shown on the new device. If it does not match, do not approve.';
+
+  @override
+  String syncApproveTitle(String name) {
+    return 'Approve “$name”';
+  }
+
+  @override
+  String get syncApproved => 'Device approved.';
+
+  @override
+  String get syncCodeSent => 'If an account exists, a code was sent by e-mail.';
+
+  @override
+  String syncConflictOn(String kind, String field) {
+    return '$kind · field “$field” changed on two devices';
+  }
+
+  @override
+  String get syncConflicts => 'Conflicts to resolve';
+
+  @override
+  String get syncConflictsHelp =>
+      'The same text was changed on two devices. Choose the version to keep; it will be sent everywhere.';
+
+  @override
+  String get syncCopyUri => 'Copy the otpauth:// link';
+
+  @override
+  String get syncCreate => 'Create an online account';
+
+  @override
+  String get syncDeleteRemote => 'Delete the online account';
+
+  @override
+  String get syncDeleteRemoteHelp =>
+      'All your data is erased from the server. The data on this computer is kept.';
+
+  @override
+  String get syncDeletedRemote =>
+      'Online account deleted. This device is back to local mode.';
+
+  @override
+  String get syncDeviceActive => 'paired';
+
+  @override
+  String get syncDevicePending => 'waiting for approval';
+
+  @override
+  String get syncDeviceRevoked => 'revoked';
+
+  @override
+  String get syncDevices => 'Devices';
+
+  @override
+  String get syncDevicesHelp =>
+      'A new device receives the keys only after you approve it.';
+
+  @override
+  String get syncDone => 'Sync complete.';
+
+  @override
+  String get syncEmailCode => 'Code received by e-mail';
+
+  @override
+  String get syncEmailCodeHelp => 'Paste the code from the message.';
+
+  @override
+  String get syncForgot => 'Forgot password';
+
+  @override
+  String get syncKeepMine => 'Keep this device\'s version';
+
+  @override
+  String syncLast(String date) {
+    return 'Last sync: $date';
+  }
+
+  @override
+  String get syncLink => 'Sign in and link this device';
+
+  @override
+  String get syncLinked => 'Device linked to the online account.';
+
+  @override
+  String get syncLocalMode =>
+      'Current mode: local only. Your data stays on this computer.';
+
+  @override
+  String get syncNewPassword => 'New password';
+
+  @override
+  String get syncNow => 'Sync now';
+
+  @override
+  String get syncOnlinePassword => 'Online account password';
+
+  @override
+  String get syncOtherVersion => 'Other device';
+
+  @override
+  String get syncPairCheck => 'Check pairing';
+
+  @override
+  String get syncPairCode => 'Pairing code';
+
+  @override
+  String get syncPairHelp =>
+      'On a paired device, open Settings > Sync > Devices, pick this device and type this code.';
+
+  @override
+  String get syncPairTitle => 'Pairing pending';
+
+  @override
+  String get syncPasswordReset => 'Password changed. Sign in again.';
+
+  @override
+  String syncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes waiting to be sent',
+      one: '1 change waiting to be sent',
+      zero: 'No pending change',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncQuota(String used, String total) {
+    return 'Storage used: $used of $total';
+  }
+
+  @override
+  String get syncResend => 'Resend the code';
+
+  @override
+  String get syncResetTitle => 'Reset the password';
+
+  @override
+  String get syncResetWarning =>
+      'Resetting gives back access to the account, not to the data: only your paired devices hold the keys.';
+
+  @override
+  String get syncRevoke => 'Revoke the device';
+
+  @override
+  String get syncRule1 =>
+      'End-to-end encryption: the server cannot read your profile, notes or applications.';
+
+  @override
+  String get syncRule2 =>
+      'Self-hosted server: you choose the instance (no official instance exists yet).';
+
+  @override
+  String get syncRule3 =>
+      'Optional: without an online account the app works fully offline.';
+
+  @override
+  String get syncSecurity => 'Online account security';
+
+  @override
+  String get syncSendCode => 'Send a code';
+
+  @override
+  String get syncServer => 'Server address';
+
+  @override
+  String get syncServerHelp =>
+      'HTTPS required. Example: https://sync.my-association.org';
+
+  @override
+  String syncSkipped(String reason) {
+    return 'Item not applied on this device ($reason).';
+  }
+
+  @override
+  String syncSyncedMode(String email) {
+    return 'Current mode: synced, end-to-end encrypted ($email)';
+  }
+
+  @override
+  String get syncTakeOther => 'Take the other version';
+
+  @override
+  String syncThisDevice(String name) {
+    return '$name (this device)';
+  }
+
+  @override
+  String get syncThisVersion => 'This device';
+
+  @override
+  String get syncTitle => 'Encrypted sync';
+
+  @override
+  String get syncTotp => 'Two-factor authentication (TOTP)';
+
+  @override
+  String get syncTotpCode => '6-digit code';
+
+  @override
+  String get syncTotpEnable => 'Turn on';
+
+  @override
+  String get syncTotpHelp =>
+      'A code from your authenticator app is asked whenever a device signs in.';
+
+  @override
+  String get syncTotpOn => 'Two-factor authentication on.';
+
+  @override
+  String get syncTotpOptional => 'Two-factor code (if enabled)';
+
+  @override
+  String get syncTotpSetup =>
+      'Add this secret to your authenticator app, then type the code it shows.';
+
+  @override
+  String get syncUnlink => 'Unlink this device';
+
+  @override
+  String get syncUnlinkConfirm =>
+      'Sync stops on this device. Its data stays available locally.';
+
+  @override
+  String get syncVerifyAndLink => 'Confirm and link this device';
+
+  @override
+  String get syncVerifyTitle => 'Confirm the e-mail address';
 }

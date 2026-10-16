@@ -18,6 +18,7 @@ List<NavItem> navItems(AppLocalizations l) => [
       NavItem('/monitors', l.navMonitors, Icons.notifications_active_outlined, Icons.notifications_active),
       NavItem('/workspaces', l.navWorkspaces, Icons.folder_copy_outlined, Icons.folder_copy),
       NavItem('/sources', l.navSources, Icons.hub_outlined, Icons.hub),
+      NavItem('/orgs', l.navOrgs, Icons.groups_outlined, Icons.groups),
       NavItem('/profile', l.navProfile, Icons.person_outline, Icons.person),
       NavItem('/settings', l.navSettings, Icons.settings_outlined, Icons.settings),
     ];

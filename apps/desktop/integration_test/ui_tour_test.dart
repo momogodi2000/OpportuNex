@@ -31,6 +31,7 @@ void main() {
     }
     final dataDir = Directory.systemTemp.createTempSync('opx-tour-');
     final site = await _Publisher.start();
+    final sync = await _SyncServer.start(dataDir);
     final problems = <String>[];
     var current = 'start';
     final previousOnError = FlutterError.onError;
@@ -145,7 +146,7 @@ void main() {
     // ------------------------------------------------------------- realistic data
     final api = container.read(apiClientProvider)!;
     late final Map<String, String> ids;
-    await tester.runAsync(() async => ids = await _seed(api, site));
+    await tester.runAsync(() async => ids = await _seed(api, site, sync));
 
     await go('/onboarding', '05_onboarding_filled');
     await go('/dashboard', '06_dashboard');
@@ -162,15 +163,18 @@ void main() {
       ('/workspaces', 'workspaces'),
       ('/workspaces/${ids['workspace']}', 'workspace'),
       ('/sources', 'sources'),
+      ('/orgs', 'orgs'),
+      ('/orgs/${ids['org']}', 'org'),
       ('/profile', 'profile'),
       ('/profile/cv', 'cv_import'),
       ('/settings?tab=0', 'settings_account'),
       ('/settings?tab=1', 'settings_preferences'),
       ('/settings?tab=2', 'settings_privacy'),
       ('/settings?tab=3', 'settings_ai'),
-      ('/settings?tab=4', 'settings_backups'),
-      ('/settings?tab=5', 'settings_maintenance'),
-      ('/settings?tab=6', 'settings_about'),
+      ('/settings?tab=4', 'settings_sync'),
+      ('/settings?tab=5', 'settings_backups'),
+      ('/settings?tab=6', 'settings_maintenance'),
+      ('/settings?tab=7', 'settings_about'),
       ('/legal', 'legal'),
     ];
     await container.read(uiPrefsProvider.notifier).setTheme(ThemeMode.light);
@@ -224,6 +228,7 @@ void main() {
     await container.read(engineSupervisorProvider.notifier).stop();
     container.dispose();
     await site.close();
+    sync.stop();
     expect(problems, isEmpty, reason: problems.join('\n'));
   }, timeout: const Timeout(Duration(minutes: 15)));
 }
@@ -231,7 +236,7 @@ void main() {
 String _d(int days) => DateTime.now().add(Duration(days: days)).toIso8601String().substring(0, 10);
 
 /// Fills the profile and creates the data every page needs, through the real engine API.
-Future<Map<String, String>> _seed(ApiClient api, _Publisher site) async {
+Future<Map<String, String>> _seed(ApiClient api, _Publisher site, _SyncServer sync) async {
   await api.putJson('/profile/general', body: {
     'full_name': 'Awa Ndjock', 'country_code': 'CM', 'city': 'Douala', 'professional_status': 'employed',
     'current_occupation': 'Analyste de données', 'highest_education': 'master', 'experience_years': 4,
@@ -289,10 +294,22 @@ Future<Map<String, String>> _seed(ApiClient api, _Publisher site) async {
   });
   await api.postJson('/monitors/${monitor.string('id')}/run');
   final ws = await api.postJson('/workspaces', body: {'name': 'Master 2027', 'description': 'Bourses de master en données'});
+  // Optional encrypted sync against a real local sync server, and an organisation sharing a workspace.
+  await api.postJson('/sync/account/register',
+      body: {'server_url': sync.url, 'email': 'awa@example.org', 'password': 'Mot-De-Passe-En-Ligne-2026!'});
+  await api.postJson('/sync/account/verify', body: {'server_url': sync.url, 'code': await sync.code()});
+  await api.postJson('/sync/account/link', body: {
+    'server_url': sync.url, 'email': 'awa@example.org', 'password': 'Mot-De-Passe-En-Ligne-2026!', 'device_name': 'Bureau',
+  });
+  final org = await api.postJson('/orgs', body: {'name': 'Association Jeunesse Numérique', 'org_type': 'association'});
+  final shared = await api.postJson('/workspaces', body: {'name': 'Subventions associatives'});
+  await api.postJson('/orgs/share', body: {'kind': 'workspace', 'id': shared.string('id'), 'organization_id': org.string('id')});
+  await api.postJson('/orgs/${org.string('id')}/invites', body: {'email': 'bob@example.org', 'role': 'editor'});
+  await api.postJson('/sync/run');
   await api.putJson('/workspaces/${ws.string('id')}/opportunities/$opp');
   await api.postJson('/workspaces/${ws.string('id')}/notes', body: {'body': 'Comparer les conditions de mobilité.'});
   await Future<void>.delayed(const Duration(seconds: 2));
-  return {'run': runId, 'opp': opp, 'saved': savedId, 'workspace': ws.string('id')};
+  return {'run': runId, 'opp': opp, 'saved': savedId, 'workspace': ws.string('id'), 'org': org.string('id')};
 }
 
 /// Minimal public publisher with an RSS feed and detail pages (deadlines relative to today).
@@ -357,4 +374,60 @@ class _Publisher {
   }
 
   static String _esc(String s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+
+/// Real sync server (sync-server/) started with the engine's Python environment, data in the tour folder.
+class _SyncServer {
+  _SyncServer(this._process, this.url, this._log);
+  final Process _process;
+  final String url;
+  final StringBuffer _log;
+
+  static Future<_SyncServer> start(Directory dataDir) async {
+    final probe = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+    final port = probe.port;
+    await probe.close();
+    final root = Directory.current.parent.parent.path; // apps/desktop → repository root
+    final python = Platform.isWindows ? '$root/engine/.venv/Scripts/python.exe' : '$root/engine/.venv/bin/python';
+    final dbPath = '${dataDir.path}/sync.db'.replaceAll(r'\', '/');
+    final process = await Process.start(
+      python,
+      ['-m', 'uvicorn', 'opx_sync.app:get_app', '--factory', '--host', '127.0.0.1', '--port', '$port'],
+      workingDirectory: '$root/sync-server',
+      environment: {
+        'OPX_SYNC_DATABASE_URL': 'sqlite:///$dbPath',
+        'OPX_SYNC_ARGON2_MEMORY_KIB': '8192',
+        'OPX_SYNC_ARGON2_ITERATIONS': '1',
+        'PYTHONUNBUFFERED': '1',
+      },
+    );
+    final log = StringBuffer();
+    process.stdout.transform(const SystemEncoding().decoder).listen(log.write);
+    process.stderr.transform(const SystemEncoding().decoder).listen(log.write);
+    final client = HttpClient();
+    final deadline = DateTime.now().add(const Duration(seconds: 30));
+    while (DateTime.now().isBefore(deadline)) {
+      try {
+        final r = await (await client.getUrl(Uri.parse('http://127.0.0.1:$port/v1/health'))).close();
+        if (r.statusCode == 200) break;
+      } on SocketException {
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      }
+    }
+    client.close();
+    return _SyncServer(process, 'http://127.0.0.1:$port', log);
+  }
+
+  /// Without SMTP the server logs the verification message (self-hosting fallback, D-34).
+  Future<String> code() async {
+    for (var i = 0; i < 50; i++) {
+      final m = RegExp(r'Code : (\S+)').allMatches(_log.toString()).lastOrNull;
+      if (m != null) return m.group(1)!;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    throw StateError('no verification code in the sync server log');
+  }
+
+  void stop() => _process.kill();
 }
