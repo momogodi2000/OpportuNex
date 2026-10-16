@@ -52,6 +52,9 @@ def _decode_cursor(cursor: str | None) -> int:
         raise ValidationFailed("invalid cursor", code="cursor_invalid") from exc
 
 
+FTS_RANK_WINDOW = 5000
+
+
 class SearchService:
     def __init__(self, active: ActiveProfile, state: EngineState) -> None:
         self.active = active
@@ -533,13 +536,17 @@ class SearchService:
         if not words:
             return []
         expr = " OR ".join(f'"{w.replace(chr(34), "")}"*' for w in words)
+        # bm25 ranking costs time per matching document: rank only the FTS_RANK_WINDOW most recently collected
+        # matches, which keeps a query under ENF-PERF-03 (300 ms at 100 000 opportunities) even when most of the
+        # database matches a common word. Below the window the ranking is exact.
         return list(
             conn.execute(
                 text(
-                    "SELECT o.id FROM opportunities_fts f JOIN opportunities o ON o.rowid = f.rowid "
-                    "WHERE opportunities_fts MATCH :q ORDER BY rank LIMIT :n"
+                    "SELECT o.id FROM (SELECT rowid, rank FROM opportunities_fts WHERE opportunities_fts MATCH :q "
+                    "ORDER BY rowid DESC LIMIT :window) m JOIN opportunities o ON o.rowid = m.rowid "
+                    "ORDER BY m.rank LIMIT :n"
                 ),
-                {"q": expr, "n": limit},
+                {"q": expr, "n": limit, "window": FTS_RANK_WINDOW},
             ).scalars()
         )
 

@@ -7,3 +7,9 @@
 - [ ] Set up an official contact address for security reports (`SECURITY.md`) and support (user guide).
 - [ ] Review the terms of use of each source in the catalogue (D-20). Sources without clear permission are disabled by default.
 - [ ] Confirm the AGPL compatibility of the `regex` package (Apache-2.0 AND CNRI-Python, a transitive dependency of `dateparser`); see `THIRD_PARTY_NOTICES.md`, section "Reviewed by hand".
+- [ ] Decide whether `documentation/Ai-agents-rule/` stays in the repository. It holds 854 files of third-party AI-agent
+      skill packs that are not part of Opportunex and do not ship with it. Three packs are MIT-licensed
+      (`awesome-agent-skills-main`, `awesome-design-skills-main`, `ui-ux-pro-max-skill-main`); six have **no licence
+      file** (`acquire-codebase-knowledge`, `agentic-workflows`, `ai-team-orchestration`, `developer`,
+      `devops-rollout-plan`, `error-messages`), so their redistribution terms are unknown. Recommended: move them out of
+      the public repository before publication.

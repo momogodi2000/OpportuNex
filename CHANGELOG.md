@@ -33,6 +33,10 @@ Première version complète, reconstruite sur une base auditée (`documentation/
 - Les mots-clés de recherche gardent leurs accents (« données » au lieu de « donnees »).
 - Les pays s'affichent par leur nom (« Cameroun ») et non par leur code dans les résultats et la fiche.
 - L'option « Inclure les expirées » est alignée sur son libellé et annoncée par les lecteurs d'écran.
+- Tableau de bord 50 fois plus rapide sur un profil volumineux (3,6 s → 68 ms à 100 000 opportunités) grâce à un
+  nouvel index (migration `0005_perf_indexes`).
+- Recherche plein texte locale sous 300 ms même quand la plupart des opportunités correspondent (classement limité
+  aux 5 000 plus récentes).
 - Le moteur restait actif quand l'application était fermée de force ou plantait, et bloquait le lancement
   suivant (« déjà en cours d'exécution ») : il s'arrête désormais avec l'application (`--parent-pid`).
 

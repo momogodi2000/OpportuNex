@@ -29,6 +29,62 @@ def test_custom_source_discovery_and_validation(client: EngineClient, site: Fixt
     assert client.delete(f"/sources/{body['id']}").status_code == 204
 
 
+def _add_opportunities(state: object, titles: list[str]) -> None:
+    from sqlalchemy import text
+
+    with state.active.db.tx() as conn:  # type: ignore[attr-defined]
+        for i, title in enumerate(titles):
+            conn.execute(
+                text(
+                    "INSERT INTO opportunities (id, canonical_url, normalized_url, dedup_fingerprint, title) "
+                    "VALUES (:id, :u, :u, :id, :t)"
+                ),
+                {"id": f"o{i:02d}", "u": f"https://example.org/{i}", "t": title},
+            )
+
+
+def test_local_fulltext_ranks_within_the_most_recent_window(signed_in: EngineClient, monkeypatch: object) -> None:
+    """ENF-PERF-03: bm25 ranks only the FTS_RANK_WINDOW most recent matches; below it the ranking is exact."""
+    import pytest
+
+    import services.search_service as search_mod
+
+    state = signed_in.state
+    # o00..o09 mention the word once, o10 (the most recent) three times, so it ranks first.
+    _add_opportunities(
+        state, [f"Stage {i} en géomatique appliquée" for i in range(10)] + ["géomatique géomatique géomatique"]
+    )
+    svc = search_mod.SearchService(state.active, state)
+    with state.active.db.read() as conn:
+        ranked = svc._fts_ids(conn, {"keywords": ["géomatique"]})
+    assert len(ranked) == 11 and ranked[0] == "o10"
+
+    mp = pytest.MonkeyPatch()
+    mp.setattr(search_mod, "FTS_RANK_WINDOW", 4)
+    try:
+        with state.active.db.read() as conn:
+            window = svc._fts_ids(conn, {"keywords": ["geomatique"]})
+    finally:
+        mp.undo()
+    assert sorted(window) == ["o07", "o08", "o09", "o10"]  # the four most recently collected matches
+    assert window[0] == "o10"
+
+
+def test_recommendation_candidates_use_the_last_checked_index(signed_in: EngineClient) -> None:
+    """Regression: without ix_opp_last_checked the dashboard sorted the whole table (2.8 s at 100 000 rows)."""
+    from sqlalchemy import text
+
+    state = signed_in.state
+    with state.active.db.read() as conn:
+        plan = " ".join(
+            str(r[-1])
+            for r in conn.execute(
+                text("EXPLAIN QUERY PLAN SELECT id FROM opportunities ORDER BY last_checked_at DESC LIMIT 200")
+            )
+        )
+    assert "ix_opp_last_checked" in plan and "TEMP B-TREE" not in plan
+
+
 def test_keywords_keep_the_typed_spelling() -> None:
     """Regression: the chips showed "donnees" for "données"; matching must stay accent-insensitive."""
     from collection.adapters import RawItem

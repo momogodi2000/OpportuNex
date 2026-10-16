@@ -332,6 +332,28 @@ Found and fixed while capturing:
 - **Raw country codes.** Result cards, the opportunity sheet and the "strengths" list showed "CM" instead of "Cameroun". There is now a shared `core/ref_data.dart` helper (regression test).
 - **Stale sync state in the tour.** The tour linked sync through the API without refreshing the account, so the sidebar said "Mode local" while synced. It now reloads the account, as the Settings screen does.
 
+### Phase 9 — Final validation
+**Security.**
+- **Static analysis.** Ruff's bandit rules (`S`) run with every engine lint and are clean.
+- **Secrets.** No secret patterns and no `.env`, `.pem` or `.key` files are tracked.
+- **Dependencies.** The new `engine/tools/dependency_audit.py` checks dependencies with read-only requests: PyPI's vulnerability data (from OSV) for the 86 Python packages, and the GitHub advisory database for the 80 hosted Dart packages. Result: **0 known vulnerabilities** in the versions shipped. The OSV batch API (POST) is blocked from this machine, hence those two sources. `psycopg` (sync server, PostgreSQL only) is not installed here and was not checked.
+- **Live transport guard.** Tested on the packaged engine:
+  - `/health` is public;
+  - no token or a wrong token gets 401;
+  - a browser `Origin` gets 403;
+  - a foreign `Host` gets 421;
+  - the engine listens on `127.0.0.1` only.
+
+**Performance.** The new `engine/tools/benchmark.py` runs in throw-away folders, with synthetic data only.
+- **Dashboard (fixed).** At 100 000 opportunities the dashboard took **3.6 s**. The recommendations query sorted the whole table by `last_checked_at`, which had no index, decrypting all 188 MB. Migration `0005_perf_indexes` adds the index: the dashboard now takes **68 ms** (35 ms warm).
+- **Full-text search (fixed).** Multi-word local search took **302–325 ms**, above ENF-PERF-03 (300 ms). In this worst-case corpus 81 % of documents match a common word, and bm25 scored every match. The engine now ranks only the 5 000 most recently collected matches, and ranking stays exact below that. Medians are now **98–151 ms**. Both fixes have regression tests: the query-plan check and the ranking-window test.
+
+**Repository review.**
+- Office lock files (`~$*`) are now ignored.
+- `documentation/Ai-agents-rule/` (854 third-party files, six packs without a licence) was added to the owner's legal decisions.
+- The legacy code folders (`engine/_legacy`, `apps/desktop/_legacy_lib`, `packaging/legacy`) are listed for the owner's deletion decision.
+- The user guide generator now declares current Word compatibility, so Word no longer opens it in "Compatibility Mode". The committed `.docx` predates this fix: it was open in Word during this phase, so it was not regenerated. Run `build_guide.py`, then `tools/finalize_with_word.ps1`, to refresh it.
+
 ## C. Test results
 
 | Date | Command (in `engine/`) | Result |
@@ -410,6 +432,36 @@ Phase 8 (2026-10-16):
 | 2026-10-16 | `build_guide.py` + `tools/finalize_with_word.ps1` (Word 16) | 41 figures, 53 pages, table of contents filled |
 | 2026-10-16 | Packaged app at rest (portable build, welcome screen) | Window 109 MB + engine 133 MB working set; engine exits when the app is killed |
 
+Phase 9 — final run (2026-10-16, Windows 11 Pro 10.0.26200, Python 3.14.2, Flutter 3.41.2, SQLCipher 4.12.0):
+
+| Command | Result |
+| --- | --- |
+| `engine: pytest -q --cov` | **135 passed, 0 failed**, 89 % coverage (8 801 statements) |
+| `engine: ruff check · ruff format --check · mypy` | Clean · 117 files formatted · clean (99 files) |
+| `sync-server: pytest -q · ruff · mypy` | **8 passed** · clean · clean |
+| `desktop: flutter analyze · flutter test` | No issues · **60 passed** |
+| `flutter test integration_test/app_e2e_test.dart -d windows` | **1 passed (21 s)**. The first attempt in this phase stopped before the app started ("No tests were found"); the immediate re-run passed. Treated as a one-off start-up failure of the test harness, not explained. |
+| `flutter test integration_test/ui_tour_test.dart -d windows` | 1 passed (phase 8, 5 min 50 s); 0 layout problems |
+| `engine/tools/dependency_audit.py` | 166 packages, **0 known vulnerabilities** |
+| `engine/tools/benchmark.py` (packaged engine, 5 cold starts) | `PORT:` after 0.61 s (median); healthy after **2.42 s** median (first start 5.02 s) |
+| `engine/tools/benchmark.py` (100 000 synthetic rows) | Insert 2 500 rows/s with FTS triggers; FTS median 98 / 106 / 151 ms; `GET /dashboard` 68 ms; database 191 MB |
+| `packaging/windows/build.ps1` | Bundle self-test `SELF-TEST OK engine=1.0.0 schema=0005_perf_indexes libs=9`; ZIP and installer produced |
+| Final installer, silent install in a temp folder | App start to "engine ready": 6.2 s (first launch after install), 2.76 s, 2.59 s; engine exits when the app is killed; installed self-test OK; silent uninstall clean |
+| Packaged app at rest (welcome screen) | 242 MB working set (window 109 MB + engine 133 MB) |
+
+Non-functional targets (cahier des charges §ENF-PERF):
+
+| Target | Measured | Status |
+| --- | --- | --- |
+| PERF-01 cold start to dashboard ≤ 4 s | Engine ready 2.6–2.8 s after launch; dashboard API 68 ms; first launch after install 6.2 s. The time a person takes to type a password is not counted, and the full path to the dashboard was not timed. | Partly verified |
+| PERF-02 no UI frame blocked > 100 ms during a collection | Not measured (needs Flutter DevTools profiling) | Not verified |
+| PERF-03 local full-text search on 100 000 opportunities ≤ 300 ms | 98–151 ms median, 254 ms worst sample | Met |
+| PERF-04 full search over 30 sources ≤ 3 min | Not measured on 30 live sources (20 live-verified feeds exist) | Not verified |
+| PERF-05 RAM at rest ≤ 400 MB | 242 MB | Met |
+| PERF-06 network concurrency (8 total, 1 per domain) | `collection/http.py`; tests `test_one_request_at_a_time_per_domain` (peak 1) and `test_global_concurrency_cap` (peak = cap), added in phase 9 | Met (by test) |
+| PERF-07 ≤ 10 MB per downloaded resource | `MAX_BYTES` in `collection/http.py`; `test_responses_over_10_mb_are_refused` (declared and streamed sizes), added in phase 9 | Met (by test) |
+| PERF-08 Windows installer ≤ 150 MB | 86.8 MB | Met |
+
 Traceability after phase 6 (176 requirements):
 - 15 operational end to end.
 - 20 operational engine-internal features.
@@ -446,12 +498,129 @@ Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.5
 
 ## D. Deliverables
 
-*(Filled in during phases 7–8.)*
+| Deliverable | Path | State |
+| --- | --- | --- |
+| Windows installer | `dist/windows/Opportunex-Setup-1.0.0-x64.exe` (86.8 MB) | Built and verified (silent install, launch, kill, uninstall); **unsigned** |
+| Windows portable version | `dist/windows/Opportunex-1.0.0-windows-x64-portable.zip` (116.8 MB) | Built; same files as the installed version |
+| Application folder | `dist/windows/Opportunex/` (`opportunex.exe`, `engine/opportunex-engine.exe`, `licenses/`) | Built; engine self-test OK |
+| Checksums | `dist/windows/SHA256SUMS.txt` | Produced by the build |
+| Debian package | `dist/linux/opportunex_1.0.0_amd64.deb` (planned path) | **Not produced**: scripts ready (`packaging/linux/`), Docker unavailable on this machine |
+| Sync server image | `sync-server/Dockerfile`, `docker-compose.yml` | **Not built** (Docker unavailable); server tested on SQLite outside a container |
+| Licence | `LICENSE` (GNU AGPL v3, verbatim), `NOTICE`, `AUTHORS`, `TRADEMARKS.md`, `THIRD_PARTY_NOTICES.md`, `packaging/licenses/` | Done |
+| Community files | `README.md`, `README.en.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md` | Done |
+| Word user guide | `documentation/user-guide/Guide_Utilisateur_Opportunex.docx` (53 pages, 41 figures) | Done |
+| Screenshots | `documentation/user-guide/screenshots/` (42 PNG, real application) | Done |
+| Video recordings | `documentation/user-guide/videos/` | **Not produced** (ffmpeg not installed; owner chose to skip); script `documentation/user-guide/tools/record_video.ps1` |
+| Build scripts | `packaging/windows/build.ps1`, `packaging/windows/opportunex.iss`, `packaging/engine/opportunex-engine.spec`, `packaging/linux/{Dockerfile,build-deb.sh,test-deb.sh}` | Windows scripts run; Linux scripts not run |
+| CI | `.github/workflows/ci.yml`, `.github/workflows/release.yml` | Written; never run (nothing pushed) |
+| Audit tools | `engine/tools/{third_party_notices,dependency_audit,benchmark}.py`, `apps/desktop/integration_test/ui_tour_test.dart` | Run in this session |
+| Audit documents | `documentation/audit/AUDIT_REPORT.md`, `documentation/audit/TRACEABILITY.md`, `documentation/DECISIONS.md`, `documentation/LEGAL_DECISIONS_NEEDED.md` | Up to date |
+
+`dist/` and `build/` are build outputs and are not committed (`.gitignore`); `packaging/windows/build.ps1` reproduces them.
 
 ## E. Remaining limitations
 
-*(Filled in during phase 9.)*
+**Defects and gaps not fixed**
+- 9 requirements are absent:
+  - EF-05.04 headless browser for sources that need one;
+  - EF-05.05 announcements published as PDF;
+  - EF-06.05 visual connector editor;
+  - EF-06.06 / 06.07 signed community connector registry;
+  - EF-08.07 local semantic matching (embeddings);
+  - EF-13.10 server-side monitoring;
+  - EF-17.10 public anonymous share link;
+  - EF-18.11 signed update check.
+- 9 requirements are partial:
+  - EF-04.05: source, experience and amount filters are not on screen;
+  - EF-05.08: pagination handling is incomplete;
+  - EF-06.09: 74 catalogue entries, of which 20 are live-verified feeds; the others are official links;
+  - EF-10.07: grant proposal follows a generic outline, not the funder's template;
+  - EF-15.02: monitors are not attached to workspaces;
+  - EF-17.08: no official sync instance;
+  - EF-18.03: regional formats are partly configurable;
+  - EF-18.13: shortcuts are fixed, not configurable;
+  - EF-18.14: no guided tour.
+- 9 requirements are implemented without an automated test: EF-04.07, 10.03, 10.08, 10.09, 13.06, 13.09, 16.06, 18.09 and 17.09 (Docker image).
+- Monitors and sync rounds only run while the application is open (by design, stated in the UI and the guide).
+- 4 contrast findings from the UI tour were reviewed as sampling artifacts (text on chips over tinted backgrounds), not re-measured by hand.
+
+**Tests not run**
+- The `.deb` build and install test, and the sync-server image with PostgreSQL and Caddy (`docker-compose.test.yml`): Docker Desktop does not start on this machine.
+- Real AI providers (only a local fake provider in tests), the real OS keychain (tests use the in-memory store), and SMTP delivery for the sync server.
+- ENF-PERF-02 (UI frame times during a collection) and ENF-PERF-04 (full search over 30 live sources).
+- The GitHub Actions workflows (no push was made).
+- Usability targets (SUS ≥ 75, 30 beta testers) are human activities outside this work.
+
+**Platforms not verified**
+- Linux (Debian/Ubuntu): package scripts only.
+- macOS: not built (D-10).
+- Windows 10: only Windows 11 Pro 10.0.26200 was used. Windows 10 1809+ is the declared minimum in the installer.
+
+**Decisions needed from the owner** (details in `documentation/LEGAL_DECISIONS_NEEDED.md` and `DECISIONS.md`)
+- **Legal and publishing:**
+  - trademark search for "Opportunex";
+  - legal entity and copyright assignment;
+  - lawyer review of the dual-licensing and inbound grant;
+  - code signing (SignPath);
+  - official contact addresses;
+  - terms review for each catalogue source;
+  - the `regex` package licence.
+- **Third-party AI-agent rule packs.** Keep or remove `documentation/Ai-agents-rule/` (854 third-party files, six packs without a licence) before publishing.
+- **Legacy code.** Delete it once no longer needed: `engine/_legacy/` (72 files), `apps/desktop/_legacy_lib/` (65 files) and `packaging/legacy/` (old build scripts). None is compiled or shipped; deletions were left to the owner.
+- **Videos.** Install ffmpeg and record them with `record_video.ps1`.
+- **Push and publication.** Push the `finalisation` branch, open the pull request and publish a release. No push or publication was made.
 
 ## F. Final assessment
 
-*(Filled in during phase 9.)*
+A build that succeeds, a feature whose engine is tested, and a feature verified end to end in the real application are three different levels. The table keeps them apart.
+
+**Levels used**
+- **E2E**: walked by the Windows end-to-end test against the real engine.
+- **Engine**: covered by engine tests, with no user interface involved.
+- **Engine tested · UI delivered**: the engine is covered by tests, and the screen exists and renders without layout errors in the UI tour, but no automated test walks the user flow on it.
+
+| Module | Requirements | E2E | Engine | Engine tested · UI delivered | Not tested | Partial | Absent | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| M01 Accounts | 12 | 5 | 2 | 5 | 0 | 0 | 0 | High |
+| M02 Profile | 12 | 1 | 0 | 11 | 0 | 0 | 0 | High |
+| M03 CV import | 5 | 0 | 1 | 4 | 0 | 0 | 0 | Medium-high (scanned CVs not supported) |
+| M04 Search | 8 | 0 | 0 | 6 | 1 | 1 | 0 | Medium-high |
+| M05 Collection | 13 | 1 | 9 | 0 | 0 | 1 | 2 | Medium (live sources change; 20 verified) |
+| M06 Sources | 9 | 1 | 0 | 4 | 0 | 1 | 3 | Medium |
+| M07 AI analysis | 8 | 0 | 2 | 6 | 0 | 0 | 0 | Medium (fake provider only) |
+| M08 Matching | 7 | 0 | 0 | 6 | 0 | 0 | 1 | High |
+| M09 Ranking | 7 | 0 | 3 | 4 | 0 | 0 | 0 | High |
+| M10 Opportunity sheet | 12 | 0 | 0 | 8 | 3 | 1 | 0 | Medium-high |
+| M11 Dashboard | 8 | 2 | 0 | 6 | 0 | 0 | 0 | High (now 68 ms at 100 000 rows) |
+| M12 Tracking | 12 | 0 | 0 | 12 | 0 | 0 | 0 | High |
+| M13 Monitoring | 10 | 0 | 0 | 7 | 2 | 0 | 1 | Medium (scheduling while the app is open only) |
+| M14 AI providers | 11 | 1 | 2 | 8 | 0 | 0 | 0 | Medium (no real provider tested) |
+| M15 Workspaces | 8 | 0 | 0 | 7 | 0 | 1 | 0 | High |
+| M16 Exports | 8 | 0 | 0 | 7 | 1 | 0 | 0 | High |
+| M17 Organisations / sync | 12 | 0 | 0 | 9 | 1 | 1 | 1 | Medium (server on SQLite only, no Docker or PostgreSQL run) |
+| M18 Settings | 14 | 4 | 1 | 4 | 1 | 3 | 1 | Medium-high |
+| **Total** | **176** | **15** | **20** | **114** | **9** | **9** | **9** | |
+
+**Distribution**
+
+| Item | Evidence | Status |
+| --- | --- | --- |
+| Windows installer and portable ZIP | Built; silent install, launch, crash-safety and uninstall verified on Windows 11 | Verified (unsigned) |
+| Debian package | Scripts only | Not verified |
+| Sync server container | Dockerfile and Compose only | Not verified |
+
+**Quality**
+- Engine: 135 tests, 89 % coverage; ruff (including bandit rules), format and mypy clean.
+- Sync server: 8 tests.
+- Desktop: 60 tests and a clean analyze, the Windows E2E test, and the 5-minute UI tour (0 layout problems).
+- 166 dependencies with no known vulnerability.
+- Performance: 5 of 8 targets met, 1 partly verified (start-up), 2 not measured.
+
+**Summary.** Version 1.0.0 is a working, tested Windows application. A person can create an encrypted local profile, build a profile or import a CV, search real sources and get explainable scores, track applications with reminders, monitor, export, back up and restore. The optional AI and end-to-end encrypted sync are implemented and tested against local stand-ins.
+
+It is not yet a validated public release:
+- binaries are unsigned;
+- Linux and Docker artefacts were never built;
+- real AI providers, SMTP and PostgreSQL were never exercised;
+- 27 requirements remain absent, partial or untested;
+- legal checks remain open (trademark, licences of third-party packs and sources).

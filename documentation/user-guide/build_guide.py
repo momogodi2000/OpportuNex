@@ -180,6 +180,10 @@ class Guide:
             s.page_width, s.page_height = Cm(21), Cm(29.7)
             s.left_margin = s.right_margin = Cm(2.2)
             s.top_margin = s.bottom_margin = Cm(2.2)
+        # python-docx's template declares Word 2010 compatibility (Word then opens it in "Compatibility Mode").
+        for setting in d.settings.element.iter(qn("w:compatSetting")):
+            if setting.get(qn("w:name")) == "compatibilityMode":
+                setting.set(qn("w:val"), "15")
         props = d.core_properties
         props.title = "Guide utilisateur Opportunex"
         props.subject = f"Opportunex {VERSION}"

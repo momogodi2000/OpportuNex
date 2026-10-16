@@ -99,3 +99,116 @@ def test_reliability_score_rewards_success_and_official_origin() -> None:
     failing = SourceService._reliability({"is_official": 0, "last_status": "failed", "consecutive_failures": 3})
     link = SourceService._reliability({"is_official": 1, "access_method": "manual_link", "consecutive_failures": 9})
     assert ok == pytest.approx(0.9) and failing == pytest.approx(0.2) and link == pytest.approx(0.7)
+
+
+class _Loopback:
+    """Tiny HTTP servers on 127.0.0.1-3 that record how many requests are in flight (ENF-PERF-06/07)."""
+
+    def __init__(self, hosts: int = 3) -> None:
+        import threading
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+        self.guard = threading.Lock()
+        self.now = 0
+        self.peak = 0
+        self.per_host_peak: dict[str, int] = {}
+        self._per_host: dict[str, int] = {}
+        recorder = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args: object) -> None:
+                pass
+
+            def do_GET(self) -> None:
+                import time
+
+                host = self.server.server_address[0]
+                if self.path.startswith("/slow"):
+                    with recorder.guard:
+                        recorder.now += 1
+                        recorder._per_host[host] = recorder._per_host.get(host, 0) + 1
+                        recorder.peak = max(recorder.peak, recorder.now)
+                        recorder.per_host_peak[host] = max(
+                            recorder.per_host_peak.get(host, 0), recorder._per_host[host]
+                        )
+                    time.sleep(0.3)
+                    with recorder.guard:
+                        recorder.now -= 1
+                        recorder._per_host[host] -= 1
+                    body = b"ok"
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                elif self.path == "/big":  # no Content-Length: the size is only known while streaming
+                    self.send_response(200)
+                    self.send_header("Connection", "close")
+                    self.end_headers()
+                    chunk = b"x" * 65536
+                    try:
+                        for _ in range(10 * 16 + 2):  # 10 MB + 128 KB
+                            self.wfile.write(chunk)
+                    except OSError:
+                        pass
+                elif self.path == "/declared":
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(10 * 1024 * 1024 + 1))
+                    self.end_headers()
+                else:
+                    self.send_response(404)
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+
+        self.servers = [ThreadingHTTPServer((f"127.0.0.{i}", 0), Handler) for i in range(1, hosts + 1)]
+        for s in self.servers:
+            threading.Thread(target=s.serve_forever, daemon=True).start()
+
+    def url(self, i: int, path: str) -> str:
+        host, port = self.servers[i].server_address[:2]
+        return f"http://{host}:{port}{path}"
+
+    def close(self) -> None:
+        for s in self.servers:
+            s.shutdown()
+            s.server_close()
+
+
+async def test_one_request_at_a_time_per_domain() -> None:
+    import asyncio
+
+    srv = _Loopback(hosts=1)
+    try:
+        async with PoliteClient(allow_private=True, min_delay=0) as client:
+            await asyncio.gather(*(client.get(srv.url(0, f"/slow?{i}"), use_cache=False) for i in range(3)))
+    finally:
+        srv.close()
+    assert srv.per_host_peak == {"127.0.0.1": 1}
+
+
+async def test_global_concurrency_cap(monkeypatch: pytest.MonkeyPatch) -> None:
+    import asyncio
+
+    import collection.http as http_mod
+
+    monkeypatch.setattr(http_mod, "MAX_CONCURRENCY", 2)
+    srv = _Loopback(hosts=3)
+    try:
+        async with PoliteClient(allow_private=True, min_delay=0) as client:
+            await asyncio.gather(*(client.get(srv.url(i, "/slow"), use_cache=False) for i in range(3)))
+    finally:
+        srv.close()
+    assert srv.peak == 2  # three domains in parallel, but never more than the cap
+
+
+async def test_responses_over_10_mb_are_refused() -> None:
+    from collection.http import FetchError
+
+    srv = _Loopback(hosts=1)
+    try:
+        async with PoliteClient(allow_private=True, min_delay=0) as client:
+            for path in ("/big", "/declared"):
+                with pytest.raises(FetchError) as err:
+                    await client.get(srv.url(0, path), use_cache=False)
+                assert err.value.code == "oversize_response"
+    finally:
+        srv.close()

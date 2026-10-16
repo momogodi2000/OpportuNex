@@ -61,7 +61,7 @@ def test_fresh_database_has_every_schema_object(tmp_path: Path) -> None:
             assert {"sync_shadow", "sync_cursors", "sync_keys", "sync_guard"} <= reflected
             assert conn.exec_driver_sql("PRAGMA foreign_keys").scalar() == 1
             assert conn.exec_driver_sql("PRAGMA journal_mode").scalar() == "wal"
-            assert conn.exec_driver_sql("PRAGMA user_version").scalar() == 102
+            assert conn.exec_driver_sql("PRAGMA user_version").scalar() == 103
         assert db.revision == head_revision()
     finally:
         db.close()
