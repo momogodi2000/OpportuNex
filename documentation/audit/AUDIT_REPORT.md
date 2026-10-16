@@ -449,6 +449,16 @@ Phase 9 — final run (2026-10-16, Windows 11 Pro 10.0.26200, Python 3.14.2, Flu
 | Final installer, silent install in a temp folder | App start to "engine ready": 6.2 s (first launch after install), 2.76 s, 2.59 s; engine exits when the app is killed; installed self-test OK; silent uninstall clean |
 | Packaged app at rest (welcome screen) | 242 MB working set (window 109 MB + engine 133 MB) |
 
+GitHub Actions, first run (push of `9bf49fd` and pull request [momogodi2000/OpportuNex#1](https://github.com/momogodi2000/OpportuNex/pull/1), run 38918059515):
+
+| Job | Result |
+| --- | --- |
+| engine (windows-2022): ruff, format, mypy, pytest, self-test | Passed |
+| engine (ubuntu-24.04) | **Failed at mypy**: `core/parent_watch.py` called the Windows-only `ctypes.WinDLL`, which mypy rejects on Linux. Fixed with a platform block; `mypy --platform linux/darwin/win32` now clean locally. The re-run on GitHub was still pending when this report was written |
+| sync-server: ruff, mypy, pytest | Passed |
+| desktop: pub get, gen-l10n, analyze, test (Ubuntu) | Passed |
+| sync-server-image: `docker compose -f docker-compose.test.yml up --build` + `/v1/health` | **Passed**: image built, container started with PostgreSQL 16, health check OK (first verification of the image) |
+
 Non-functional targets (cahier des charges §ENF-PERF):
 
 | Target | Measured | Status |
@@ -505,14 +515,14 @@ Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.5
 | Application folder | `dist/windows/Opportunex/` (`opportunex.exe`, `engine/opportunex-engine.exe`, `licenses/`) | Built; engine self-test OK |
 | Checksums | `dist/windows/SHA256SUMS.txt` | Produced by the build |
 | Debian package | `dist/linux/opportunex_1.0.0_amd64.deb` (planned path) | **Not produced**: scripts ready (`packaging/linux/`), Docker unavailable on this machine |
-| Sync server image | `sync-server/Dockerfile`, `docker-compose.yml` | **Not built** (Docker unavailable); server tested on SQLite outside a container |
+| Sync server image | `sync-server/Dockerfile`, `docker-compose.yml`, `docker-compose.test.yml` | Built and started with PostgreSQL 16 by GitHub Actions (health check OK); production stack (Caddy TLS, backups) not run |
 | Licence | `LICENSE` (GNU AGPL v3, verbatim), `NOTICE`, `AUTHORS`, `TRADEMARKS.md`, `THIRD_PARTY_NOTICES.md`, `packaging/licenses/` | Done |
 | Community files | `README.md`, `README.en.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CHANGELOG.md` | Done |
 | Word user guide | `documentation/user-guide/Guide_Utilisateur_Opportunex.docx` (53 pages, 41 figures) | Done |
 | Screenshots | `documentation/user-guide/screenshots/` (42 PNG, real application) | Done |
 | Video recordings | `documentation/user-guide/videos/` | **Not produced** (ffmpeg not installed; owner chose to skip); script `documentation/user-guide/tools/record_video.ps1` |
 | Build scripts | `packaging/windows/build.ps1`, `packaging/windows/opportunex.iss`, `packaging/engine/opportunex-engine.spec`, `packaging/linux/{Dockerfile,build-deb.sh,test-deb.sh}` | Windows scripts run; Linux scripts not run |
-| CI | `.github/workflows/ci.yml`, `.github/workflows/release.yml` | Written; never run (nothing pushed) |
+| CI | `.github/workflows/ci.yml`, `.github/workflows/release.yml` | `ci.yml` ran on the pushed branch: 5 of 6 jobs passed, the Linux mypy failure is fixed (see C); `release.yml` not run (no tag) |
 | Audit tools | `engine/tools/{third_party_notices,dependency_audit,benchmark}.py`, `apps/desktop/integration_test/ui_tour_test.dart` | Run in this session |
 | Audit documents | `documentation/audit/AUDIT_REPORT.md`, `documentation/audit/TRACEABILITY.md`, `documentation/DECISIONS.md`, `documentation/LEGAL_DECISIONS_NEEDED.md` | Up to date |
 
@@ -540,15 +550,15 @@ Platform: Windows 11 Pro 10.0.26200, Python 3.14.2, SQLCipher 4.12.0 (SQLite 3.5
   - EF-18.03: regional formats are partly configurable;
   - EF-18.13: shortcuts are fixed, not configurable;
   - EF-18.14: no guided tour.
-- 9 requirements are implemented without an automated test: EF-04.07, 10.03, 10.08, 10.09, 13.06, 13.09, 16.06, 18.09 and 17.09 (Docker image).
+- 8 requirements are implemented without an automated test: EF-04.07, 10.03, 10.08, 10.09, 13.06, 13.09, 16.06 and 18.09.
 - Monitors and sync rounds only run while the application is open (by design, stated in the UI and the guide).
 - 4 contrast findings from the UI tour were reviewed as sampling artifacts (text on chips over tinted backgrounds), not re-measured by hand.
 
 **Tests not run**
-- The `.deb` build and install test, and the sync-server image with PostgreSQL and Caddy (`docker-compose.test.yml`): Docker Desktop does not start on this machine.
+- The `.deb` build and install test (Docker Desktop does not start on this machine; `release.yml` would build it on a version tag). The sync-server image was verified only by CI, without Caddy and without a sync round trip against PostgreSQL.
 - Real AI providers (only a local fake provider in tests), the real OS keychain (tests use the in-memory store), and SMTP delivery for the sync server.
 - ENF-PERF-02 (UI frame times during a collection) and ENF-PERF-04 (full search over 30 live sources).
-- The GitHub Actions workflows (no push was made).
+- `release.yml` (runs on a version tag); the CI re-run after the Linux mypy fix.
 - Usability targets (SUS ≥ 75, 30 beta testers) are human activities outside this work.
 
 **Platforms not verified**
@@ -597,9 +607,9 @@ A build that succeeds, a feature whose engine is tested, and a feature verified 
 | M14 AI providers | 11 | 1 | 2 | 8 | 0 | 0 | 0 | Medium (no real provider tested) |
 | M15 Workspaces | 8 | 0 | 0 | 7 | 0 | 1 | 0 | High |
 | M16 Exports | 8 | 0 | 0 | 7 | 1 | 0 | 0 | High |
-| M17 Organisations / sync | 12 | 0 | 0 | 9 | 1 | 1 | 1 | Medium (server on SQLite only, no Docker or PostgreSQL run) |
+| M17 Organisations / sync | 12 | 0 | 1 | 9 | 0 | 1 | 1 | Medium (image built and started on PostgreSQL in CI; no sync round trip on PostgreSQL) |
 | M18 Settings | 14 | 4 | 1 | 4 | 1 | 3 | 1 | Medium-high |
-| **Total** | **176** | **15** | **20** | **114** | **9** | **9** | **9** | |
+| **Total** | **176** | **15** | **21** | **114** | **8** | **9** | **9** | |
 
 **Distribution**
 
@@ -607,7 +617,7 @@ A build that succeeds, a feature whose engine is tested, and a feature verified 
 | --- | --- | --- |
 | Windows installer and portable ZIP | Built; silent install, launch, crash-safety and uninstall verified on Windows 11 | Verified (unsigned) |
 | Debian package | Scripts only | Not verified |
-| Sync server container | Dockerfile and Compose only | Not verified |
+| Sync server container | Built and health-checked with PostgreSQL 16 in GitHub Actions | Partly verified |
 
 **Quality**
 - Engine: 135 tests, 89 % coverage; ruff (including bandit rules), format and mypy clean.
@@ -620,7 +630,7 @@ A build that succeeds, a feature whose engine is tested, and a feature verified 
 
 It is not yet a validated public release:
 - binaries are unsigned;
-- Linux and Docker artefacts were never built;
+- the Linux package was never built, and the server image only ran a health check in CI;
 - real AI providers, SMTP and PostgreSQL were never exercised;
-- 27 requirements remain absent, partial or untested;
+- 26 requirements remain absent, partial or untested;
 - legal checks remain open (trademark, licences of third-party packs and sources).

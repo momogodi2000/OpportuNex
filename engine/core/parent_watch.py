@@ -17,22 +17,26 @@ POLL_SECONDS = 2.0
 
 
 def _wait_windows(pid: int) -> None:
-    import ctypes
-    from ctypes import wintypes
+    # The platform check lets type checkers on Linux and macOS skip these Win32-only calls (CI runs mypy there).
+    if sys.platform != "win32":
+        raise OSError("Win32 only")
+    else:
+        import ctypes
+        from ctypes import wintypes
 
-    synchronize, infinite = 0x00100000, 0xFFFFFFFF
-    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    kernel32.OpenProcess.restype = wintypes.HANDLE
-    kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
-    kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
-    kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
-    handle = kernel32.OpenProcess(synchronize, False, pid)
-    if not handle:  # already gone (or not ours): nothing to wait for
-        return
-    try:
-        kernel32.WaitForSingleObject(handle, infinite)
-    finally:
-        kernel32.CloseHandle(handle)
+        synchronize, infinite = 0x00100000, 0xFFFFFFFF
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.OpenProcess.restype = wintypes.HANDLE
+        kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        handle = kernel32.OpenProcess(synchronize, False, pid)
+        if not handle:  # already gone (or not ours): nothing to wait for
+            return
+        try:
+            kernel32.WaitForSingleObject(handle, infinite)
+        finally:
+            kernel32.CloseHandle(handle)
 
 
 def _alive_posix(pid: int) -> bool:
